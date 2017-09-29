@@ -16,14 +16,16 @@ You can test the trained model on the converted dataset by
 ```
 python tools/test_shadownet.py --dataset_dir path/to/your/tfrecords --weights_path path/to/your/ckpt/model_weights
 ```
+Expected output is
+![Test output](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_output.png)
 If you want to test a single image you can do it by
 ```
 python tools/demo_shadownet.py --image_path path/to/your/test_image --weights_path path/to/your/ckpt/model_weights
 ```
-
-The test result can be list as follows:
-![Test result](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_result.png)
-
+Example image is
+![Example image](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image.png)
+Expected output is
+![Example image output](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image_output.png)
 
 ## Train your own model
 #### Data Preparation
@@ -34,12 +36,11 @@ path/1/2/373_coley_14845.jpg coley
 path/17/5/176_Nevadans_51437.jpg nevadans
 ```
 
-Secondly you are supposed to convert your dataset into tensorflow records here I supply a tool to automaticlly convert your dataset into tfrecords.
-
+Secondly you are supposed to convert your dataset into tensorflow records which can be done by
 ```
 python tools/write_text_features --dataset_dir path/to/your/dataset --save_dir path/to/tfrecords_dir
 ```
-All your training image will be scaled into 32*100*3 the dataset will be divided into train, test, validation set and you can change the parameter to control the ratio of them.
+All your training image will be scaled into (32, 100, 3) the dataset will be divided into train, test, validation set and you can change the parameter to control the ratio of them.
 
 #### Train model
 The whole training epoches are 40000 in my experiment. I trained the model with a batch size 32, initialized learning rate is 0.1 and decrease by multiply 0.1 every 10000 epochs. About training parameters you can check the global_configuration/config.py for details. To train your own model by
