@@ -1,2 +1,63 @@
 # CRNN_Tensorflow
-CRNN Tensorflow text recongnition
+Use tensorflow to implement a Deep Neural Network for scene text recognition mainly based on the paper "An End-to-End Trainable Neural Network for Image-based Sequence Recognition and Its Application to Scene Text Recognition".You can refer to their paper for details http://arxiv.org/abs/1507.05717.
+This model consists of a CNN stage, RNN stage and CTC loss for scene text recognition task.
+
+## Installation
+This software has only been tested on ubuntu 16.04(x64), cuda-8.0, cudnn-6.0 with a GTX-1070 GPU. To install this software you need to install the tensorflow 1.3.0 and I didn't test it on other version of tensorflow but I think it will be to work properly in tensorflow above version 1.0. Other required package you may install them by
+
+```
+pip3 install -r requirements.txt
+```
+
+## Test model
+In this repo I upload a model trained on a subset of the [Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/). During data preparation process the dataset is converted into a tensorflow records which you can find in the data folder.
+You can test the trained model by
+
+```
+python tools/test_shadownet.py --dataset_dir data/ --weights_path model/shadownet/shadownet.ckpt
+```
+
+The test result can be list as follows:
+![Test result](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_result.png)
+
+
+## Train your own model
+#### Data Preparation
+Firstly you need to store all your image data in a root folder then you need to supply a txt file named sample.txt to specify the relative path to the image data dir and it's corresponding text label. For example
+
+```
+path/1/2/373_coley_14845.jpg coley
+path/17/5/176_Nevadans_51437.jpg nevadans
+```
+
+Secondly you are supposed to convert your dataset into tensorflow records here I supply a tool to automaticlly convert your dataset into tfrecords.
+
+```
+python tools/write_text_features --dataset_dir path/to/your/dataset --save_dir path/to/tfrecords_dir
+```
+All your training image will be scaled into 32*100*3 the dataset will be divided into train, test, validation set and you can change the parameter to control the ratio of them.
+
+#### Train model
+The whold training epoches are 40000 in my experiment. I trained the model with a batch size 32, initialized learning rate is 0.1 and decrease by multiply 0.1 every 10000 epochs. About training parameters you can check the global_configuration/config.py for details. To train your own model by
+
+```
+python tools/train_shadownet.py --dataset_dir path/to/your/tfrecords
+```
+You can also continue the training process from the snapshot by
+```
+python tools/train_shadownet.py --dataset_dir path/to/your/tfrecords --weights_path path/to/your/last/checkpoint
+```
+After several times of iteration you can check the log file in logs folder you are supposed to see the following contenent
+![Training log](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/train_log.png)
+The accuracy are computed by calculate the distance between two saparse tensor so the lower the accuracy value is the better the model performs.
+
+During my experiment the loss drops as follows
+![Training loss](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/train_loss.png)
+
+## Experiment
+The accuracy during training process rises as follows
+![Training accuracy](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/training_accuracy.md)
+
+
+
+
