@@ -42,7 +42,7 @@ python tools/write_text_features --dataset_dir path/to/your/dataset --save_dir p
 All your training image will be scaled into 32*100*3 the dataset will be divided into train, test, validation set and you can change the parameter to control the ratio of them.
 
 #### Train model
-The whold training epoches are 40000 in my experiment. I trained the model with a batch size 32, initialized learning rate is 0.1 and decrease by multiply 0.1 every 10000 epochs. About training parameters you can check the global_configuration/config.py for details. To train your own model by
+The whole training epoches are 40000 in my experiment. I trained the model with a batch size 32, initialized learning rate is 0.1 and decrease by multiply 0.1 every 10000 epochs. About training parameters you can check the global_configuration/config.py for details. To train your own model by
 
 ```
 python tools/train_shadownet.py --dataset_dir path/to/your/tfrecords
@@ -53,7 +53,7 @@ python tools/train_shadownet.py --dataset_dir path/to/your/tfrecords --weights_p
 ```
 After several times of iteration you can check the log file in logs folder you are supposed to see the following contenent
 ![Training log](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/train_log.png)
-The accuracy are computed by calculate the distance between two saparse tensor so the lower the accuracy value is the better the model performs.
+The seq distance is computed by calculating the distance between two saparse tensor so the lower the accuracy value is the better the model performs.The train accuracy is computed by calculating the character-wise precision between the prediction and the ground truth so the higher the better the model performs.
 
 During my experiment the loss drops as follows
 ![Training loss](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/train_loss.png)
