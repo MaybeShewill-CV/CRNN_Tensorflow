@@ -11,10 +11,14 @@ pip3 install -r requirements.txt
 
 ## Test model
 In this repo I upload a model trained on a subset of the [Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/). During data preparation process the dataset is converted into a tensorflow records which you can find in the data folder.
-You can test the trained model by
+You can test the trained model on the converted dataset by
 
 ```
-python tools/test_shadownet.py --dataset_dir data/ --weights_path model/shadownet/shadownet.ckpt
+python tools/test_shadownet.py --dataset_dir path/to/your/tfrecords --weights_path path/to/your/ckpt/model_weights
+```
+If you want to test a single image you can do it by
+```
+python tools/demo_shadownet.py --image_path path/to/your/test_image --weights_path path/to/your/ckpt/model_weights
 ```
 
 The test result can be list as follows:
