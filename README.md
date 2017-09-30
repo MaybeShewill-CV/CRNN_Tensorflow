@@ -17,19 +17,19 @@ You can test the trained model on the converted dataset by
 python tools/test_shadownet.py --dataset_dir data/ --weights_path model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999
 ```
 Expected output is
-![Test output](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_output.png)
+![Test output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_out.png)
 If you want to test a single image you can do it by
 ```
 python tools/demo_shadownet.py --image_path data/test_images/test_01.jpg --weights_path model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999
 ```
 Example image_01 is
-![Example image](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image1.png)
+![Example image](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image1.png)
 Expected output_01 is
 ![Example image output](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image1_output.png)
 Example image_02 is
-![Example image](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image2.png)
+![Example image](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image2.png)
 Expected output_02 is
-![Example image output](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image2_output.png)
+![Example image output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image2_output.png)
 
 ## Train your own model
 #### Data Preparation
@@ -57,17 +57,17 @@ You can also continue the training process from the snapshot by
 python tools/train_shadownet.py --dataset_dir path/to/your/tfrecords --weights_path path/to/your/last/checkpoint
 ```
 After several times of iteration you can check the log file in logs folder you are supposed to see the following contenent
-![Training log](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/train_log.png)
+![Training log](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/train_log.png)
 The seq distance is computed by calculating the distance between two saparse tensor so the lower the accuracy value is the better the model performs.The train accuracy is computed by calculating the character-wise precision between the prediction and the ground truth so the higher the better the model performs.
 
 During my experiment the loss drops as follows
-![Training loss](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/train_loss.png)
+![Training loss](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/train_loss.png)
 The distance between the ground truth and the prediction drops as follows
-![Sequence distance](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/seq_distance.png)
+![Sequence distance](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/seq_distance.png)
 
 ## Experiment
 The accuracy during training process rises as follows
-![Training accuracy](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/training_accuracy.md)
+![Training accuracy](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/training_accuracy.md)
 
 ## TODO
 The model is trained on a subet of [Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/). So i will train a new model on the whold dataset to get a more robust model.The crnn model needs large of training data to get a rubust model.
