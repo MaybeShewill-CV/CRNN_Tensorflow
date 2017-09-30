@@ -16,19 +16,19 @@ You can test the trained model on the converted dataset by
 ```
 python tools/test_shadownet.py --dataset_dir data/ --weights_path model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999
 ```
-Expected output is
+`Expected output is`  
 ![Test output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_output.png)
 If you want to test a single image you can do it by
 ```
 python tools/demo_shadownet.py --image_path data/test_images/test_01.jpg --weights_path model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999
 ```
-Example image_01 is
+`Example image_01 is`  
 ![Example image1](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/text_example_image1.png)
-Expected output_01 is
+`Expected output_01 is`  
 ![Example image1 output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image1_output.png)
-Example image_02 is
+`Example image_02 is`  
 ![Example image2](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image2.png)
-Expected output_02 is
+`Expected output_02 is`  
 ![Example image2 output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image2_output.png)
 
 ## Train your own model
@@ -60,13 +60,13 @@ After several times of iteration you can check the log file in logs folder you a
 ![Training log](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/train_log.png)
 The seq distance is computed by calculating the distance between two saparse tensor so the lower the accuracy value is the better the model performs.The train accuracy is computed by calculating the character-wise precision between the prediction and the ground truth so the higher the better the model performs.
 
-During my experiment the loss drops as follows
+During my experiment the `loss` drops as follows  
 ![Training loss](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/train_loss.png)
-The distance between the ground truth and the prediction drops as follows
+The `distance` between the ground truth and the prediction drops as follows  
 ![Sequence distance](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/seq_distance.png)
 
 ## Experiment
-The accuracy during training process rises as follows
+The accuracy during training process rises as follows  
 ![Training accuracy](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/training_accuracy.md)
 
 ## TODO
