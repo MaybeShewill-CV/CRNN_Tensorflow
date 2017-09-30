@@ -17,19 +17,19 @@ You can test the trained model on the converted dataset by
 python tools/test_shadownet.py --dataset_dir data/ --weights_path model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999
 ```
 Expected output is
-![Test output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_out.png)
+![Test output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_output.png)
 If you want to test a single image you can do it by
 ```
 python tools/demo_shadownet.py --image_path data/test_images/test_01.jpg --weights_path model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999
 ```
 Example image_01 is
-![Example image](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image1.png)
+![Example image1](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/text_example_image1.png)
 Expected output_01 is
-![Example image output](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image1_output.png)
+![Example image1 output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image1_output.png)
 Example image_02 is
-![Example image](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image2.png)
+![Example image2](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image2.png)
 Expected output_02 is
-![Example image output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image2_output.png)
+![Example image2 output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image2_output.png)
 
 ## Train your own model
 #### Data Preparation
