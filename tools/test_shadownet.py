@@ -42,7 +42,7 @@ def test_shadownet(dataset_dir, weights_path, is_vis=True):
     # Initialize the record decoder
     decoder = data_utils.TextFeatureIO().reader
     images_t, labels_t, imagenames_t = decoder.read_features(
-        ops.join(dataset_dir, 'train_feature.tfrecords'), num_epochs=None)
+        ops.join(dataset_dir, 'test_feature.tfrecords'), num_epochs=None)
     images_sh, labels_sh, imagenames_sh = tf.train.shuffle_batch(tensors=[images_t, labels_t, imagenames_t],
                                                                  batch_size=32, capacity=1000+32*2, min_after_dequeue=2,
                                                                  num_threads=4)
@@ -79,11 +79,9 @@ def test_shadownet(dataset_dir, weights_path, is_vis=True):
         predictions, images, labels, imagenames = sess.run([decoded, images_sh, labels_sh, imagenames_sh])
         imagenames = np.reshape(imagenames, newshape=imagenames.shape[0])
         imagenames = [tmp.decode('utf-8') for tmp in imagenames]
-        preds, preds_res = decoder.sparse_tensor_to_str(predictions[0])
-        gt_labels, gt_res = decoder.sparse_tensor_to_str(labels)
+        preds_res = decoder.sparse_tensor_to_str(predictions[0])
+        gt_res = decoder.sparse_tensor_to_str(labels)
         for index, image in enumerate(images):
-            # prediction = decoder.sparse_tensor_to_str(predictions[index])
-            # label = decoder.sparse_tensor_to_str(labels[index])
             print('Predict {:s} image with gt label: {:s} **** predict label: {:s}'.format(
                 imagenames[index], gt_res[index], preds_res[index]))
             if is_vis:

@@ -61,7 +61,7 @@ def train_shadownet(dataset_dir, weights_path=None):
 
     decoded, log_prob = tf.nn.ctc_beam_search_decoder(net_out, 25*np.ones(32), merge_repeated=False)
 
-    accuracy = tf.reduce_mean(tf.edit_distance(tf.cast(decoded[0], tf.int32), input_labels))
+    sequence_dist = tf.reduce_mean(tf.edit_distance(tf.cast(decoded[0], tf.int32), input_labels))
 
     global_step = tf.Variable(0, name='global_step', trainable=False)
 
@@ -80,7 +80,7 @@ def train_shadownet(dataset_dir, weights_path=None):
         os.makedirs(tboard_save_path)
     tf.summary.scalar(name='Cost', tensor=cost)
     tf.summary.scalar(name='Learning_Rate', tensor=learning_rate)
-    tf.summary.scalar(name='Accuracy', tensor=accuracy)
+    tf.summary.scalar(name='Seq_Dist', tensor=sequence_dist)
     merge_summary_op = tf.summary.merge_all()
 
     # Set saver configuration
@@ -118,11 +118,38 @@ def train_shadownet(dataset_dir, weights_path=None):
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
         for epoch in range(train_epochs):
-            _, c, train_accuracy, summary = sess.run([optimizer, cost, accuracy, merge_summary_op])
+            _, c, seq_distance, preds, gt_labels, summary = sess.run(
+                [optimizer, cost, sequence_dist, decoded, input_labels, merge_summary_op])
+
+            # calculate the precision
+            preds = decoder.sparse_tensor_to_str(preds[0])
+            gt_labels = decoder.sparse_tensor_to_str(gt_labels)
+
+            accuracy = []
+
+            for index, gt_label in enumerate(gt_labels):
+                pred = preds[index]
+                totol_count = len(gt_label)
+                correct_count = 0
+                try:
+                    for i, tmp in enumerate(gt_label):
+                        if tmp == pred[i]:
+                            correct_count += 1
+                except IndexError:
+                    continue
+                finally:
+                    try:
+                        accuracy.append(correct_count / totol_count)
+                    except ZeroDivisionError:
+                        if len(pred) == 0:
+                            accuracy.append(1)
+                        else:
+                            accuracy.append(0)
+            accuracy = np.mean(np.array(accuracy).astype(np.float32), axis=0)
 
             if epoch % config.cfg.TRAIN.DISPLAY_STEP == 0:
-                logger.info('Epoch: {:d} cost= {:9f} training accuracy= {:9f}'.format(
-                    epoch + 1, c, train_accuracy))
+                logger.info('Epoch: {:d} cost= {:9f} seq distance= {:9f} train accuracy= {:9f}'.format(
+                    epoch + 1, c, seq_distance, accuracy))
 
             summary_writer.add_summary(summary=summary, global_step=epoch)
             saver.save(sess=sess, save_path=model_save_path, global_step=epoch)

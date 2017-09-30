@@ -109,7 +109,7 @@ class FeatureIO(object):
 
     def encode_labels(self, labels):
         """
-        encode the labels for ctc loss
+            encode the labels for ctc loss
         :param labels:
         :return:
         """
@@ -142,16 +142,13 @@ class FeatureIO(object):
         number_lists = np.ones(dense_shape, dtype=values.dtype)
         str_lists = []
         res = []
-        str_tmp = ''
         for i, index in enumerate(indices):
             number_lists[index[0], index[1]] = values[i]
         for number_list in number_lists:
             str_lists.append([self.int_to_char(val) for val in number_list])
         for str_list in str_lists:
             res.append(''.join(c for c in str_list if c != '1'))
-        for str_list in str_lists:
-            str_tmp += ''.join(str_list)
-        return str_tmp, res
+        return res
 
 
 class TextFeatureWriter(FeatureIO):

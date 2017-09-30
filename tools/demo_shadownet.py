@@ -33,9 +33,9 @@ def init_args():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('--image_path', type=str, help='Where you store the image',
-                        default='/home/baidu/DataBase/Sequence_Recognition/Train/1/2/373_coley_14845.jpg')
+                        default='data/test_images/test_01.jpg')
     parser.add_argument('--weights_path', type=str, help='Where you store the weights',
-                        default='/home/baidu/CRNN_Tensorflow/model/shadownet/shadownet_2017-09-29-15-22-43.ckpt-4910')
+                        default='model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999')
 
     return parser.parse_args()
 
@@ -79,7 +79,7 @@ def recognize(image_path, weights_path, is_vis=True):
 
         preds = sess.run(decodes, feed_dict={inputdata: image})
 
-        _, preds = decoder.writer.sparse_tensor_to_str(preds[0])
+        preds = decoder.writer.sparse_tensor_to_str(preds[0])
 
         logger.info('Predict image {:s} label {:s}'.format(ops.split(image_path)[1], preds[0]))
 

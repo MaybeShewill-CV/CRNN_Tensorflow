@@ -24,6 +24,7 @@ class Dataset(object):
 
         :param images:
         :param labels:
+        :param imagenames:
         :return:
         """
         images = np.array(images)
