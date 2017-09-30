@@ -3,29 +3,33 @@ Use tensorflow to implement a Deep Neural Network for scene text recognition mai
 This model consists of a CNN stage, RNN stage and CTC loss for scene text recognition task.
 
 ## Installation
-This software has only been tested on ubuntu 16.04(x64), cuda-8.0, cudnn-6.0 with a GTX-1070 GPU. To install this software you need to install the tensorflow 1.3.0 and I didn't test it on other version of tensorflow but I think it will be to work properly in tensorflow above version 1.0. Other required package you may install them by
+This software has only been tested on ubuntu 16.04(x64), cuda-8.0, cudnn-6.0 with a GTX-1070 GPU. To install this software you need tensorflow 1.3.0 and other version of tensorflow has not been tested but I think it will be to work properly in tensorflow above version 1.0. Other required package you may install them by
 
 ```
 pip3 install -r requirements.txt
 ```
 
 ## Test model
-In this repo I upload a model trained on a subset of the [Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/). During data preparation process the dataset is converted into a tensorflow records which you can find in the data folder.
+In this repo I uploaded a model trained on a subset of the [Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/). During data preparation process the dataset is converted into a tensorflow records which you can find in the data folder.
 You can test the trained model on the converted dataset by
 
 ```
-python tools/test_shadownet.py --dataset_dir path/to/your/tfrecords --weights_path path/to/your/ckpt/model_weights
+python tools/test_shadownet.py --dataset_dir data/ --weights_path model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999
 ```
 Expected output is
 ![Test output](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_output.png)
 If you want to test a single image you can do it by
 ```
-python tools/demo_shadownet.py --image_path path/to/your/test_image --weights_path path/to/your/ckpt/model_weights
+python tools/demo_shadownet.py --image_path data/test_images/test_01.jpg --weights_path model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999
 ```
-Example image is
-![Example image](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image.png)
-Expected output is
-![Example image output](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image_output.png)
+Example image_01 is
+![Example image](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image1.png)
+Expected output_01 is
+![Example image output](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image1_output.png)
+Example image_02 is
+![Example image](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image2.png)
+Expected output_02 is
+![Example image output](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/test_example_image2_output.png)
 
 ## Train your own model
 #### Data Preparation
@@ -58,11 +62,15 @@ The seq distance is computed by calculating the distance between two saparse ten
 
 During my experiment the loss drops as follows
 ![Training loss](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/train_loss.png)
+The distance between the ground truth and the prediction drops as follows
+![Sequence distance](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/seq_distance.png)
 
 ## Experiment
 The accuracy during training process rises as follows
 ![Training accuracy](https://github.com/TJCVRS/CRNN_Tensorflow/data/images/training_accuracy.md)
 
+## TODO
+The model is trained on a subet of [Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/). So i will train a new model on the whold dataset to get a more robust model.The crnn model needs large of training data to get a rubust model.
 
 
 
