@@ -146,7 +146,7 @@ def train_shadownet(dataset_dir, weights_path=None):
                         else:
                             accuracy.append(0)
             accuracy = np.mean(np.array(accuracy).astype(np.float32), axis=0)
-
+            #
             if epoch % config.cfg.TRAIN.DISPLAY_STEP == 0:
                 logger.info('Epoch: {:d} cost= {:9f} seq distance= {:9f} train accuracy= {:9f}'.format(
                     epoch + 1, c, seq_distance, accuracy))
