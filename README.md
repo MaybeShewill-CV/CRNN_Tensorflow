@@ -3,7 +3,7 @@ Use tensorflow to implement a Deep Neural Network for scene text recognition mai
 This model consists of a CNN stage, RNN stage and CTC loss for scene text recognition task.
 
 ## Installation
-This software has only been tested on ubuntu 16.04(x64), cuda-8.0, cudnn-6.0 with a GTX-1070 GPU. To install this software you need tensorflow 1.3.0 and other version of tensorflow has not been tested but I think it will be to work properly in tensorflow above version 1.0. Other required package you may install them by
+This software has only been tested on ubuntu 16.04(x64), python3.5, cuda-8.0, cudnn-6.0 with a GTX-1070 GPU. To install this software you need tensorflow 1.3.0 and other version of tensorflow has not been tested but I think it will be to work properly in tensorflow above version 1.0. Other required package you may install them by
 
 ```
 pip3 install -r requirements.txt
