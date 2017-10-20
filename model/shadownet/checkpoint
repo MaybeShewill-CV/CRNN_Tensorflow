@@ -1,2 +1,6 @@
-model_checkpoint_path: "shadownet_2017-09-29-19-16-33.ckpt-39999"
-all_model_checkpoint_paths: "shadownet_2017-09-29-19-16-33.ckpt-39999"
+model_checkpoint_path: "shadownet_2017-10-17-11-47-46.ckpt-199999"
+all_model_checkpoint_paths: "shadownet_2017-10-17-11-47-46.ckpt-199995"
+all_model_checkpoint_paths: "shadownet_2017-10-17-11-47-46.ckpt-199996"
+all_model_checkpoint_paths: "shadownet_2017-10-17-11-47-46.ckpt-199997"
+all_model_checkpoint_paths: "shadownet_2017-10-17-11-47-46.ckpt-199998"
+all_model_checkpoint_paths: "shadownet_2017-10-17-11-47-46.ckpt-199999"
