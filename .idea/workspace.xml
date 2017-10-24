@@ -2,44 +2,23 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9d7162d6-97d8-473f-b2c9-42b0ff26d2fe" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/images/seq_distance.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/images/test_example_image1_output.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/images/test_example_image2.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/images/test_example_image2_output.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/images/test_output.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/images/text_example_image1.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/images/train_log.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/images/train_loss.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/test_feature.tfrecords" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/test_images/test_01.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/test_images/test_02.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/test_images/test_03.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/train_feature.tfrecords" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999.index" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tboard/shadownet/events.out.tfevents.1506683793.baidu-pc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/CRNN_Tensorflow.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/requirements.txt" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/model/shadownet/shadownet_2017-09-29-15-22-43.ckpt-4910.index" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/model/shadownet/shadownet_2017-09-29-15-22-43.ckpt-4910.meta" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/tboard/shadownet/events.out.tfevents.1506669724.baidu-pc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/tboard/shadownet/events.out.tfevents.1506669763.baidu-pc" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/tools/decode_cifar_10.py" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/tools/logs/shadownet.log.log.wf" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/tools/read_text_features.py" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/model/shadownet/shadownet_2017-09-29-15-22-43.ckpt-4910.data-00000-of-00001" afterPath="$PROJECT_DIR$/model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999.data-00000-of-00001" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/tboard/shadownet/events.out.tfevents.1506669686.baidu-pc" afterPath="$PROJECT_DIR$/model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999.meta" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_provider/base_data_provider.py" afterPath="$PROJECT_DIR$/data_provider/base_data_provider.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/global_configuration/config.py" afterPath="$PROJECT_DIR$/global_configuration/config.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/local_utils/data_utils.py" afterPath="$PROJECT_DIR$/local_utils/data_utils.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/model/shadownet/shadownet_2017-10-17-11-47-46.ckpt-199999.index" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tboard/shadownet/events.out.tfevents.1507547419.baidu-pc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tboard/shadownet/events.out.tfevents.1507601187.baidu-pc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tboard/shadownet/events.out.tfevents.1507601236.baidu-pc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tboard/shadownet/events.out.tfevents.1508212066.baidu-pc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tboard/shadownet/events.out.tfevents.1508379528.baidu-pc" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/logs/shadownet.log.2017-09-30" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/logs/shadownet.log.2017-10-17" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999.index" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999.data-00000-of-00001" afterPath="$PROJECT_DIR$/model/shadownet/shadownet_2017-10-17-11-47-46.ckpt-199999.data-00000-of-00001" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999.meta" afterPath="$PROJECT_DIR$/model/shadownet/shadownet_2017-10-17-11-47-46.ckpt-199999.meta" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/images/seq_distance.png" afterPath="$PROJECT_DIR$/data/images/seq_distance.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/images/train_loss.png" afterPath="$PROJECT_DIR$/data/images/train_loss.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model/shadownet/checkpoint" afterPath="$PROJECT_DIR$/model/shadownet/checkpoint" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tools/demo_shadownet.py" afterPath="$PROJECT_DIR$/tools/demo_shadownet.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tools/test_shadownet.py" afterPath="$PROJECT_DIR$/tools/test_shadownet.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tools/train_shadownet.py" afterPath="$PROJECT_DIR$/tools/train_shadownet.py" />
     </list>
+    <ignored path="$PROJECT_DIR$/.idea/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -47,13 +26,16 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FavoritesManager">
+    <favorites_list name="CRNN_Tensorflow" />
+  </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="train_shadownet.py" pinned="false" current-in-tab="true">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="train_shadownet.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tools/train_shadownet.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="164" column="26" lean-forward="true" selection-start-line="164" selection-start-column="26" selection-end-line="164" selection-end-column="26" />
+            <state relative-caret-position="236">
+              <caret line="140" column="24" lean-forward="false" selection-start-line="140" selection-start-column="24" selection-end-line="140" selection-end-column="24" />
               <folding>
                 <element signature="e#231#240#0" expanded="true" />
               </folding>
@@ -61,45 +43,47 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="data_provider.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/data_provider/data_provider.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-3121">
-              <caret line="20" column="0" lean-forward="true" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="config.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/global_configuration/config.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="43" column="14" lean-forward="false" selection-start-line="43" selection-start-column="14" selection-end-line="43" selection-end-column="14" />
+            <state relative-caret-position="304">
+              <caret line="16" column="0" lean-forward="false" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test_shadownet.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tools/test_shadownet.py">
+      <file leaf-file-name="data_utils.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/local_utils/data_utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-784">
-              <caret line="38" column="18" lean-forward="false" selection-start-line="38" selection-start-column="18" selection-end-line="38" selection-end-column="18" />
+            <state relative-caret-position="3363">
+              <caret line="177" column="32" lean-forward="false" selection-start-line="177" selection-start-column="32" selection-end-line="177" selection-end-column="32" />
               <folding>
-                <element signature="e#229#250#0" expanded="true" />
+                <element signature="e#289#307#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="demo_shadownet.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tools/demo_shadownet.py">
+      <file leaf-file-name="write_text_features.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tools/write_text_features.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-347">
-              <caret line="52" column="9" lean-forward="false" selection-start-line="52" selection-start-column="4" selection-end-line="52" selection-end-column="9" />
+            <state relative-caret-position="256">
+              <caret line="49" column="39" lean-forward="false" selection-start-line="49" selection-start-column="39" selection-end-line="49" selection-end-column="39" />
               <folding>
-                <element signature="e#249#272#0" expanded="true" />
+                <element signature="e#255#264#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="make_new_samples.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/tools/make_new_samples.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="769">
+              <caret line="41" column="51" lean-forward="false" selection-start-line="41" selection-start-column="51" selection-end-line="41" selection-end-column="51" />
+              <folding>
+                <element signature="e#201#210#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -121,6 +105,7 @@
       <find>seq_length</find>
       <find>W</find>
       <find>print</find>
+      <find>55</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -140,12 +125,16 @@
         <option value="$PROJECT_DIR$/global_configuration/config.py" />
         <option value="$PROJECT_DIR$/logs/shadownet.log" />
         <option value="$PROJECT_DIR$/requirements.txt" />
-        <option value="$PROJECT_DIR$/tools/train_shadownet.py" />
         <option value="$PROJECT_DIR$/tools/analysis_log.py" />
-        <option value="$PROJECT_DIR$/tools/test_shadownet.py" />
         <option value="$PROJECT_DIR$/tools/demo_shadownet.py" />
         <option value="$PROJECT_DIR$/data_provider/base_data_provider.py" />
+        <option value="$PROJECT_DIR$/tools/test.py" />
+        <option value="$PROJECT_DIR$/tools/test_shadownet.py" />
+        <option value="$PROJECT_DIR$/local_utils/establish_char_dict.py" />
+        <option value="$PROJECT_DIR$/tools/train_shadownet.py" />
         <option value="$PROJECT_DIR$/local_utils/data_utils.py" />
+        <option value="$PROJECT_DIR$/tools/make_train_sample.py" />
+        <option value="$PROJECT_DIR$/tools/make_new_samples.py" />
       </list>
     </option>
   </component>
@@ -171,7 +160,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -182,18 +171,28 @@
             <path>
               <item name="CRNN_Tensorflow" type="b2602c69:ProjectViewProjectNode" />
               <item name="CRNN_Tensorflow" type="462c0819:PsiDirectoryNode" />
+              <item name="crnn_model" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="CRNN_Tensorflow" type="b2602c69:ProjectViewProjectNode" />
+              <item name="CRNN_Tensorflow" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="CRNN_Tensorflow" type="b2602c69:ProjectViewProjectNode" />
+              <item name="CRNN_Tensorflow" type="462c0819:PsiDirectoryNode" />
               <item name="tools" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="fileTemplates" />
-    <property name="last_opened_file_path" value="$USER_HOME$/crnn-tensorflow" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
@@ -225,7 +224,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.demo_shadownet">
+  <component name="RunManager" selected="Python.train_shadownet">
     <configuration name="analysis_log" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -243,53 +242,19 @@
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
-    <configuration name="cnn_basenet" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="data_utils" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/crnn_model" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/local_utils" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="CRNN_Tensorflow" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/crnn_model/cnn_basenet.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-    </configuration>
-    <configuration name="crnn_model" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/crnn_model" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="CRNN_Tensorflow" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/crnn_model/crnn_model.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-    </configuration>
-    <configuration name="decode_cifar_10" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tools" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="CRNN_Tensorflow" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/decode_cifar_10.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/local_utils/data_utils.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -307,6 +272,40 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="CRNN_Tensorflow" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/demo_shadownet.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
+    <configuration name="establish_char_dict" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/local_utils" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="CRNN_Tensorflow" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/local_utils/establish_char_dict.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+    </configuration>
+    <configuration name="make_train_sample" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tools" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="CRNN_Tensorflow" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/make_train_sample.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -358,7 +357,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="CRNN_Tensorflow" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/train_shadownet.py" />
-      <option name="PARAMETERS" value="--dataset_dir $USER_HOME$/DataBase/Sequence_Recognition/tfrecords --weights_path model/shadownet/shadownet_2017-09-29-16-50-32.ckpt-30376" />
+      <option name="PARAMETERS" value="--dataset_dir $USER_HOME$/DataBase/Sequence_Recognition/tfrecords" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
@@ -375,7 +374,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="CRNN_Tensorflow" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tools/write_text_features.py" />
-      <option name="PARAMETERS" value="--dataset_dir $USER_HOME$/DataBase/Sequence_Recognition --save_dir $USER_HOME$/DataBase/Sequence_Recognition/tfrecords" />
+      <option name="PARAMETERS" value="--dataset_dir $USER_HOME$/DataBase/Sequence_Recognition/Synth_90K --save_dir $USER_HOME$/DataBase/Sequence_Recognition/Synth_90K/tfrecords" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
     </configuration>
@@ -384,19 +383,19 @@
       <item index="1" class="java.lang.String" itemvalue="Python.write_text_features" />
       <item index="2" class="java.lang.String" itemvalue="Python.read_text_features" />
       <item index="3" class="java.lang.String" itemvalue="Python.test_shadownet" />
-      <item index="4" class="java.lang.String" itemvalue="Python.decode_cifar_10" />
-      <item index="5" class="java.lang.String" itemvalue="Python.crnn_model" />
-      <item index="6" class="java.lang.String" itemvalue="Python.cnn_basenet" />
-      <item index="7" class="java.lang.String" itemvalue="Python.demo_shadownet" />
-      <item index="8" class="java.lang.String" itemvalue="Python.analysis_log" />
+      <item index="4" class="java.lang.String" itemvalue="Python.demo_shadownet" />
+      <item index="5" class="java.lang.String" itemvalue="Python.analysis_log" />
+      <item index="6" class="java.lang.String" itemvalue="Python.establish_char_dict" />
+      <item index="7" class="java.lang.String" itemvalue="Python.data_utils" />
+      <item index="8" class="java.lang.String" itemvalue="Python.make_train_sample" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Python.demo_shadownet" />
-        <item index="1" class="java.lang.String" itemvalue="Python.analysis_log" />
-        <item index="2" class="java.lang.String" itemvalue="Python.decode_cifar_10" />
-        <item index="3" class="java.lang.String" itemvalue="Python.crnn_model" />
-        <item index="4" class="java.lang.String" itemvalue="Python.cnn_basenet" />
+        <item index="0" class="java.lang.String" itemvalue="Python.make_train_sample" />
+        <item index="1" class="java.lang.String" itemvalue="Python.establish_char_dict" />
+        <item index="2" class="java.lang.String" itemvalue="Python.data_utils" />
+        <item index="3" class="java.lang.String" itemvalue="Python.demo_shadownet" />
+        <item index="4" class="java.lang.String" itemvalue="Python.analysis_log" />
       </list>
     </recent_temporary>
   </component>
@@ -413,28 +412,77 @@
     </task>
     <servers />
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
-    <frame x="3" y="-4" width="1855" height="1092" extended-state="6" />
+    <frame x="67" y="-4" width="1853" height="1084" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26342005" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32984293" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3539267" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32984293" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37068063" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32984293" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug Logs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37068063" sideWeight="0.5019369" order="5" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5371728" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33926702" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32984293" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Execute Anonymous" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32984293" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23021583" sideWeight="0.49417636" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24958494" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34450263" sideWeight="0.4980631" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21693414" sideWeight="0.5058236" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32982844" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Salesforce" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+              <option name="COLUMN_ORDER">
+                <list>
+                  <option value="0" />
+                  <option value="1" />
+                  <option value="2" />
+                  <option value="3" />
+                </list>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
@@ -449,23 +497,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/local_utils/data_utils.py</url>
-          <line>170</line>
-          <option name="timeStamp" value="48" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/local_utils/data_utils.py</url>
-          <line>72</line>
+          <line>70</line>
           <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tools/test_shadownet.py</url>
           <line>102</line>
           <option name="timeStamp" value="60" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/tools/train_shadownet.py</url>
-          <line>110</line>
-          <option name="timeStamp" value="63" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tools/test_shadownet.py</url>
@@ -478,11 +516,6 @@
           <option name="timeStamp" value="81" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/tools/train_shadownet.py</url>
-          <line>45</line>
-          <option name="timeStamp" value="82" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tools/test_shadownet.py</url>
           <line>45</line>
           <option name="timeStamp" value="84" />
@@ -492,92 +525,45 @@
           <line>83</line>
           <option name="timeStamp" value="90" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tools/write_text_features.py</url>
+          <line>47</line>
+          <option name="timeStamp" value="100" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tools/write_text_features.py</url>
+          <line>93</line>
+          <option name="timeStamp" value="107" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tools/train_shadownet.py</url>
+          <line>125</line>
+          <option name="timeStamp" value="115" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/local_utils/data_utils.py</url>
+          <line>172</line>
+          <option name="timeStamp" value="120" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/local_utils/data_utils.py</url>
+          <line>192</line>
+          <option name="timeStamp" value="125" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/data_provider/data_provider.py</url>
+          <line>152</line>
+          <option name="timeStamp" value="128" />
+        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="93" />
+      <option name="time" value="129" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/tools/test_shadownet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="912">
-          <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-          <folding>
-            <element signature="e#229#250#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/local_utils/data_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3116">
-          <caret line="164" column="59" lean-forward="false" selection-start-line="164" selection-start-column="53" selection-end-line="164" selection-end-column="59" />
-          <folding>
-            <element signature="e#289#307#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tools/write_text_features.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1349">
-          <caret line="71" column="49" lean-forward="false" selection-start-line="71" selection-start-column="49" selection-end-line="71" selection-end-column="49" />
-          <folding>
-            <element signature="e#255#264#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tools/test_shadownet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1577">
-          <caret line="83" column="0" lean-forward="false" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
-          <folding>
-            <element signature="e#229#250#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/local_utils/data_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2793">
-          <caret line="147" column="42" lean-forward="false" selection-start-line="147" selection-start-column="42" selection-end-line="147" selection-end-column="42" />
-          <folding>
-            <element signature="e#289#307#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/crnn_model/cnn_basenet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4978">
-          <caret line="264" column="8" lean-forward="false" selection-start-line="264" selection-start-column="8" selection-end-line="264" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tools/train_shadownet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="874">
-          <caret line="46" column="33" lean-forward="true" selection-start-line="46" selection-start-column="33" selection-end-line="46" selection-end-column="33" />
-          <folding>
-            <element signature="e#231#240#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/local_utils/data_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1444">
-          <caret line="76" column="62" lean-forward="true" selection-start-line="76" selection-start-column="62" selection-end-line="76" selection-end-column="62" />
-          <folding>
-            <element signature="e#289#307#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tools/write_text_features.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1140">
@@ -650,7 +636,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="197">
           <caret line="530" column="0" lean-forward="false" selection-start-line="530" selection-start-column="0" selection-end-line="530" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -739,13 +724,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/crnn_model/crnn_model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="162" column="0" lean-forward="false" selection-start-line="162" selection-start-column="0" selection-end-line="162" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/shadownet.log">
       <provider selected="true" editor-type-id="LogFileEditorProvider">
         <state relative-caret-position="304">
@@ -753,29 +731,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tools/read_text_features.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1463">
-          <caret line="77" column="0" lean-forward="true" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/tools/read_text_features.py" />
     <entry file="file://$PROJECT_DIR$/requirements.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="114">
           <caret line="6" column="0" lean-forward="true" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tools/write_text_features.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-161">
-          <caret line="54" column="27" lean-forward="false" selection-start-line="54" selection-start-column="27" selection-end-line="54" selection-end-column="27" />
-          <folding>
-            <element signature="e#255#264#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -783,15 +743,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="247">
           <caret line="13" column="53" lean-forward="true" selection-start-line="13" selection-start-column="53" selection-end-line="13" selection-end-column="53" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/lib/python3/dist-packages/apport_python_hook.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="46" column="0" lean-forward="false" selection-start-line="46" selection-start-column="0" selection-end-line="46" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -799,23 +750,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="139">
           <caret line="3304" column="4" lean-forward="false" selection-start-line="3304" selection-start-column="4" selection-end-line="3304" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tools/analysis_log.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="202">
-          <caret line="25" column="0" lean-forward="true" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/tools/analysis_log.py" />
     <entry file="file://$PROJECT_DIR$/local_utils/log_utils.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="299">
           <caret line="53" column="35" lean-forward="false" selection-start-line="53" selection-start-column="35" selection-end-line="53" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -823,7 +765,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="57">
           <caret line="38" column="46" lean-forward="true" selection-start-line="38" selection-start-column="46" selection-end-line="38" selection-end-column="46" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -831,39 +772,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-974">
           <caret line="25" column="22" lean-forward="true" selection-start-line="25" selection-start-column="22" selection-end-line="25" selection-end-column="22" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data_provider/data_provider.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3121">
-          <caret line="20" column="0" lean-forward="true" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/global_configuration/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="43" column="14" lean-forward="false" selection-start-line="43" selection-start-column="14" selection-end-line="43" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/local_utils/data_utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2304">
-          <caret line="111" column="12" lean-forward="false" selection-start-line="111" selection-start-column="12" selection-end-line="111" selection-end-column="12" />
-          <folding>
-            <element signature="e#289#307#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/tools/test.py" />
     <entry file="file://$PROJECT_DIR$/tools/demo_shadownet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-347">
+        <state relative-caret-position="19">
           <caret line="52" column="9" lean-forward="false" selection-start-line="52" selection-start-column="4" selection-end-line="52" selection-end-column="9" />
           <folding>
             <element signature="e#249#272#0" expanded="true" />
@@ -873,20 +788,131 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/tools/test_shadownet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-784">
-          <caret line="38" column="18" lean-forward="false" selection-start-line="38" selection-start-column="18" selection-end-line="38" selection-end-column="18" />
+        <state relative-caret-position="133">
+          <caret line="41" column="17" lean-forward="false" selection-start-line="41" selection-start-column="17" selection-end-line="41" selection-end-column="17" />
           <folding>
             <element signature="e#229#250#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/data/char_dict/char_dict.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="6295" lean-forward="false" selection-start-line="0" selection-start-column="6295" selection-end-line="0" selection-end-column="6295" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/char_dict/ord_map.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="71" column="3" lean-forward="false" selection-start-line="71" selection-start-column="3" selection-end-line="71" selection-end-column="3" />
+        </state>
+      </provider>
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="418">
+            <caret line="22" column="36" lean-forward="true" selection-start-line="22" selection-start-column="36" selection-end-line="22" selection-end-column="36" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2017.2/system/python_stubs/-1247971764/builtins.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="4999" column="8" lean-forward="false" selection-start-line="4999" selection-start-column="8" selection-end-line="4999" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/lib/python3/dist-packages/apport_python_hook.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="164">
+          <caret line="151" column="0" lean-forward="false" selection-start-line="151" selection-start-column="0" selection-end-line="151" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/local_utils/data_utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3363">
+          <caret line="177" column="32" lean-forward="false" selection-start-line="177" selection-start-column="32" selection-end-line="177" selection-end-column="32" />
+          <folding>
+            <element signature="e#289#307#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/local_utils/establish_char_dict.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-266">
+          <caret line="18" column="7" lean-forward="false" selection-start-line="18" selection-start-column="7" selection-end-line="18" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/crnn_model/crnn_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324">
+          <caret line="133" column="7" lean-forward="false" selection-start-line="133" selection-start-column="7" selection-end-line="133" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data_provider/data_provider.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="94">
+          <caret line="188" column="0" lean-forward="false" selection-start-line="188" selection-start-column="0" selection-end-line="188" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/global_configuration/config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="16" column="0" lean-forward="false" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/tools/train_shadownet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="164" column="26" lean-forward="true" selection-start-line="164" selection-start-column="26" selection-end-line="164" selection-end-column="26" />
+        <state relative-caret-position="236">
+          <caret line="140" column="24" lean-forward="false" selection-start-line="140" selection-start-column="24" selection-end-line="140" selection-end-column="24" />
           <folding>
             <element signature="e#231#240#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tools/make_train_sample.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="52" column="0" lean-forward="true" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tools/write_text_features.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="256">
+          <caret line="49" column="39" lean-forward="false" selection-start-line="49" selection-start-column="39" selection-end-line="49" selection-end-column="39" />
+          <folding>
+            <element signature="e#255#264#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tools/make_new_samples.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="769">
+          <caret line="41" column="51" lean-forward="false" selection-start-line="41" selection-start-column="51" selection-end-line="41" selection-end-column="51" />
+          <folding>
+            <element signature="e#201#210#0" expanded="true" />
           </folding>
         </state>
       </provider>

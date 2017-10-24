@@ -14,14 +14,18 @@ import os
 import os.path as ops
 import sys
 
+from local_utils import establish_char_dict
+
 
 class FeatureIO(object):
     """
         Implement the base writer class
     """
-    def __init__(self):
-        self.__char_list = '0123456789abcdefghijklmnopqrstuvwxyz '
-        pass
+    def __init__(self, char_dict_path=ops.join(os.getcwd(), 'data/char_dict/char_dict.json'),
+                 ord_map_dict_path=ops.join(os.getcwd(), 'data/char_dict/ord_map.json')):
+        self.__char_list = establish_char_dict.CharDictBuilder.read_char_dict(char_dict_path)
+        self.__ord_map = establish_char_dict.CharDictBuilder.read_ord_map_dict(ord_map_dict_path)
+        return
 
     @property
     def char_list(self):
@@ -79,24 +83,25 @@ class FeatureIO(object):
             value = [value]
         return tf.train.Feature(bytes_list=tf.train.BytesList(value=value))
 
-    @staticmethod
-    def char_to_int(char):
+    def char_to_int(self, char):
         """
 
         :param char:
         :return:
         """
         temp = ord(char)
-        if 97 <= temp <= 122:
-            temp = temp - 97 + 10
-        else:
-            if 65 <= temp <= 90:
-                temp -= 55
-            else:
-                if 48 <= temp <= 57:
-                    temp -= 48
-                else:
-                    temp = 36
+        # convert upper character into lower character
+        if 65 <= temp <= 90:
+            temp = temp + 32
+
+        for k, v in self.__ord_map.items():
+            if v == str(temp):
+                temp = int(k)
+                break
+
+        # TODO
+        # Here implement a double way dict or two dict to quickly map ord and it's corresponding index
+
         return temp
 
     def int_to_char(self, number):
@@ -105,7 +110,12 @@ class FeatureIO(object):
         :param number:
         :return:
         """
-        return self.__char_list[number]
+        if number == '1':
+            return '*'
+        if number == 1:
+            return '*'
+        else:
+            return self.__char_list[str(number)]
 
     def encode_labels(self, labels):
         """
@@ -113,22 +123,13 @@ class FeatureIO(object):
         :param labels:
         :return:
         """
-        encord_labeles = []
+        encoded_labeles = []
         lengths = []
         for label in labels:
-            encord_labele = [self.char_to_int(char) for char in label]
-            encord_labeles.append(encord_labele)
+            encode_label = [self.char_to_int(char) for char in label]
+            encoded_labeles.append(encode_label)
             lengths.append(len(label))
-        return encord_labeles, lengths
-
-    def encode_label(self, label):
-        """
-        :param label:
-        :return:
-        """
-        encord_label = [self.char_to_int(char) for char in label]
-        length = len(label)
-        return encord_label, length
+        return encoded_labeles, lengths
 
     def sparse_tensor_to_str(self, spares_tensor: tf.SparseTensor):
         """
@@ -137,6 +138,7 @@ class FeatureIO(object):
         """
         indices = spares_tensor.indices
         values = spares_tensor.values
+        values = np.array([self.__ord_map[str(tmp)] for tmp in values])
         dense_shape = spares_tensor.dense_shape
 
         number_lists = np.ones(dense_shape, dtype=values.dtype)
@@ -147,7 +149,7 @@ class FeatureIO(object):
         for number_list in number_lists:
             str_lists.append([self.int_to_char(val) for val in number_list])
         for str_list in str_lists:
-            res.append(''.join(c for c in str_list if c != '1'))
+            res.append(''.join(c for c in str_list if c != '*'))
         return res
 
 
