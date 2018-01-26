@@ -71,8 +71,3 @@ The accuracy during training process rises as follows
 
 ## TODO
 The model is trained on a subet of [Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/). So i will train a new model on the whold dataset to get a more robust model.The crnn model needs large of training data to get a rubust model.
-
-```
-graph TB
-A-->B
-```
