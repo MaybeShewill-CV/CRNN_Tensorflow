@@ -97,12 +97,12 @@ class FeatureIO(object):
         for k, v in self.__ord_map.items():
             if v == str(temp):
                 temp = int(k)
-                break
+                return temp
+        raise KeyError("Character {} missing in ord_map.json".format(char))
 
         # TODO
         # Here implement a double way dict or two dict to quickly map ord and it's corresponding index
 
-        return temp
 
     def int_to_char(self, number):
         """
