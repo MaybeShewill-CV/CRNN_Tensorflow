@@ -56,7 +56,6 @@ def write_features(dataset_dir, save_dir):
     print('Start writing training tf records')
 
     train_images = provider.train.images
-    train_images = [cv2.resize(tmp, (100, 32)) for tmp in train_images]
     train_images = [bytes(list(np.reshape(tmp, [100 * 32 * 3]))) for tmp in train_images]
     train_labels = provider.train.labels
     train_imagenames = provider.train.imagenames
@@ -69,7 +68,6 @@ def write_features(dataset_dir, save_dir):
     print('Start writing testing tf records')
 
     test_images = provider.test.images
-    test_images = [cv2.resize(tmp, (100, 32)) for tmp in test_images]
     test_images = [bytes(list(np.reshape(tmp, [100 * 32 * 3]))) for tmp in test_images]
     test_labels = provider.test.labels
     test_imagenames = provider.test.imagenames
@@ -82,7 +80,6 @@ def write_features(dataset_dir, save_dir):
     print('Start writing validation tf records')
 
     val_images = provider.validation.images
-    val_images = [cv2.resize(tmp, (100, 32)) for tmp in val_images]
     val_images = [bytes(list(np.reshape(tmp, [100 * 32 * 3]))) for tmp in val_images]
     val_labels = provider.validation.labels
     val_imagenames = provider.validation.imagenames
