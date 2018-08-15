@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:1.3.0-gpu-py3
+FROM tensorflow/tensorflow:1.3.0-py3
 
 RUN apt update && \
     apt install -y --no-install-recommends \
@@ -12,7 +12,7 @@ ADD . /app
 
 WORKDIR /app
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r docker/requirements.txt
 
 ENV PYTHONPATH=/app
 
