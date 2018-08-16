@@ -51,8 +51,9 @@ def train_shadownet(dataset_dir, weights_path=None):
 
     inputdata = tf.cast(x=inputdata, dtype=tf.float32)
 
-    # initializa the net model
-    shadownet = crnn_model.ShadowNet(phase='Train', hidden_nums=256, layers_nums=2, seq_length=25, num_classes=37)
+    # initialise the net model
+    # Set num_classes to 27 for letters, 37 for letters/numbers, 47 for letters/numbers/special_chars
+    shadownet = crnn_model.ShadowNet(phase='Train', hidden_nums=256, layers_nums=2, seq_length=25, num_classes=47)
 
     with tf.variable_scope('shadow', reuse=False):
         net_out = shadownet.build_shadownet(inputdata=inputdata)
