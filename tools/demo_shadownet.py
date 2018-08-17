@@ -56,13 +56,16 @@ def recognize(image_path, weights_path, is_vis=True):
 
     decoder = data_utils.TextFeatureIO()
 
-    net = crnn_model.ShadowNet(phase='Test', hidden_nums=256, layers_nums=2, seq_length=25,
+    net = crnn_model.ShadowNet(phase='Test',
+                               hidden_nums=config.cfg.ARCH.HIDDEN_UNITS,
+                               layers_nums=config.cfg.ARCH.HIDDEN_LAYERS,
                                num_classes=len(decoder.char_dict))
 
     with tf.variable_scope('shadow'):
         net_out = net.build_shadownet(inputdata=inputdata)
 
-    decodes, _ = tf.nn.ctc_beam_search_decoder(inputs=net_out, sequence_length=25*np.ones(1), merge_repeated=False)
+    decodes, _ = tf.nn.ctc_beam_search_decoder(inputs=net_out, sequence_length=config.cfg.ARCH.SEQ_LENGTH*np.ones(1),
+                                               merge_repeated=False)
 
     # config tf session
     sess_config = tf.ConfigProto()
