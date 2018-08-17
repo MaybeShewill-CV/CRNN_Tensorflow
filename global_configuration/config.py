@@ -25,6 +25,8 @@ __C.ARCH.HIDDEN_LAYERS = 2
 __C.ARCH.SEQ_LENGTH = 25
 # Set to 27 for letters, 37 for letters/numbers, 47 for letters/numbers/special_chars
 __C.ARCH.NUM_CLASSES = 47
+# Width x height into which training / testing images are resized before feeding into the network
+__C.ARCH.INPUT_SIZE = (100, 32)
 
 # Train options
 __C.TRAIN = edict()

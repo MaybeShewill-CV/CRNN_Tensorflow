@@ -49,10 +49,11 @@ def recognize(image_path, weights_path, is_vis=True):
     :return:
     """
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-    image = cv2.resize(image, (100, 32))
+    image = cv2.resize(image, config.cfg.ARCH.INPUT_SIZE)
     image = np.expand_dims(image, axis=0).astype(np.float32)
 
-    inputdata = tf.placeholder(dtype=tf.float32, shape=[1, 32, 100, 3], name='input')
+    w, h = config.cfg.ARCH.INPUT_SIZE
+    inputdata = tf.placeholder(dtype=tf.float32, shape=[1, h, w, 3], name='input')
 
     decoder = data_utils.TextFeatureIO()
 
