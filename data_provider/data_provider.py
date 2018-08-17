@@ -9,6 +9,8 @@
 Provide the training and testing data for shadow net
 """
 import os.path as ops
+from typing import Tuple
+
 import numpy as np
 import copy
 import cv2
@@ -133,7 +135,7 @@ class TextDataProvider(object):
         Implement the text data provider for training and testing the shadow net
     """
     def __init__(self, dataset_dir, annotation_name, validation_set=None, validation_split=None, shuffle=None,
-                 normalization=None):
+                 normalization=None, input_size: Tuple[int, int]=None):
         """
 
         :param dataset_dir: str, where you save the dataset one class on folder
@@ -150,7 +152,9 @@ class TextDataProvider(object):
                               'divide_256': divide all pixels by 256
                               'by_chanels': substract mean of every chanel and divide each
                                             chanel data by it's standart deviation
+        :param input_size: Target size to which all images will be resized.
         """
+        self.__input_size = input_size if input_size is not None else config.cfg.ARCH.INPUT_SIZE
         self.__dataset_dir = dataset_dir
         self.__validation_split = validation_split
         self.__shuffle = shuffle
@@ -171,7 +175,7 @@ class TextDataProvider(object):
 
             test_images_org = [cv2.imread(ops.join(self.__test_dataset_dir, tmp), cv2.IMREAD_COLOR)
                                for tmp in info[:, 0]]
-            test_images = np.array([cv2.resize(tmp, config.cfg.ARCH.INPUT_SIZE) for tmp in test_images_org])
+            test_images = np.array([cv2.resize(tmp, self.__input_size) for tmp in test_images_org])
 
             test_labels = np.array([tmp for tmp in info[:, 1]])
 
@@ -190,7 +194,7 @@ class TextDataProvider(object):
 
             train_images_org = [cv2.imread(ops.join(self.__train_dataset_dir, tmp), cv2.IMREAD_COLOR)
                                      for tmp in info[:, 0]]
-            train_images = np.array([cv2.resize(tmp, config.cfg.ARCH.INPUT_SIZE) for tmp in train_images_org])
+            train_images = np.array([cv2.resize(tmp, self.__input_size) for tmp in train_images_org])
 
             train_labels = np.array([tmp for tmp in info[:, 1]])
 
@@ -217,6 +221,14 @@ class TextDataProvider(object):
         provider_info = 'Dataset_dir: {:s} contain training images: {:d} validation images: {:d} testing images: {:d}'.\
             format(self.__dataset_dir, self.train.num_examples, self.validation.num_examples, self.test.num_examples)
         return provider_info
+
+    @property
+    def input_size(self):
+        """ Size to which images are rescaled before training and testing.
+
+        :return:
+        """
+        return self.__input_size
 
     @property
     def dataset_dir(self):

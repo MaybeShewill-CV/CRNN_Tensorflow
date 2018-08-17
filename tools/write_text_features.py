@@ -73,7 +73,8 @@ def write_features(dataset_dir: str, save_dir: str, annotation_name: str, valida
     print('Writing tf records for training...')
 
     train_images = provider.train.images
-    train_images = [bytes(list(np.reshape(tmp, [100 * 32 * 3]))) for tmp in train_images]
+    w, h = provider.input_size
+    train_images = [bytes(list(np.reshape(tmp, [w * h * 3]))) for tmp in train_images]
     train_labels = provider.train.labels
     train_imagenames = provider.train.imagenames
 
@@ -93,7 +94,7 @@ def write_features(dataset_dir: str, save_dir: str, annotation_name: str, valida
     print('Writing tf records for testing...')
 
     test_images = provider.test.images
-    test_images = [bytes(list(np.reshape(tmp, [100 * 32 * 3]))) for tmp in test_images]
+    test_images = [bytes(list(np.reshape(tmp, [w * h * 3]))) for tmp in test_images]
     test_labels = provider.test.labels
     test_imagenames = provider.test.imagenames
 
@@ -113,7 +114,7 @@ def write_features(dataset_dir: str, save_dir: str, annotation_name: str, valida
     print('Writing tf records for validation...')
 
     val_images = provider.validation.images
-    val_images = [bytes(list(np.reshape(tmp, [100 * 32 * 3]))) for tmp in val_images]
+    val_images = [bytes(list(np.reshape(tmp, [w * h * 3]))) for tmp in val_images]
     val_labels = provider.validation.labels
     val_imagenames = provider.validation.imagenames
 
