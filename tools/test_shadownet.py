@@ -8,6 +8,7 @@
 """
 Test shadow net script
 """
+import os
 import os.path as ops
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -26,9 +27,11 @@ def init_args():
     :return:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset_dir', type=str, help='Path to test tfrecords data')
-    parser.add_argument('--weights_path', type=str, help='Path to pretrained weights')
-    parser.add_argument('--is_recursive', type=bool, help='Whether to recursively test the dataset')
+    parser.add_argument('-d', '--dataset_dir', type=str, help='Path to test tfrecords data')
+    parser.add_argument('-w', '--weights_path', type=str, help='Path to pre-trained weights')
+    parser.add_argument('-r', '--is_recursive', type=bool, help='Whether to recursively test the dataset')
+    parser.add_argument('-j', '--num_threads', type=int, default=int(os.cpu_count() / 2),
+                        help='Number of threads to use in batch shuffling')
 
     return parser.parse_args()
 
@@ -183,4 +186,4 @@ if __name__ == '__main__':
     args = init_args()
 
     # test shadow net
-    test_shadownet(args.dataset_dir, args.weights_path, args.is_recursive)
+    test_shadownet(args.dataset_dir, args.weights_path, args.is_recursive, args.num_threads)

@@ -29,8 +29,9 @@ def init_args():
     :return:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dataset_dir', type=str, help='Path to dir containing train/test data and annotation files.')
-    parser.add_argument('-w', '--weights_path', type=str, help='Path to pretrained weights.')
+    parser.add_argument('-d', '--dataset_dir', type=str,
+                        help='Path to dir containing train/test data and annotation files.')
+    parser.add_argument('-w', '--weights_path', type=str, help='Path to pre-trained weights.')
     parser.add_argument('-j', '--num_threads', type=int, default=int(os.cpu_count()/2),
                         help='Number of threads to use in batch shuffling')
 
@@ -179,5 +180,5 @@ if __name__ == '__main__':
     if not ops.exists(args.dataset_dir):
         raise ValueError('{:s} doesn\'t exist'.format(args.dataset_dir))
 
-    train_shadownet(args.dataset_dir, args.weights_path)
+    train_shadownet(args.dataset_dir, args.weights_path, args.num_threads)
     print('Done')
