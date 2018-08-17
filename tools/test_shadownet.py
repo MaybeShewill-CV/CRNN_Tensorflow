@@ -26,14 +26,14 @@ def init_args():
     :return:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset_dir', type=str, help='Where you store the test tfrecords data')
-    parser.add_argument('--weights_path', type=str, help='Where you store the shadow net weights')
-    parser.add_argument('--is_recursive', type=bool, help='If need to recursively test the dataset')
+    parser.add_argument('--dataset_dir', type=str, help='Path to test tfrecords data')
+    parser.add_argument('--weights_path', type=str, help='Path to pretrained weights')
+    parser.add_argument('--is_recursive', type=bool, help='Whether to recursively test the dataset')
 
     return parser.parse_args()
 
 
-def test_shadownet(dataset_dir, weights_path, is_vis=False, is_recursive=True):
+def test_shadownet(dataset_dir, weights_path, is_vis=False, is_recursive=True, num_threads=4):
     """
 
     :param dataset_dir:
@@ -48,22 +48,28 @@ def test_shadownet(dataset_dir, weights_path, is_vis=False, is_recursive=True):
         ops.join(dataset_dir, 'test_feature.tfrecords'), num_epochs=None)
     if not is_recursive:
         images_sh, labels_sh, imagenames_sh = tf.train.shuffle_batch(tensors=[images_t, labels_t, imagenames_t],
-                                                                     batch_size=32, capacity=1000+32*2,
-                                                                     min_after_dequeue=2, num_threads=4)
+                                                                     batch_size=config.cfg.TEST.BATCH_SIZE,
+                                                                     capacity=1000+2*config.cfg.TEST.BATCH_SIZE,
+                                                                     min_after_dequeue=2, num_threads=num_threads)
     else:
         images_sh, labels_sh, imagenames_sh = tf.train.batch(tensors=[images_t, labels_t, imagenames_t],
-                                                             batch_size=32, capacity=1000 + 32 * 2, num_threads=4)
+                                                             batch_size=config.cfg.TEST.BATCH_SIZE,
+                                                             capacity=1000 + 2 * config.cfg.TEST.BATCH_SIZE,
+                                                             num_threads=num_threads)
 
     images_sh = tf.cast(x=images_sh, dtype=tf.float32)
 
     # build shadownet
-    net = crnn_model.ShadowNet(phase='Test', hidden_nums=256, layers_nums=2, seq_length=25,
+    net = crnn_model.ShadowNet(phase='Test', hidden_nums=config.cfg.ARCH.HIDDEN_UNITS,
+                               layers_nums=config.cfg.ARCH.HIDDEN_LAYERS,
                                num_classes=len(decoder.char_dict))
 
     with tf.variable_scope('shadow'):
         net_out = net.build_shadownet(inputdata=images_sh)
 
-    decoded, _ = tf.nn.ctc_beam_search_decoder(net_out, 25 * np.ones(32), merge_repeated=False)
+    decoded, _ = tf.nn.ctc_beam_search_decoder(net_out,
+                                               config.cfg.ARCH.SEQ_LENGTH * np.ones(config.cfg.TEST.BATCH_SIZE),
+                                               merge_repeated=False)
 
     # config tf session
     sess_config = tf.ConfigProto()
@@ -78,7 +84,7 @@ def test_shadownet(dataset_dir, weights_path, is_vis=False, is_recursive=True):
     test_sample_count = 0
     for record in tf.python_io.tf_record_iterator(ops.join(dataset_dir, 'test_feature.tfrecords')):
         test_sample_count += 1
-    loops_nums = int(math.ceil(test_sample_count / 32))
+    loops_nums = int(math.ceil(test_sample_count / config.cfg.TEST.BATCH_SIZE))
     # loops_nums = 100
 
     with sess.as_default():

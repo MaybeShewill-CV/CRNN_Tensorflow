@@ -15,6 +15,17 @@ __C = edict()
 
 cfg = __C
 
+__C.ARCH = edict()
+
+# Number of units in each LSTM cell
+__C.ARCH.HIDDEN_UNITS = 256
+# Number of stacked LSTM cells
+__C.ARCH.HIDDEN_LAYERS = 2
+# Sequence length
+__C.ARCH.SEQ_LENGTH = 25
+# Set to 27 for letters, 37 for letters/numbers, 47 for letters/numbers/special_chars
+__C.ARCH.NUM_CLASSES = 47
+
 # Train options
 __C.TRAIN = edict()
 

@@ -21,16 +21,18 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
     """
         Implement the crnn model for squence recognition
     """
-    def __init__(self, phase, hidden_nums, layers_nums, seq_length, num_classes):
+    def __init__(self, phase, hidden_nums, layers_nums, num_classes):
         """
 
-        :param phase:
+        :param phase: 'Train' or 'Test'
+        :param hidden_nums: Number of hidden units in each LSTM cell (block)
+        :param layers_nums: Number of LSTM cells (blocks)
+        :param num_classes: Number of classes (different symbols) to detect
         """
         super(ShadowNet, self).__init__()
         self.__phase = phase
         self.__hidden_nums = hidden_nums
         self.__layers_nums = layers_nums
-        self.__seq_length = seq_length
         self.__num_classes = num_classes
         return
 
@@ -118,9 +120,9 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
         with tf.variable_scope('LSTMLayers'):
             # construct stack lstm rcnn layer
             # forward lstm cell
-            fw_cell_list = [rnn.BasicLSTMCell(nh, forget_bias=1.0) for nh in [self.__hidden_nums, self.__hidden_nums]]
+            fw_cell_list = [rnn.BasicLSTMCell(nh, forget_bias=1.0) for nh in [self.__hidden_nums]*self.__layers_nums]
             # Backward direction cells
-            bw_cell_list = [rnn.BasicLSTMCell(nh, forget_bias=1.0) for nh in [self.__hidden_nums, self.__hidden_nums]]
+            bw_cell_list = [rnn.BasicLSTMCell(nh, forget_bias=1.0) for nh in [self.__hidden_nums]*self.__layers_nums]
 
             stack_lstm_layer, _, _ = rnn.stack_bidirectional_dynamic_rnn(fw_cell_list, bw_cell_list, inputdata,
                                                                          dtype=tf.float32)

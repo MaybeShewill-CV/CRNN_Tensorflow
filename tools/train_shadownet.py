@@ -29,17 +29,20 @@ def init_args():
     :return:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset_dir', type=str, help='Where you store the dataset')
-    parser.add_argument('--weights_path', type=str, help='Where you store the pretrained weights')
+    parser.add_argument('-d', '--dataset_dir', type=str, help='Path to dir containing train/test data and annotation files.')
+    parser.add_argument('-w', '--weights_path', type=str, help='Path to pretrained weights.')
+    parser.add_argument('-j', '--num_threads', type=int, default=int(os.cpu_count()/2),
+                        help='Number of threads to use in batch shuffling')
 
     return parser.parse_args()
 
 
-def train_shadownet(dataset_dir, weights_path=None):
+def train_shadownet(dataset_dir, weights_path=None, num_threads=4):
     """
 
     :param dataset_dir:
     :param weights_path:
+    :param num_threads: Number of threads to use in tf.train.shuffle_batch
     :return:
     """
     # decode the tf records to get the training data
@@ -47,20 +50,26 @@ def train_shadownet(dataset_dir, weights_path=None):
     images, labels, imagenames = decoder.read_features(ops.join(dataset_dir, 'train_feature.tfrecords'),
                                                        num_epochs=None)
     inputdata, input_labels, input_imagenames = tf.train.shuffle_batch(
-        tensors=[images, labels, imagenames], batch_size=32, capacity=1000+2*32, min_after_dequeue=100, num_threads=1)
+        tensors=[images, labels, imagenames], batch_size=config.cfg.TRAIN.BATCH_SIZE,
+        capacity=1000 + 2*config.cfg.TRAIN.BATCH_SIZE, min_after_dequeue=100, num_threads=num_threads)
 
     inputdata = tf.cast(x=inputdata, dtype=tf.float32)
 
     # initialise the net model
-    shadownet = crnn_model.ShadowNet(phase='Train', hidden_nums=256, layers_nums=2, seq_length=25,
+    shadownet = crnn_model.ShadowNet(phase='Train',
+                                     hidden_nums=config.cfg.ARCH.HIDDEN_UNITS,
+                                     layers_nums=config.cfg.ARCH.HIDDEN_LAYERS,
                                      num_classes=len(decoder.char_dict))
 
     with tf.variable_scope('shadow', reuse=False):
         net_out = shadownet.build_shadownet(inputdata=inputdata)
 
-    cost = tf.reduce_mean(tf.nn.ctc_loss(labels=input_labels, inputs=net_out, sequence_length=25*np.ones(32)))
+    cost = tf.reduce_mean(tf.nn.ctc_loss(labels=input_labels, inputs=net_out,
+                                         sequence_length=config.cfg.ARCH.SEQ_LENGTH*np.ones(config.cfg.TRAIN.BATCH_SIZE)))
 
-    decoded, log_prob = tf.nn.ctc_beam_search_decoder(net_out, 25*np.ones(32), merge_repeated=False)
+    decoded, log_prob = tf.nn.ctc_beam_search_decoder(net_out,
+                                                      config.cfg.ARCH.SEQ_LENGTH*np.ones(config.cfg.TRAIN.BATCH_SIZE),
+                                                      merge_repeated=False)
 
     sequence_dist = tf.reduce_mean(tf.edit_distance(tf.cast(decoded[0], tf.int32), input_labels))
 
@@ -130,7 +139,7 @@ def train_shadownet(dataset_dir, weights_path=None):
 
             for index, gt_label in enumerate(gt_labels):
                 pred = preds[index]
-                totol_count = len(gt_label)
+                total_count = len(gt_label)
                 correct_count = 0
                 try:
                     for i, tmp in enumerate(gt_label):
@@ -140,7 +149,7 @@ def train_shadownet(dataset_dir, weights_path=None):
                     continue
                 finally:
                     try:
-                        accuracy.append(correct_count / totol_count)
+                        accuracy.append(correct_count / total_count)
                     except ZeroDivisionError:
                         if len(pred) == 0:
                             accuracy.append(1)
