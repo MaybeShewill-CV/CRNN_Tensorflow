@@ -11,10 +11,12 @@ Write text features into tensorflow records
 import os
 import os.path as ops
 import argparse
+from functools import reduce
+
 import numpy as np
 
 from data_provider import data_provider
-from local_utils import data_utils
+from local_utils import data_utils, establish_char_dict
 
 
 def init_args() -> argparse.Namespace:
@@ -33,10 +35,13 @@ def init_args() -> argparse.Namespace:
                         help='Fraction of training data to use for validation. Set to 0 to disable.')
     parser.add_argument('-n', '--normalization', type=str, default=None,
                         help="Perform normalization on images. Can be either 'divide_255' or 'divide_256'")
+    parser.add_argument('-c', '--char_maps', type=str, default=None,
+                        help="Set the path to character maps to be built from labels in training and test sets.")
     return parser.parse_args()
 
 
-def write_features(dataset_dir: str, save_dir: str, annotation_name: str, validation_split: float, normalization: str):
+def write_features(dataset_dir: str, save_dir: str, annotation_name: str, validation_split: float, normalization: str,
+                   char_maps: str):
     """ Processes training and test data creating Tensorflow records.
 
     :param dataset_dir: root to Train and Test datasets
@@ -44,6 +49,7 @@ def write_features(dataset_dir: str, save_dir: str, annotation_name: str, valida
     :param annotation_name: Name of annotations file in each dataset dir
     :param validation_split: Fraction of training data to use for validation
     :param normalization: Perform normalization on images 'divide_255', 'divide_256'
+    :param build_char_maps: Whether to extract character maps from training and test labels
     """
     os.makedirs(save_dir, exist_ok=True)
 
@@ -91,6 +97,15 @@ def write_features(dataset_dir: str, save_dir: str, annotation_name: str, valida
     val_tfrecord_path = ops.join(save_dir, 'validation_feature.tfrecords')
     feature_io.writer.write_features(tfrecords_path=val_tfrecord_path, labels=val_labels, images=val_images,
                                      imagenames=val_imagenames)
+    # Write character maps
+    if char_maps is not None:
+        train_chars = reduce(lambda a, b: set(a).union(set(b)), train_labels)
+        test_chars = reduce(lambda a, b: set(a).union(set(b)), test_labels)
+        val_chars = reduce(lambda a, b: set(a).union(set(b)), val_labels)
+        all_chars = train_chars.union(test_chars).union(val_chars)
+        os.makedirs(os.path.dirname(char_maps), exist_ok=True)
+        establish_char_dict.CharDictBuilder.write_char_dict(all_chars, char_maps)
+        establish_char_dict.CharDictBuilder.map_ord_to_index(all_chars, char_maps)
 
 
 if __name__ == '__main__':
@@ -101,4 +116,5 @@ if __name__ == '__main__':
 
     # write tf records
     write_features(dataset_dir=args.dataset_dir, save_dir=args.save_dir, annotation_name=args.annotation_file,
-                   validation_split=args.validation_split, normalization=args.normalization)
+                   validation_split=args.validation_split, normalization=args.normalization,
+                   char_maps=args.char_maps)

@@ -8,6 +8,8 @@
 """
 Implement some utils used to convert image and it's corresponding label into tfrecords
 """
+from typing import List
+
 import numpy as np
 import tensorflow as tf
 import os
@@ -23,17 +25,17 @@ class FeatureIO(object):
     """
     def __init__(self, char_dict_path=ops.join(os.getcwd(), 'data/char_dict/char_dict.json'),
                  ord_map_dict_path=ops.join(os.getcwd(), 'data/char_dict/ord_map.json')):
-        self.__char_list = establish_char_dict.CharDictBuilder.read_char_dict(char_dict_path)
+        self.__char_dict = establish_char_dict.CharDictBuilder.read_char_dict(char_dict_path)
         self.__ord_map = establish_char_dict.CharDictBuilder.read_ord_map_dict(ord_map_dict_path)
         return
 
     @property
-    def char_list(self):
+    def char_dict(self):
         """
 
         :return:
         """
-        return self.__char_list
+        return self.__char_dict
 
     @staticmethod
     def int64_feature(value):
@@ -83,7 +85,7 @@ class FeatureIO(object):
             value = [value]
         return tf.train.Feature(bytes_list=tf.train.BytesList(value=value))
 
-    def char_to_int(self, char):
+    def char_to_int(self, char: str) -> int:
         """
 
         :param char:
@@ -103,19 +105,18 @@ class FeatureIO(object):
         # TODO
         # Here implement a double way dict or two dict to quickly map ord and it's corresponding index
 
+    def int_to_char(self, number: int) -> str:
+        """ Return the character corresponding to the given integer.
 
-    def int_to_char(self, number):
-        """
-
-        :param number:
-        :return:
+        :param number: Can be passed as string representing the integer value to look up.
+        :return: Character corresponding to 'number' in the char_dict
         """
         if number == '1':
             return '*'
         if number == 1:
             return '*'
         else:
-            return self.__char_list[str(number)]
+            return self.__char_dict[str(number)]
 
     def encode_labels(self, labels):
         """
@@ -123,23 +124,23 @@ class FeatureIO(object):
         :param labels:
         :return:
         """
-        encoded_labeles = []
+        encoded_labels = []
         lengths = []
         for label in labels:
             encode_label = [self.char_to_int(char) for char in label]
-            encoded_labeles.append(encode_label)
+            encoded_labels.append(encode_label)
             lengths.append(len(label))
-        return encoded_labeles, lengths
+        return encoded_labels, lengths
 
-    def sparse_tensor_to_str(self, spares_tensor: tf.SparseTensor):
+    def sparse_tensor_to_str(self, sparse_tensor: tf.SparseTensor) -> List[str]:
         """
-        :param spares_tensor:
-        :return: a str
+        :param sparse_tensor: prediction or ground truth label
+        :return: String value of the sparse tensor
         """
-        indices = spares_tensor.indices
-        values = spares_tensor.values
+        indices = sparse_tensor.indices
+        values = sparse_tensor.values
         values = np.array([self.__ord_map[str(tmp)] for tmp in values])
-        dense_shape = spares_tensor.dense_shape
+        dense_shape = sparse_tensor.dense_shape
 
         number_lists = np.ones(dense_shape, dtype=values.dtype)
         str_lists = []
