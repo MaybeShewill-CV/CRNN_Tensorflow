@@ -22,7 +22,7 @@ def init_args() -> argparse.Namespace:
 
     :return: Parsed arguments
     """
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Writes text features from train and test data as tensorflow records')
     parser.add_argument('-d', '--dataset_dir', type=str, required=True,
                         help='Path to "Train" and "Test" folders with data')
     parser.add_argument('-s', '--save_dir', type=str, required=True,
@@ -30,27 +30,28 @@ def init_args() -> argparse.Namespace:
     parser.add_argument('-a', '--annotation_file', type=str, default='sample.txt',
                         help='Name of annotations file (in dataset_dir/Train and dataset_dir/Test)')
     parser.add_argument('-v', '--validation_split', type=float, default=0.15,
-                        help='Fraction of training data to use for validation')
-
+                        help='Fraction of training data to use for validation. Set to 0 to disable.')
+    parser.add_argument('-n', '--normalization', type=str, default=None,
+                        help="Perform normalization on images. Can be either 'divide_255' or 'divide_256'")
     return parser.parse_args()
 
 
-def write_features(dataset_dir: str, save_dir: str, annotation_name: str, validation_split: float):
+def write_features(dataset_dir: str, save_dir: str, annotation_name: str, validation_split: float, normalization: str):
     """ Processes training and test data creating Tensorflow records.
 
     :param dataset_dir: root to Train and Test datasets
     :param save_dir: Where to store the tf records
     :param annotation_name: Name of annotations file in each dataset dir
     :param validation_split: Fraction of training data to use for validation
+    :param normalization: Perform normalization on images 'divide_255', 'divide_256'
     """
-    if not ops.exists(save_dir):
-        os.makedirs(save_dir)
+    os.makedirs(save_dir, exist_ok=True)
 
     print('Initializing the dataset provider... ', end='')
 
     provider = data_provider.TextDataProvider(dataset_dir=dataset_dir, annotation_name=annotation_name,
-                                              validation_set=True, validation_split=validation_split,
-                                              shuffle='every_epoch', normalization=None)
+                                              validation_set=validation_split > 0, validation_split=validation_split,
+                                              shuffle='every_epoch', normalization=normalization.lower())
     print('done.')
 
     feature_io = data_utils.TextFeatureIO()
@@ -100,4 +101,4 @@ if __name__ == '__main__':
 
     # write tf records
     write_features(dataset_dir=args.dataset_dir, save_dir=args.save_dir, annotation_name=args.annotation_file,
-                   validation_split=args.validation_split)
+                   validation_split=args.validation_split, normalization=args.normalization)
