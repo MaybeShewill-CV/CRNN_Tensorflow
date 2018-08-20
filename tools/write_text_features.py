@@ -31,13 +31,14 @@ def init_args() -> argparse.Namespace:
     parser.add_argument('-s', '--save_dir', type=str, required=True,
                         help='Where to store the generated tfrecords')
     parser.add_argument('-a', '--annotation_file', type=str, default='sample.txt',
-                        help='Name of annotations file (in dataset_dir/Train and dataset_dir/Test)')
+                        help='Name of annotations file (in dataset_dir/Train and dataset_dir/Test). '
+                             'The encoding is assumed to be utf-8')
     parser.add_argument('-v', '--validation_split', type=float, default=0.15,
                         help='Fraction of training data to use for validation. Set to 0 to disable.')
     parser.add_argument('-n', '--normalization', type=str, default=None,
                         help="Perform normalization on images. Can be either 'divide_255' or 'divide_256'")
     parser.add_argument('-c', '--char_maps', type=str, default=None,
-                        help="Set the path where character maps will be saved from labels in training and test sets.")
+                        help='Set the path where character maps will be saved from labels in training and test sets.')
     return parser.parse_args()
 
 
