@@ -47,7 +47,7 @@ def write_features(dataset_dir: str, save_dir: str, annotation_name: str, valida
     """
     os.makedirs(save_dir, exist_ok=True)
 
-    print('Initializing the dataset provider... ', end='')
+    print('Initializing the dataset provider... ', end='', flush=True)
 
     provider = data_provider.TextDataProvider(dataset_dir=dataset_dir, annotation_name=annotation_name,
                                               validation_set=validation_split > 0, validation_split=validation_split,
