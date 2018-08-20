@@ -23,8 +23,10 @@ def init_args() -> argparse.Namespace:
     :return: Parsed arguments
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dataset_dir', type=str, help='Path to "Train" and "Test" folders with data')
-    parser.add_argument('-s', '--save_dir', type=str, help='Where to store the generated tfrecords')
+    parser.add_argument('-d', '--dataset_dir', type=str, required=True,
+                        help='Path to "Train" and "Test" folders with data')
+    parser.add_argument('-s', '--save_dir', type=str, required=True,
+                        help='Where to store the generated tfrecords')
     parser.add_argument('-a', '--annotation_file', type=str, default='sample.txt',
                         help='Name of annotations file (in dataset_dir/Train and dataset_dir/Test)')
     parser.add_argument('-v', '--validation_split', type=float, default=0.15,
