@@ -11,7 +11,7 @@ Establish the char dictionary in order to contain chinese character
 import json
 import os.path as ops
 import os
-from typing import Union, List, Set
+from typing import Union, List, Set, Iterable
 
 
 class CharDictBuilder(object):
@@ -22,6 +22,30 @@ class CharDictBuilder(object):
         pass
 
     @staticmethod
+    def _read_chars(origin_char_list: Union[str, List, Set]):
+        """ Read a list of chars or a file containing it. """
+        if isinstance(origin_char_list, str):
+            assert ops.exists(origin_char_list), \
+                "Character list %s is not a file or could not be found" % origin_char_list
+            with open(origin_char_list, 'r', encoding='utf-8') as origin_f:
+                chars = (l[0] for l in origin_f.readlines())
+        elif isinstance(origin_char_list, Iterable):
+            ok = all(map(lambda s: isinstance(s, str) and len(s) == 1, origin_char_list))
+            assert ok, "Character list is not an Iterable of strings of length 1"
+            chars = origin_char_list
+        else:
+            raise TypeError("Character list needs to be a file or a list of strings")
+        return chars
+
+    @staticmethod
+    def _write_json(save_path: str, data: dict):
+        if not save_path.endswith('.json'):
+            raise ValueError('save path {:s} should be a json file'.format(save_path))
+        os.makedirs(ops.dirname(save_path), exist_ok=True)
+        with open(save_path, 'w', encoding='utf-8') as json_f:
+            json.dump(data, json_f)
+
+    @staticmethod
     def write_char_dict(origin_char_list: Union[str, List, Set], save_path: str):
         """ Writes the ordinal to char map used in int_to_char to decode predictions and labels.
         The file is read with CharDictBuilder.read_char_dict()
@@ -30,28 +54,8 @@ class CharDictBuilder(object):
                                  of characters
         :param save_path: Destination file, full path.
         """
-
-        if not save_path.endswith('.json'):
-            raise ValueError('save path {:s} should be a json file'.format(save_path))
-
-        os.makedirs(ops.split(save_path)[0], exist_ok=True)
-        from typing import Iterable
-        if isinstance(origin_char_list, str):
-            assert ops.exists(origin_char_list), \
-                "Character list %s is not a file or could not be found" % origin_char_list
-            with open(origin_char_list, 'r', encoding='utf-8') as origin_f:
-                chars = (l[0] for l in origin_f.readlines())
-        elif isinstance(origin_char_list, Iterable):
-            ok = all(map(lambda s: isinstance(s, str) and len(s) == 1, origin_char_list))
-            assert ok, "Character list is not a list of strings of length 1"
-            chars = origin_char_list
-        else:
-            raise TypeError("Character list needs to be a file or a list of strings")
-
-        char_dict = {str(ord(c)): c for c in chars}
-
-        with open(save_path, 'w', encoding='utf-8') as json_f:
-            json.dump(char_dict, json_f)
+        char_dict = {str(ord(c)): c for c in CharDictBuilder._read_chars(origin_char_list)}
+        CharDictBuilder._write_json(save_path, char_dict)
 
     @staticmethod
     def read_char_dict(dict_path: str) -> dict:
@@ -68,29 +72,14 @@ class CharDictBuilder(object):
         return res
 
     @staticmethod
-    def map_ord_to_index(origin_char_list, save_path):
+    def map_ord_to_index(origin_char_list: Union[str, List, Set], save_path):
         """
             Map ord of character in origin char list into index start from 0 in order to meet the output of the DNN
         :param origin_char_list:
         :param save_path:
         """
-        assert ops.exists(origin_char_list)
-
-        if not save_path.endswith('.json'):
-            raise ValueError('save path {:s} should be a json file'.format(save_path))
-
-        os.makedirs(ops.split(save_path)[0], exist_ok=True)
-
-        char_dict = dict()
-
-        with open(origin_char_list, 'r', encoding='utf-8') as origin_f:
-            for index, info in enumerate(origin_f.readlines()):
-                char_value = str(ord(info[0]))
-                char_key = index
-                char_dict[char_key] = char_value
-
-        with open(save_path, 'w', encoding='utf-8') as json_f:
-            json.dump(char_dict, json_f)
+        char_dict = {i: str(ord(c)) for i, c in enumerate(CharDictBuilder._read_chars(origin_char_list))}
+        CharDictBuilder._write_json(save_path, char_dict)
 
     @staticmethod
     def read_ord_map_dict(ord_map_dict_path: str) -> dict:

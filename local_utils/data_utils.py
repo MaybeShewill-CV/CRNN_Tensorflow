@@ -23,8 +23,7 @@ class FeatureIO(object):
     """
         Implement the base writer class
     """
-    def __init__(self, char_dict_path=ops.join(os.getcwd(), 'data/char_dict/char_dict.json'),
-                 ord_map_dict_path=ops.join(os.getcwd(), 'data/char_dict/ord_map.json')):
+    def __init__(self, char_dict_path, ord_map_dict_path):
         self.__char_dict = establish_char_dict.CharDictBuilder.read_char_dict(char_dict_path)
         self.__ord_map = establish_char_dict.CharDictBuilder.read_ord_map_dict(ord_map_dict_path)
         return
@@ -158,8 +157,8 @@ class TextFeatureWriter(FeatureIO):
     """
         Implement the crnn feature writer
     """
-    def __init__(self):
-        super(TextFeatureWriter, self).__init__()
+    def __init__(self, char_dict_path, ord_map_dict_path):
+        super(TextFeatureWriter, self).__init__(char_dict_path, ord_map_dict_path)
         return
 
     def write_features(self, tfrecords_path, labels, images, imagenames):
@@ -198,8 +197,8 @@ class TextFeatureReader(FeatureIO):
     """
         Implement the crnn feature reader
     """
-    def __init__(self):
-        super(TextFeatureReader, self).__init__()
+    def __init__(self, char_dict_path, ord_map_dict_path):
+        super(TextFeatureReader, self).__init__(char_dict_path, ord_map_dict_path)
         return
 
     @staticmethod
@@ -234,12 +233,13 @@ class TextFeatureIO(object):
     """
         Implement a crnn feture io manager
     """
-    def __init__(self):
+    def __init__(self, char_dict_path=ops.join(os.getcwd(), 'data/char_dict/char_dict.json'),
+                 ord_map_dict_path=ops.join(os.getcwd(), 'data/char_dict/ord_map.json')):
         """
 
         """
-        self.__writer = TextFeatureWriter()
-        self.__reader = TextFeatureReader()
+        self.__writer = TextFeatureWriter(char_dict_path, ord_map_dict_path)
+        self.__reader = TextFeatureReader(char_dict_path, ord_map_dict_path)
         return
 
     @property
