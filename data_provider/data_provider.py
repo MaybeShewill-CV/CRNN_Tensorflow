@@ -171,7 +171,8 @@ class TextDataProvider(object):
         assert ops.exists(test_anno_path)
 
         with open(test_anno_path, 'r', encoding='utf-8') as anno_file:
-            info = np.array([tmp.strip().split() for tmp in anno_file.readlines()])
+            info = np.array(list(filter(lambda x: len(x) == 2,  # discard bogus entries with no label
+                                        [tmp.strip().split(maxsplit=1) for tmp in anno_file.readlines()])))
 
             test_images_org = [cv2.imread(ops.join(self.__test_dataset_dir, tmp), cv2.IMREAD_COLOR)
                                for tmp in info[:, 0]]
@@ -183,14 +184,14 @@ class TextDataProvider(object):
 
             self.test = TextDataset(test_images, test_labels, imagenames=test_imagenames,
                                     shuffle=shuffle, normalization=normalization)
-        anno_file.close()
 
         # add train and validation dataset
         train_anno_path = ops.join(self.__train_dataset_dir, annotation_name)
         assert ops.exists(train_anno_path)
 
         with open(train_anno_path, 'r', encoding='utf-8') as anno_file:
-            info = np.array([tmp.strip().split() for tmp in anno_file.readlines()])
+            info = np.array(list(filter(lambda x: len(x) == 2,  # discard bogus entries with no label
+                                        [tmp.strip().split(maxsplit=1) for tmp in anno_file.readlines()])))
 
             train_images_org = [cv2.imread(ops.join(self.__train_dataset_dir, tmp), cv2.IMREAD_COLOR)
                                      for tmp in info[:, 0]]
@@ -214,8 +215,6 @@ class TextDataProvider(object):
 
             if validation_set and not validation_split:
                 self.validation = self.test
-        anno_file.close()
-        return
 
     def __str__(self):
         provider_info = 'Dataset_dir: {:s} contain training images: {:d} validation images: {:d} testing images: {:d}'.\
