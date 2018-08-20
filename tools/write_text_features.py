@@ -51,7 +51,7 @@ def write_features(dataset_dir: str, save_dir: str, annotation_name: str, valida
 
     provider = data_provider.TextDataProvider(dataset_dir=dataset_dir, annotation_name=annotation_name,
                                               validation_set=validation_split > 0, validation_split=validation_split,
-                                              shuffle='every_epoch', normalization=normalization.lower())
+                                              shuffle='every_epoch', normalization=normalization)
     print('done.')
 
     feature_io = data_utils.TextFeatureIO()
