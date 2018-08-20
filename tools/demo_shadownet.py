@@ -48,6 +48,8 @@ def recognize(image_path, weights_path, is_vis=True):
     :param is_vis:
     :return:
     """
+    decoder = data_utils.TextFeatureIO()
+
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
     image = cv2.resize(image, config.cfg.ARCH.INPUT_SIZE)
     image = np.expand_dims(image, axis=0).astype(np.float32)
@@ -60,7 +62,7 @@ def recognize(image_path, weights_path, is_vis=True):
     net = crnn_model.ShadowNet(phase='Test',
                                hidden_nums=config.cfg.ARCH.HIDDEN_UNITS,
                                layers_nums=config.cfg.ARCH.HIDDEN_LAYERS,
-                               num_classes=len(decoder.char_dict))
+                               num_classes=len(decoder.char_dict) + 1)
 
     with tf.variable_scope('shadow'):
         net_out = net.build_shadownet(inputdata=inputdata)

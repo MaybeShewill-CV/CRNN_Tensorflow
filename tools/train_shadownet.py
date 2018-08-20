@@ -60,7 +60,7 @@ def train_shadownet(dataset_dir, weights_path=None, num_threads=4):
     shadownet = crnn_model.ShadowNet(phase='Train',
                                      hidden_nums=config.cfg.ARCH.HIDDEN_UNITS,
                                      layers_nums=config.cfg.ARCH.HIDDEN_LAYERS,
-                                     num_classes=len(decoder.char_dict))
+                                     num_classes=len(decoder.char_dict)+1)
 
     with tf.variable_scope('shadow', reuse=False):
         net_out = shadownet.build_shadownet(inputdata=inputdata)
