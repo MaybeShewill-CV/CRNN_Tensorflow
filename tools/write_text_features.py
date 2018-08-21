@@ -12,10 +12,10 @@ import os
 import os.path as ops
 import argparse
 from functools import reduce
-
 import numpy as np
 
 from data_provider import data_provider
+from data_provider.data_provider import TextDataset
 from local_utils.data_utils import TextFeatureIO
 from local_utils.establish_char_dict import CharDictBuilder
 
@@ -42,6 +42,48 @@ def init_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def write_tfrecords(dataset: TextDataset, name: str, save_dir: str, char_maps_dir: str=None):
+    """
+
+    :param dataset:
+    :param name:
+    :param save_dir:
+    :param char_maps_dir:
+    :return:
+    """
+    tfrecord_path = ops.join(save_dir, '%s_features.tfrecords' % name)
+    print('Writing tf records for %s at %s...' % (name, tfrecord_path))
+
+    images = dataset.images
+    h, w = dataset.images.shape
+    images = [bytes(list(np.reshape(tmp, [w * h * 3]))) for tmp in images]
+    labels = dataset.labels
+    imagenames = dataset.imagenames
+
+    if char_maps_dir is not None:
+        os.makedirs(os.path.dirname(char_maps_dir), exist_ok=True)
+        # FIXME: rereading every time is a bit silly...
+        try:
+            d = CharDictBuilder.read_char_dict(os.path.join(char_maps_dir, "char_dict.json"))
+            all_chars = set(map(lambda k: chr(int(k)), d.keys()))
+        except FileNotFoundError:
+            all_chars = set()
+        all_chars = all_chars.union(reduce(lambda a, b: set(a).union(set(b)), labels))
+        CharDictBuilder.write_char_dict(all_chars, os.path.join(char_maps_dir, "char_dict.json"))
+        CharDictBuilder.map_ord_to_index(all_chars, os.path.join(char_maps_dir, "ord_map.json"))
+        print("  (character maps written)")
+
+        char_dict_path=os.path.join(char_maps_dir, "char_dict.json")
+        ord_map_dict_path=os.path.join(char_maps_dir, "ord_map.json")
+    else:
+        char_dict_path = os.path.join("data/char_dict", "char_dict.json")
+        ord_map_dict_path = os.path.join("data/char_dict", "ord_map.json")
+
+    feature_io = TextFeatureIO(char_dict_path, ord_map_dict_path)
+    feature_io.writer.write_features(tfrecords_path=tfrecord_path, labels=labels, images=images,
+                                     imagenames=imagenames)
+
+
 def write_features(dataset_dir: str, save_dir: str, annotation_name: str, validation_split: float, normalization: str,
                    char_maps: str):
     """ Processes training and test data creating Tensorflow records.
@@ -62,73 +104,11 @@ def write_features(dataset_dir: str, save_dir: str, annotation_name: str, valida
                                               shuffle='every_epoch', normalization=normalization)
     print('done.')
 
-    if char_maps is not None:
-        char_dict_path=os.path.join(char_maps, "char_dict.json")
-        ord_map_dict_path=os.path.join(char_maps, "ord_map.json")
-    else:
-        char_dict_path = os.path.join("data/char_dict", "char_dict.json")
-        ord_map_dict_path = os.path.join("data/char_dict", "ord_map.json")
+    write_tfrecords(provider.train, "training", save_dir, char_maps)
 
-    # write train tfrecords
-    print('Writing tf records for training...')
+    write_tfrecords(provider.test, "test", save_dir, char_maps)
 
-    train_images = provider.train.images
-    w, h = provider.input_size
-    train_images = [bytes(list(np.reshape(tmp, [w * h * 3]))) for tmp in train_images]
-    train_labels = provider.train.labels
-    train_imagenames = provider.train.imagenames
-
-    train_tfrecord_path = ops.join(save_dir, 'train_feature.tfrecords')
-    if char_maps is not None:
-        os.makedirs(os.path.dirname(char_maps), exist_ok=True)
-        all_chars = reduce(lambda a, b: set(a).union(set(b)), train_labels)
-        CharDictBuilder.write_char_dict(all_chars, os.path.join(char_maps, "char_dict.json"))
-        CharDictBuilder.map_ord_to_index(all_chars, os.path.join(char_maps, "ord_map.json"))
-        print("  (character maps written)")
-
-    feature_io = TextFeatureIO(char_dict_path, ord_map_dict_path)
-    feature_io.writer.write_features(tfrecords_path=train_tfrecord_path, labels=train_labels, images=train_images,
-                                     imagenames=train_imagenames)
-    # write test tfrecords
-
-    print('Writing tf records for testing...')
-
-    test_images = provider.test.images
-    test_images = [bytes(list(np.reshape(tmp, [w * h * 3]))) for tmp in test_images]
-    test_labels = provider.test.labels
-    test_imagenames = provider.test.imagenames
-
-    test_tfrecord_path = ops.join(save_dir, 'test_feature.tfrecords')
-    if char_maps is not None:
-        os.makedirs(os.path.dirname(char_maps), exist_ok=True)
-        all_chars = all_chars.union(reduce(lambda a, b: set(a).union(set(b)), test_labels))
-        CharDictBuilder.write_char_dict(all_chars, os.path.join(char_maps, "char_dict.json"))
-        CharDictBuilder.map_ord_to_index(all_chars, os.path.join(char_maps, "ord_map.json"))
-        print("  (updated character maps written)")
-
-    feature_io = TextFeatureIO(char_dict_path, ord_map_dict_path)
-    feature_io.writer.write_features(tfrecords_path=test_tfrecord_path, labels=test_labels, images=test_images,
-                                     imagenames=test_imagenames)
-
-    # write val tfrecords
-    print('Writing tf records for validation...')
-
-    val_images = provider.validation.images
-    val_images = [bytes(list(np.reshape(tmp, [w * h * 3]))) for tmp in val_images]
-    val_labels = provider.validation.labels
-    val_imagenames = provider.validation.imagenames
-
-    val_tfrecord_path = ops.join(save_dir, 'validation_feature.tfrecords')
-    if char_maps is not None:
-        os.makedirs(os.path.dirname(char_maps), exist_ok=True)
-        all_chars = all_chars.union(reduce(lambda a, b: set(a).union(set(b)), val_labels))
-        CharDictBuilder.write_char_dict(all_chars, os.path.join(char_maps, "char_dict.json"))
-        CharDictBuilder.map_ord_to_index(all_chars, os.path.join(char_maps, "ord_map.json"))
-        print("  (updated character maps written)")
-
-    feature_io = TextFeatureIO(char_dict_path, ord_map_dict_path)
-    feature_io.writer.write_features(tfrecords_path=val_tfrecord_path, labels=val_labels, images=val_images,
-                                     imagenames=val_imagenames)
+    write_tfrecords(provider.validation, "validation", save_dir, char_maps)
 
 
 if __name__ == '__main__':
