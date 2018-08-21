@@ -167,54 +167,37 @@ class TextDataProvider(object):
         assert ops.exists(self.__test_dataset_dir)
 
         # add test dataset
-        test_anno_path = ops.join(self.__test_dataset_dir, annotation_name)
-        assert ops.exists(test_anno_path)
+        def make_dataset(dir, split: ()=None):
+            annotation_path = ops.join(dir, annotation_name)
+            assert ops.exists(annotation_path)
 
-        with open(test_anno_path, 'r', encoding='utf-8') as anno_file:
-            info = np.array(list(filter(lambda x: len(x) == 2,  # discard bogus entries with no label
-                                        [tmp.strip().split(maxsplit=1) for tmp in anno_file.readlines()])))
+            with open(annotation_path, 'r', encoding='utf-8') as fd:
+                info = np.array(list(filter(lambda x: len(x) == 2,  # discard bogus entries with no label
+                                            [line.strip().split(maxsplit=1) for line in fd.readlines()])))
 
-            test_images_org = [cv2.imread(ops.join(self.__test_dataset_dir, tmp), cv2.IMREAD_COLOR)
-                               for tmp in info[:, 0]]
-            test_images = np.array([cv2.resize(tmp, self.__input_size) for tmp in test_images_org])
+                images_orig = [cv2.imread(ops.join(dir, imgname), cv2.IMREAD_COLOR) for imgname in info[:, 0]]
+                images = np.array([cv2.resize(img, self.__input_size) for img in images_orig])
+                labels = info[:, 1]
+                imagenames = np.array([ops.basename(imgname) for imgname in info[:, 0]])
 
-            test_labels = np.array([tmp for tmp in info[:, 1]])
-
-            test_imagenames = np.array([ops.basename(tmp) for tmp in info[:, 0]])
-
-            self.test = TextDataset(test_images, test_labels, imagenames=test_imagenames,
-                                    shuffle=shuffle, normalization=normalization)
-
-        # add train and validation dataset
-        train_anno_path = ops.join(self.__train_dataset_dir, annotation_name)
-        assert ops.exists(train_anno_path)
-
-        with open(train_anno_path, 'r', encoding='utf-8') as anno_file:
-            info = np.array(list(filter(lambda x: len(x) == 2,  # discard bogus entries with no label
-                                        [tmp.strip().split(maxsplit=1) for tmp in anno_file.readlines()])))
-
-            train_images_org = [cv2.imread(ops.join(self.__train_dataset_dir, tmp), cv2.IMREAD_COLOR)
-                                     for tmp in info[:, 0]]
-            train_images = np.array([cv2.resize(tmp, self.__input_size) for tmp in train_images_org])
-
-            train_labels = np.array([tmp for tmp in info[:, 1]])
-
-            train_imagenames = np.array([ops.basename(tmp) for tmp in info[:, 0]])
-
-            if validation_set is not None and validation_split is not None:
-                split_idx = int(train_images.shape[0] * (1 - validation_split))
-                self.train = TextDataset(images=train_images[:split_idx], labels=train_labels[:split_idx],
-                                         shuffle=shuffle, normalization=normalization,
-                                         imagenames=train_imagenames[:split_idx])
-                self.validation = TextDataset(images=train_images[split_idx:], labels=train_labels[split_idx:],
-                                              shuffle=shuffle, normalization=normalization,
-                                              imagenames=train_imagenames[split_idx:])
+            if split is None:
+                return TextDataset(images, labels, imagenames, shuffle=shuffle, normalization=normalization)
             else:
-                self.train = TextDataset(images=train_images, labels=train_labels, shuffle=shuffle,
-                                         normalization=normalization, imagenames=train_imagenames)
+                split_idx = images.shape[0] * split
+                return TextDataset(images[:split_idx], labels[:split_idx], imagenames[:split_idx],
+                                   shuffle=shuffle, normalization=normalization), \
+                       TextDataset(images[split_idx:], labels[split_idx:], imagenames[split_idx:],
+                                   shuffle=shuffle, normalization=normalization),
 
-            if validation_set and not validation_split:
+        self.test = make_dataset(self.__test_dataset_dir)
+
+        if validation_set is None:
+            self.train = make_dataset(self.__train_dataset_dir)
+        else:
+            if validation_split is None:
                 self.validation = self.test
+            else:
+                self.train, self.validation = make_dataset(self.__train_dataset_dir, validation_split)
 
     def __str__(self):
         provider_info = 'Dataset_dir: {:s} contain training images: {:d} validation images: {:d} testing images: {:d}'.\
