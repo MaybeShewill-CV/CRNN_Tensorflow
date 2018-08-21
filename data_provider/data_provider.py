@@ -165,13 +165,12 @@ class TextDataProvider(object):
         test_anno_path = ops.join(self.__test_dataset_dir, annotation_name)
         assert ops.exists(test_anno_path)
 
-        with open(test_anno_path, 'r') as anno_file:
+        with open(test_anno_path, 'r', encoding='utf-8') as anno_file:
             info = np.array([tmp.strip().split() for tmp in anno_file.readlines()])
 
             test_images_org = [cv2.imread(ops.join(self.__test_dataset_dir, tmp), cv2.IMREAD_COLOR)
                                for tmp in info[:, 0]]
             test_images = np.array([cv2.resize(tmp, (100, 32)) for tmp in test_images_org])
-
 
             test_labels = np.array([tmp for tmp in info[:, 1]])
 
@@ -185,7 +184,7 @@ class TextDataProvider(object):
         train_anno_path = ops.join(self.__train_dataset_dir, annotation_name)
         assert ops.exists(train_anno_path)
 
-        with open(train_anno_path, 'r') as anno_file:
+        with open(train_anno_path, 'r', encoding='utf-8') as anno_file:
             info = np.array([tmp.strip().split() for tmp in anno_file.readlines()])
 
             train_images_org = [cv2.imread(ops.join(self.__train_dataset_dir, tmp), cv2.IMREAD_COLOR)
@@ -193,6 +192,7 @@ class TextDataProvider(object):
             train_images = np.array([cv2.resize(tmp,(100,32)) for tmp in train_images_org])
 
             train_labels = np.array([tmp for tmp in info[:, 1]])
+
             train_imagenames = np.array([ops.basename(tmp) for tmp in info[:, 0]])
 
             if validation_set is not None and validation_split is not None:
