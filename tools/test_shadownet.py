@@ -65,7 +65,7 @@ def test_shadownet(dataset_dir, weights_path, is_vis=False, is_recursive=True, n
     # build shadownet
     net = crnn_model.ShadowNet(phase='Test', hidden_nums=config.cfg.ARCH.HIDDEN_UNITS,
                                layers_nums=config.cfg.ARCH.HIDDEN_LAYERS,
-                               num_classes=len(decoder.char_dict)+1)
+                               num_classes=len(decoder.char_dict) + 1)
 
     with tf.variable_scope('shadow'):
         net_out = net.build_shadownet(inputdata=images_sh)

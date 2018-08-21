@@ -48,7 +48,6 @@ def recognize(image_path, weights_path, is_vis=True):
     :param is_vis:
     :return:
     """
-    decoder = data_utils.TextFeatureIO()
 
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
     image = cv2.resize(image, config.cfg.ARCH.INPUT_SIZE)
