@@ -13,6 +13,7 @@ import os.path as ops
 import argparse
 from functools import reduce
 import numpy as np
+from global_configuration import config
 
 from data_provider import data_provider
 from data_provider.data_provider import TextDataset
@@ -96,7 +97,7 @@ if __name__ == '__main__':
     provider = data_provider.TextDataProvider(dataset_dir=args.dataset_dir, annotation_name=args.annotation_file,
                                               validation_set=args.validation_split > 0,
                                               validation_split=args.validation_split, shuffle='every_epoch',
-                                              normalization=args.normalization)
+                                              normalization=args.normalization, input_size=config.cfg.ARCH.INPUT_SIZE)
     print('done.')
 
     write_tfrecords(provider.train, "train", args.save_dir, args.char_maps)
