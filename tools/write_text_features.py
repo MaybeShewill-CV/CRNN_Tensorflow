@@ -46,10 +46,9 @@ def write_tfrecords(dataset: TextDataset, name: str, save_dir: str, char_maps_di
     """
 
     :param dataset:
-    :param name:
-    :param save_dir:
-    :param char_maps_dir:
-    :return:
+    :param name: Name of the dataset (e.g. "train", "test", or "validation")
+    :param save_dir: Where to store the tf records
+    :param char_maps_dir: If not None, extract character maps from labels and merge with any char_dict already present
     """
     tfrecord_path = ops.join(save_dir, '%s_features.tfrecords' % name)
     print('Writing tf records for %s at %s...' % (name, tfrecord_path))
@@ -84,40 +83,22 @@ def write_tfrecords(dataset: TextDataset, name: str, save_dir: str, char_maps_di
                                      imagenames=imagenames)
 
 
-def write_features(dataset_dir: str, save_dir: str, annotation_name: str, validation_split: float, normalization: str,
-                   char_maps: str):
-    """ Processes training and test data creating Tensorflow records.
-
-    :param dataset_dir: root to Train and Test datasets
-    :param save_dir: Where to store the tf records
-    :param annotation_name: Name of annotations file in each dataset dir
-    :param validation_split: Fraction of training data to use for validation
-    :param normalization: Perform normalization on images 'divide_255', 'divide_256'
-    :param build_char_maps: Whether to extract character maps from training and test labels
-    """
-    os.makedirs(save_dir, exist_ok=True)
-
-    print('Initializing the dataset provider... ', end='', flush=True)
-
-    provider = data_provider.TextDataProvider(dataset_dir=dataset_dir, annotation_name=annotation_name,
-                                              validation_set=validation_split > 0, validation_split=validation_split,
-                                              shuffle='every_epoch', normalization=normalization)
-    print('done.')
-
-    write_tfrecords(provider.train, "training", save_dir, char_maps)
-
-    write_tfrecords(provider.test, "test", save_dir, char_maps)
-
-    write_tfrecords(provider.validation, "validation", save_dir, char_maps)
-
-
 if __name__ == '__main__':
-    # init args
     args = init_args()
+
     if not ops.exists(args.dataset_dir):
         raise ValueError('Dataset {:s} doesn\'t exist'.format(args.dataset_dir))
 
-    # write tf records
-    write_features(dataset_dir=args.dataset_dir, save_dir=args.save_dir, annotation_name=args.annotation_file,
-                   validation_split=args.validation_split, normalization=args.normalization,
-                   char_maps=args.char_maps)
+    os.makedirs(args.save_dir, exist_ok=True)
+
+    print('Initializing the dataset provider... ', end='', flush=True)
+
+    provider = data_provider.TextDataProvider(dataset_dir=args.dataset_dir, annotation_name=args.annotation_name,
+                                              validation_set=args.validation_split > 0,
+                                              validation_split=args.validation_split, shuffle='every_epoch',
+                                              normalization=args.normalization)
+    print('done.')
+
+    write_tfrecords(provider.train, "train", args.save_dir, args.char_maps)
+    write_tfrecords(provider.test, "test", args.save_dir, args.char_maps)
+    write_tfrecords(provider.validation, "val", args.save_dir, args.char_maps)
