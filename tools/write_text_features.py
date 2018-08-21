@@ -93,7 +93,7 @@ if __name__ == '__main__':
 
     print('Initializing the dataset provider... ', end='', flush=True)
 
-    provider = data_provider.TextDataProvider(dataset_dir=args.dataset_dir, annotation_name=args.annotation_name,
+    provider = data_provider.TextDataProvider(dataset_dir=args.dataset_dir, annotation_name=args.annotation_file,
                                               validation_set=args.validation_split > 0,
                                               validation_split=args.validation_split, shuffle='every_epoch',
                                               normalization=args.normalization)
