@@ -24,7 +24,7 @@ __C.ARCH.HIDDEN_LAYERS = 2
 # Sequence length.  This has to be the width of the final feature map of the CNN, which is input size width / 4
 __C.ARCH.SEQ_LENGTH = 32
 # Width x height into which training / testing images are resized before feeding into the network
-__C.ARCH.INPUT_SIZE = (128, 32)
+__C.ARCH.INPUT_SIZE = (100, 32)
 
 # Train options
 __C.TRAIN = edict()
