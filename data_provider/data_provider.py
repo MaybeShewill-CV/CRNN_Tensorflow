@@ -166,8 +166,8 @@ class TextDataProvider(object):
         assert ops.exists(self.__train_dataset_dir)
         assert ops.exists(self.__test_dataset_dir)
 
-        # add test dataset
         def make_dataset(dir, split: ()=None):
+            """ Helper function """
             annotation_path = ops.join(dir, annotation_name)
             assert ops.exists(annotation_path)
 
@@ -176,18 +176,20 @@ class TextDataProvider(object):
                                             [line.strip().split(maxsplit=1) for line in fd.readlines()])))
 
                 images_orig = [cv2.imread(ops.join(dir, imgname), cv2.IMREAD_COLOR) for imgname in info[:, 0]]
-                images = np.array([cv2.resize(img, self.__input_size) for img in images_orig])
+                assert not any(map(lambda x: x is None, images_orig)),\
+                    "Could not read some images. Check for whitespace in file names or invalid files"
+                images = np.array([cv2.resize(img, tuple(self.__input_size)) for img in images_orig])
                 labels = info[:, 1]
                 imagenames = np.array([ops.basename(imgname) for imgname in info[:, 0]])
 
             if split is None:
                 return TextDataset(images, labels, imagenames, shuffle=shuffle, normalization=normalization)
             else:
-                split_idx = images.shape[0] * split
+                split_idx = int(images.shape[0] * split)
                 return TextDataset(images[:split_idx], labels[:split_idx], imagenames[:split_idx],
                                    shuffle=shuffle, normalization=normalization), \
                        TextDataset(images[split_idx:], labels[split_idx:], imagenames[split_idx:],
-                                   shuffle=shuffle, normalization=normalization),
+                                   shuffle=shuffle, normalization=normalization)
 
         self.test = make_dataset(self.__test_dataset_dir)
 
