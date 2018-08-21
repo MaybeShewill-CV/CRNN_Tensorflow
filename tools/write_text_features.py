@@ -50,12 +50,12 @@ def write_tfrecords(dataset: TextDataset, name: str, save_dir: str, char_maps_di
     :param save_dir: Where to store the tf records
     :param char_maps_dir: If not None, extract character maps from labels and merge with any char_dict already present
     """
-    tfrecord_path = ops.join(save_dir, '%s_features.tfrecords' % name)
+    tfrecord_path = ops.join(save_dir, '%s_feature.tfrecords' % name)
     print('Writing tf records for %s at %s...' % (name, tfrecord_path))
 
     images = dataset.images
-    h, w = dataset.images.shape
-    images = [bytes(list(np.reshape(tmp, [w * h * 3]))) for tmp in images]
+    h, w, c = images.shape[1:]  # shape is num samples x height x width x num channels
+    images = [bytes(list(np.reshape(tmp, [w * h * c]))) for tmp in images]
     labels = dataset.labels
     imagenames = dataset.imagenames
 
