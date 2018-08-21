@@ -4,10 +4,26 @@ This model consists of a CNN stage, RNN stage and CTC loss for scene text recogn
 
 ## Installation
 
-There are Dockerfiles inside the folder `docker`. Follow the instructions in the README to build the images.
+This software has mostly been tested on Ubuntu 16.04(x64) using python3.5 and tensorflow 1.3.0 with cuda-8.0, cudnn-6.0 and a GTX-1070 GPU. Other versions of tensorflow have not been tested but might work properly above version 1.0.
 
-Other than that, this software has only been tested on ubuntu 16.04(x64), python3.5, cuda-8.0, cudnn-6.0 with a GTX-1070 GPU. To install this software you need tensorflow 1.3.0.
-Other versions of tensorflow have not been tested but might work properly above version 1.0. Other required packages may be installed with
+The following methods are provided to install dependencies:
+
+
+## Docker
+
+There are Dockerfiles inside the folder `docker`. Follow the instructions inside `docker/README.md` to build the images.
+
+## Conda
+
+You can create a conda environment with the required dependencies using: 
+
+```
+conda env create -f crnntf-env.yml
+```
+
+## Pip
+
+Required packages may be installed with
 
 ```
 pip3 install -r requirements.txt
