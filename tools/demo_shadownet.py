@@ -48,20 +48,26 @@ def recognize(image_path, weights_path, is_vis=True):
     :param is_vis:
     :return:
     """
+
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-    image = cv2.resize(image, (100, 32))
+    image = cv2.resize(image, config.cfg.ARCH.INPUT_SIZE)
     image = np.expand_dims(image, axis=0).astype(np.float32)
 
-    inputdata = tf.placeholder(dtype=tf.float32, shape=[1, 32, 100, 3], name='input')
+    w, h = config.cfg.ARCH.INPUT_SIZE
+    inputdata = tf.placeholder(dtype=tf.float32, shape=[1, h, w, 3], name='input')
 
-    net = crnn_model.ShadowNet(phase='Test', hidden_nums=256, layers_nums=2, seq_length=25, num_classes=37)
+    decoder = data_utils.TextFeatureIO()
+
+    net = crnn_model.ShadowNet(phase='Test',
+                               hidden_nums=config.cfg.ARCH.HIDDEN_UNITS,
+                               layers_nums=config.cfg.ARCH.HIDDEN_LAYERS,
+                               num_classes=len(decoder.char_dict) + 1)
 
     with tf.variable_scope('shadow'):
         net_out = net.build_shadownet(inputdata=inputdata)
 
-    decodes, _ = tf.nn.ctc_beam_search_decoder(inputs=net_out, sequence_length=25*np.ones(1), merge_repeated=False)
-
-    decoder = data_utils.TextFeatureIO()
+    decodes, _ = tf.nn.ctc_beam_search_decoder(inputs=net_out, sequence_length=config.cfg.ARCH.SEQ_LENGTH*np.ones(1),
+                                               merge_repeated=False)
 
     # config tf session
     sess_config = tf.ConfigProto()

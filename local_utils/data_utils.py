@@ -16,6 +16,7 @@ import os
 import os.path as ops
 import sys
 
+from global_configuration import config
 from local_utils import establish_char_dict
 
 
@@ -222,7 +223,8 @@ class TextFeatureReader(FeatureIO):
                                                'labels': tf.VarLenFeature(tf.int64),
                                            })
         image = tf.decode_raw(features['images'], tf.uint8)
-        images = tf.reshape(image, [32, 100, 3])
+        w, h = config.cfg.ARCH.INPUT_SIZE
+        images = tf.reshape(image, [h, w, 3])
         labels = features['labels']
         labels = tf.cast(labels, tf.int32)
         imagenames = features['imagenames']
@@ -231,7 +233,7 @@ class TextFeatureReader(FeatureIO):
 
 class TextFeatureIO(object):
     """
-        Implement a crnn feture io manager
+        Implement a crnn feature io manager
     """
     def __init__(self, char_dict_path=ops.join(os.getcwd(), 'data/char_dict/char_dict.json'),
                  ord_map_dict_path=ops.join(os.getcwd(), 'data/char_dict/ord_map.json')):

@@ -9,6 +9,8 @@
 Provide the training and testing data for shadow net
 """
 import os.path as ops
+from typing import Tuple
+
 import numpy as np
 import copy
 import cv2
@@ -17,6 +19,7 @@ try:
 except ImportError:
     pass
 
+from global_configuration import config
 from data_provider import base_data_provider
 
 
@@ -132,7 +135,7 @@ class TextDataProvider(object):
         Implement the text data provider for training and testing the shadow net
     """
     def __init__(self, dataset_dir, annotation_name, validation_set=None, validation_split=None, shuffle=None,
-                 normalization=None):
+                 normalization=None, input_size: Tuple[int, int]=None):
         """
 
         :param dataset_dir: str, where you save the dataset one class on folder
@@ -149,7 +152,9 @@ class TextDataProvider(object):
                               'divide_256': divide all pixels by 256
                               'by_chanels': substract mean of every chanel and divide each
                                             chanel data by it's standart deviation
+        :param input_size: Target size to which all images will be resized.
         """
+        self.__input_size = input_size if input_size is not None else config.cfg.ARCH.INPUT_SIZE
         self.__dataset_dir = dataset_dir
         self.__validation_split = validation_split
         self.__shuffle = shuffle
@@ -161,61 +166,53 @@ class TextDataProvider(object):
         assert ops.exists(self.__train_dataset_dir)
         assert ops.exists(self.__test_dataset_dir)
 
-        # add test dataset
-        test_anno_path = ops.join(self.__test_dataset_dir, annotation_name)
-        assert ops.exists(test_anno_path)
+        def make_dataset(dir, split: ()=None):
+            """ Helper function """
+            annotation_path = ops.join(dir, annotation_name)
+            assert ops.exists(annotation_path)
 
-        with open(test_anno_path, 'r', encoding='utf-8') as anno_file:
-            info = np.array([tmp.strip().split() for tmp in anno_file.readlines()])
+            with open(annotation_path, 'r', encoding='utf-8') as fd:
+                info = np.array(list(filter(lambda x: len(x) == 2,  # discard bogus entries with no label
+                                            [line.strip().split(maxsplit=1) for line in fd.readlines()])))
 
-            test_images_org = [cv2.imread(ops.join(self.__test_dataset_dir, tmp), cv2.IMREAD_COLOR)
-                               for tmp in info[:, 0]]
-            test_images = np.array([cv2.resize(tmp, (100, 32)) for tmp in test_images_org])
+                images_orig = [cv2.imread(ops.join(dir, imgname), cv2.IMREAD_COLOR) for imgname in info[:, 0]]
+                assert not any(map(lambda x: x is None, images_orig)),\
+                    "Could not read some images. Check for whitespace in file names or invalid files"
+                images = np.array([cv2.resize(img, tuple(self.__input_size)) for img in images_orig])
+                labels = info[:, 1]
+                imagenames = np.array([ops.basename(imgname) for imgname in info[:, 0]])
 
-            test_labels = np.array([tmp for tmp in info[:, 1]])
-
-            test_imagenames = np.array([ops.basename(tmp) for tmp in info[:, 0]])
-
-            self.test = TextDataset(test_images, test_labels, imagenames=test_imagenames,
-                                    shuffle=shuffle, normalization=normalization)
-        anno_file.close()
-
-        # add train and validation dataset
-        train_anno_path = ops.join(self.__train_dataset_dir, annotation_name)
-        assert ops.exists(train_anno_path)
-
-        with open(train_anno_path, 'r', encoding='utf-8') as anno_file:
-            info = np.array([tmp.strip().split() for tmp in anno_file.readlines()])
-
-            train_images_org = [cv2.imread(ops.join(self.__train_dataset_dir, tmp), cv2.IMREAD_COLOR)
-                                     for tmp in info[:, 0]]
-            train_images = np.array([cv2.resize(tmp,(100,32)) for tmp in train_images_org])
-
-            train_labels = np.array([tmp for tmp in info[:, 1]])
-
-            train_imagenames = np.array([ops.basename(tmp) for tmp in info[:, 0]])
-
-            if validation_set is not None and validation_split is not None:
-                split_idx = int(train_images.shape[0] * (1 - validation_split))
-                self.train = TextDataset(images=train_images[:split_idx], labels=train_labels[:split_idx],
-                                         shuffle=shuffle, normalization=normalization,
-                                         imagenames=train_imagenames[:split_idx])
-                self.validation = TextDataset(images=train_images[split_idx:], labels=train_labels[split_idx:],
-                                              shuffle=shuffle, normalization=normalization,
-                                              imagenames=train_imagenames[split_idx:])
+            if split is None:
+                return TextDataset(images, labels, imagenames, shuffle=shuffle, normalization=normalization)
             else:
-                self.train = TextDataset(images=train_images, labels=train_labels, shuffle=shuffle,
-                                         normalization=normalization, imagenames=train_imagenames)
+                split_idx = int(images.shape[0] * split)
+                return TextDataset(images[:split_idx], labels[:split_idx], imagenames[:split_idx],
+                                   shuffle=shuffle, normalization=normalization), \
+                       TextDataset(images[split_idx:], labels[split_idx:], imagenames[split_idx:],
+                                   shuffle=shuffle, normalization=normalization)
 
-            if validation_set and not validation_split:
+        self.test = make_dataset(self.__test_dataset_dir)
+
+        if validation_set is None:
+            self.train = make_dataset(self.__train_dataset_dir)
+        else:
+            if validation_split is None:
                 self.validation = self.test
-        anno_file.close()
-        return
+            else:
+                self.train, self.validation = make_dataset(self.__train_dataset_dir, validation_split)
 
     def __str__(self):
         provider_info = 'Dataset_dir: {:s} contain training images: {:d} validation images: {:d} testing images: {:d}'.\
             format(self.__dataset_dir, self.train.num_examples, self.validation.num_examples, self.test.num_examples)
         return provider_info
+
+    @property
+    def input_size(self):
+        """ Size to which images are rescaled before training and testing.
+
+        :return:
+        """
+        return self.__input_size
 
     @property
     def dataset_dir(self):
