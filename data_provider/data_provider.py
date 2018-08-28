@@ -138,20 +138,19 @@ class TextDataProvider(object):
                  normalization=None, input_size: Tuple[int, int]=None):
         """
 
-        :param dataset_dir: str, where you save the dataset one class on folder
-        :param annotation_name: annotation name
-        :param validation_set:
+        :param dataset_dir: Directory with all data.
+        :param annotation_name: Annotations file name
+        :param validation_set: See `validation_split`
         :param validation_split: `float` or None. If a float, ratio of training data which will will be used as
                                  validation data. If None and if 'validation set' == True, the validation set will be a
                                   copy of the test set.
-        :param shuffle: if need shuffle the dataset, 'once_prior_train' represent shuffle only once before training
-                        'every_epoch' represent shuffle the data every epoch
+        :param shuffle: Set to 'once_prior_train' to shuffle the data once before training, 'every_epoch' to shuffle
+                        every epoch. None to disable shuffling
         :param normalization: if need do normalization to the dataset,
                               'None': no any normalization
                               'divide_255': divide all pixels by 255
                               'divide_256': divide all pixels by 256
-                              'by_chanels': substract mean of every chanel and divide each
-                                            chanel data by it's standart deviation
+                              'by_chanels': subtract the mean and divide by the standard deviation in each channel
         :param input_size: Target size to which all images will be resized.
         """
         self.__input_size = input_size if input_size is not None else config.cfg.ARCH.INPUT_SIZE
