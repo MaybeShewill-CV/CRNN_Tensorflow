@@ -9,7 +9,7 @@
 Provide the training and testing data for shadow net
 """
 import os.path as ops
-from typing import Tuple
+from typing import Tuple, Union
 
 import numpy as np
 import copy
@@ -138,20 +138,19 @@ class TextDataProvider(object):
                  normalization=None, input_size: Tuple[int, int]=None):
         """
 
-        :param dataset_dir: str, where you save the dataset one class on folder
-        :param annotation_name: annotation name
-        :param validation_set:
-        :param validation_split: `float` or None float: chunk of `train set` will be marked as `validation set`.
-                                 None: if 'validation set' == True, `validation set` will be
-                                 copy of `test set`
-        :param shuffle: if need shuffle the dataset, 'once_prior_train' represent shuffle only once before training
-                        'every_epoch' represent shuffle the data every epoch
+        :param dataset_dir: Directory with all data.
+        :param annotation_name: Annotations file name
+        :param validation_set: See `validation_split`
+        :param validation_split: `float` or None. If a float, ratio of training data which will will be used as
+                                 validation data. If None and if 'validation set' == True, the validation set will be a
+                                  copy of the test set.
+        :param shuffle: Set to 'once_prior_train' to shuffle the data once before training, 'every_epoch' to shuffle
+                        every epoch. None to disable shuffling
         :param normalization: if need do normalization to the dataset,
                               'None': no any normalization
                               'divide_255': divide all pixels by 255
                               'divide_256': divide all pixels by 256
-                              'by_chanels': substract mean of every chanel and divide each
-                                            chanel data by it's standart deviation
+                              'by_chanels': subtract the mean and divide by the standard deviation in each channel
         :param input_size: Target size to which all images will be resized.
         """
         self.__input_size = input_size if input_size is not None else config.cfg.ARCH.INPUT_SIZE
@@ -166,8 +165,12 @@ class TextDataProvider(object):
         assert ops.exists(self.__train_dataset_dir)
         assert ops.exists(self.__test_dataset_dir)
 
-        def make_dataset(dir, split: ()=None):
-            """ Helper function """
+        def make_datasets(dir: str, split: float=None) -> Tuple[TextDataset, Union[TextDataset, None]]:
+            """ Helper function to split data and create TextDatasets
+            TODO: maybe shuffle before splitting?
+             :param dir: Directory with all data
+             :param split: take this fraction of the data for the second TextDataset
+            """
             annotation_path = ops.join(dir, annotation_name)
             assert ops.exists(annotation_path)
 
@@ -183,26 +186,30 @@ class TextDataProvider(object):
                 imagenames = np.array([ops.basename(imgname) for imgname in info[:, 0]])
 
             if split is None:
-                return TextDataset(images, labels, imagenames, shuffle=shuffle, normalization=normalization)
+                return TextDataset(images, labels, imagenames, shuffle=shuffle, normalization=normalization), None
             else:
-                split_idx = int(images.shape[0] * split)
+                split_idx = int(images.shape[0] * (1.0 - split))
                 return TextDataset(images[:split_idx], labels[:split_idx], imagenames[:split_idx],
                                    shuffle=shuffle, normalization=normalization), \
                        TextDataset(images[split_idx:], labels[split_idx:], imagenames[split_idx:],
                                    shuffle=shuffle, normalization=normalization)
 
-        self.test = make_dataset(self.__test_dataset_dir)
+        self.test, _ = make_datasets(self.__test_dataset_dir)
 
         if validation_set is None:
-            self.train = make_dataset(self.__train_dataset_dir)
+            self.train, _ = make_datasets(self.__train_dataset_dir)
         else:
             if validation_split is None:
                 self.validation = self.test
+            elif isinstance(validation_split, float) and (0.0 <= validation_split <= 1.0):
+                if validation_split > 0.5:
+                    print("validation_split suspiciously high: %.2f" % validation_split)
+                self.train, self.validation = make_datasets(self.__train_dataset_dir, validation_split)
             else:
-                self.train, self.validation = make_dataset(self.__train_dataset_dir, validation_split)
+                raise ValueError("Expected validation_split to be a float between 0 and 1.")
 
     def __str__(self):
-        provider_info = 'Dataset_dir: {:s} contain training images: {:d} validation images: {:d} testing images: {:d}'.\
+        provider_info = 'Dataset_dir {:s} contains {:d} training, {:d} validation and {:d} testing images'.\
             format(self.__dataset_dir, self.train.num_examples, self.validation.num_examples, self.test.num_examples)
         return provider_info
 
