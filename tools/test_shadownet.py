@@ -30,20 +30,23 @@ def init_args():
     parser.add_argument('-d', '--dataset_dir', type=str, help='Path to test tfrecords data')
     parser.add_argument('-w', '--weights_path', type=str, help='Path to pre-trained weights')
     parser.add_argument('-r', '--is_recursive', type=bool, help='Whether to recursively test the dataset')
+    parser.add_argument('-c', '--num_classes', type=int, help='Force number of character classes to this number. '
+                                                              'Use 37 to run with the demo data.')
     parser.add_argument('-j', '--num_threads', type=int, default=int(os.cpu_count() / 2),
                         help='Number of threads to use in batch shuffling')
 
     return parser.parse_args()
 
 
-def test_shadownet(dataset_dir, weights_path, is_vis=False, is_recursive=True, num_threads=4):
+def test_shadownet(dataset_dir: str, weights_path: str, is_vis: bool=False, is_recursive: bool=True, num_threads: int=4,
+                   num_classes: int=None):
     """
 
     :param dataset_dir:
     :param weights_path:
     :param is_vis:
     :param is_recursive:
-    :return:
+    :param num_classes:
     """
     # Initialize the record decoder
     decoder = data_utils.TextFeatureIO().reader
@@ -63,9 +66,10 @@ def test_shadownet(dataset_dir, weights_path, is_vis=False, is_recursive=True, n
     images_sh = tf.cast(x=images_sh, dtype=tf.float32)
 
     # build shadownet
+    num_classes = len(decoder.char_dict) + 1 if num_classes is None else num_classes
     net = crnn_model.ShadowNet(phase='Test', hidden_nums=config.cfg.ARCH.HIDDEN_UNITS,
                                layers_nums=config.cfg.ARCH.HIDDEN_LAYERS,
-                               num_classes=len(decoder.char_dict) + 1)
+                               num_classes=num_classes)
 
     with tf.variable_scope('shadow'):
         net_out = net.build_shadownet(inputdata=images_sh)
@@ -186,4 +190,4 @@ if __name__ == '__main__':
     args = init_args()
 
     # test shadow net
-    test_shadownet(args.dataset_dir, args.weights_path, args.is_recursive, args.num_threads)
+    test_shadownet(args.dataset_dir, args.weights_path, args.is_recursive, args.num_threads, args.num_classes)

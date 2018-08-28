@@ -64,11 +64,8 @@ class CharDictBuilder(object):
         :param dict_path:
         :return: a dict with ord(char) as key and char as value
         """
-        assert ops.exists(dict_path)
-
         with open(dict_path, 'r', encoding='utf-8') as json_f:
             res = json.load(json_f)
-
         return res
 
     @staticmethod
@@ -88,9 +85,6 @@ class CharDictBuilder(object):
         :param ord_map_dict_path:
         :return:
         """
-        assert ops.exists(ord_map_dict_path)
-
         with open(ord_map_dict_path, 'r', encoding='utf-8') as json_f:
             res = json.load(json_f)
-
         return res
