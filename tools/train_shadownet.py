@@ -29,7 +29,7 @@ def init_args():
     :return:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dataset_dir', type=str,
+    parser.add_argument('-d', '--dataset_dir', type=str, required=True,
                         help='Path to dir containing train/test data and annotation files.')
     parser.add_argument('-w', '--weights_path', type=str, help='Path to pre-trained weights.')
     parser.add_argument('-j', '--num_threads', type=int, default=int(os.cpu_count()/2),
