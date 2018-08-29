@@ -8,7 +8,7 @@
 """
 Implement some utils used to convert image and it's corresponding label into tfrecords
 """
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 import tensorflow as tf
@@ -24,6 +24,7 @@ class FeatureIO(object):
     """
         Implement the base writer class
     """
+
     def __init__(self, char_dict_path, ord_map_dict_path):
         self.__char_dict = establish_char_dict.CharDictBuilder.read_char_dict(char_dict_path)
         self.__ord_map = establish_char_dict.CharDictBuilder.read_ord_map_dict(ord_map_dict_path)
@@ -111,14 +112,13 @@ class FeatureIO(object):
         :param number: Can be passed as string representing the integer value to look up.
         :return: Character corresponding to 'number' in the char_dict
         """
-        if number == '1':
-            return '*'
-        if number == 1:
-            return '*'
+        # 1 is the default value in sparse_tensor_to_str() This will be skipped when building the resulting strings
+        if number == 1 or number == '1':
+            return '\x00'
         else:
             return self.__char_dict[str(number)]
 
-    def encode_labels(self, labels):
+    def encode_labels(self, labels) -> Tuple[List[List[int]], List[int]]:
         """
             encode the labels for ctc loss
         :param labels:
@@ -139,6 +139,7 @@ class FeatureIO(object):
         """
         indices = sparse_tensor.indices
         values = sparse_tensor.values
+        # Translate from consecutive numbering into ord() values
         values = np.array([self.__ord_map[str(tmp)] for tmp in values])
         dense_shape = sparse_tensor.dense_shape
 
@@ -148,9 +149,12 @@ class FeatureIO(object):
         for i, index in enumerate(indices):
             number_lists[index[0], index[1]] = values[i]
         for number_list in number_lists:
+            # Translate from ord() values into characters
             str_lists.append([self.int_to_char(val) for val in number_list])
         for str_list in str_lists:
-            res.append(''.join(c for c in str_list if c != '*'))
+            # int_to_char() returns '\x00' for an input == 1, which is the default
+            # value in number_lists, so we skip it when building the result
+            res.append(''.join(c for c in str_list if c != '\x00'))
         return res
 
 
