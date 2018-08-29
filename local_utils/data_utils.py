@@ -92,11 +92,7 @@ class FeatureIO(object):
         :param char:
         :return:
         """
-        temp = ord(char)
-        # convert upper character into lower character
-        if 65 <= temp <= 90:
-            temp = temp + 32
-
+        temp = ord(char.lower())
         for k, v in self.__ord_map.items():
             if v == str(temp):
                 temp = int(k)
