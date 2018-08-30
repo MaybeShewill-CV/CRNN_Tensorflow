@@ -27,25 +27,31 @@ def init_args():
     :return:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dataset_dir', type=str, help='Path to test tfrecords data')
-    parser.add_argument('-w', '--weights_path', type=str, help='Path to pre-trained weights')
-    parser.add_argument('-r', '--is_recursive', type=bool, help='Whether to recursively test the dataset')
-    parser.add_argument('-c', '--num_classes', type=int, help='Force number of character classes to this number. '
-                                                              'Use 37 to run with the demo data.')
+    parser.add_argument('-d', '--dataset_dir', type=str, required=True,
+                        help='Path to test tfrecords data')
+    parser.add_argument('-w', '--weights_path', type=str, required=True,
+                        help='Path to pre-trained weights')
+    parser.add_argument('-r', '--is_recursive', type=bool,
+                        help='Whether to recursively test the dataset')
+    parser.add_argument('-c', '--num_classes', type=int, required=True,
+                        help='Force number of character classes to this number. '
+                             'Use 37 to run with the demo data.')
     parser.add_argument('-j', '--num_threads', type=int, default=int(os.cpu_count() / 2),
                         help='Number of threads to use in batch shuffling')
 
     return parser.parse_args()
 
 
-def test_shadownet(dataset_dir: str, weights_path: str, is_vis: bool=False, is_recursive: bool=True, num_threads: int=4,
-                   num_classes: int=None):
+def test_shadownet(dataset_dir: str, weights_path: str, is_vis: bool = False,
+                   is_recursive: bool = True, num_threads: int = 4,
+                   num_classes: int = None):
     """
 
     :param dataset_dir:
     :param weights_path:
     :param is_vis:
     :param is_recursive:
+    :param num_threads:
     :param num_classes:
     """
     # Initialize the record decoder
@@ -55,7 +61,7 @@ def test_shadownet(dataset_dir: str, weights_path: str, is_vis: bool=False, is_r
     if not is_recursive:
         images_sh, labels_sh, imagenames_sh = tf.train.shuffle_batch(tensors=[images_t, labels_t, imagenames_t],
                                                                      batch_size=config.cfg.TEST.BATCH_SIZE,
-                                                                     capacity=1000+2*config.cfg.TEST.BATCH_SIZE,
+                                                                     capacity=1000 + 2 * config.cfg.TEST.BATCH_SIZE,
                                                                      min_after_dequeue=2, num_threads=num_threads)
     else:
         images_sh, labels_sh, imagenames_sh = tf.train.batch(tensors=[images_t, labels_t, imagenames_t],
