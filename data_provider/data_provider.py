@@ -182,7 +182,7 @@ class TextDataProvider(object):
                 assert not any(map(lambda x: x is None, images_orig)),\
                     "Could not read some images. Check for whitespace in file names or invalid files"
                 images = np.array([cv2.resize(img, tuple(self.__input_size)) for img in images_orig])
-                labels = info[:, 1]
+                labels = np.array([x[:config.cfg.ARCH.SEQ_LENGTH] for x in info[:, 1]])
                 imagenames = np.array([ops.basename(imgname) for imgname in info[:, 0]])
 
             if split is None:
