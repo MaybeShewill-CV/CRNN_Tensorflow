@@ -30,13 +30,16 @@ def init_args() -> argparse.Namespace:
                         help='Path to test tfrecords data')
     parser.add_argument('-w', '--weights_path', type=str, required=True,
                         help='Path to pre-trained weights')
-    parser.add_argument('-r', '--is_recursive', type=bool, default=False,
-                        help='Whether to recursively test the dataset')
     parser.add_argument('-c', '--num_classes', type=int, required=True,
                         help='Force number of character classes to this number. '
-                             'Use 37 to run with the demo data.')
+                             'Use 37 to run with the demo data. '
+                             'Set to 0 for auto (read from char_dict)')
     parser.add_argument('-f', '--config_file', type=str,
                         help='Use this global configuration file')
+    parser.add_argument('-v', '--visualise', type=bool, default=False,
+                        help='Whether to display images')
+    parser.add_argument('-b', '--one_batch', type=bool, default=False,
+                        action='store_true', help='Test only one batch of the dataset')
     parser.add_argument('-j', '--num_threads', type=int,
                         default=int(os.cpu_count() / 2),
                         help='Number of threads to use in batch shuffling')
@@ -44,15 +47,15 @@ def init_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def test_shadownet(dataset_dir: str, weights_path: str, cfg: EasyDict, is_vis: bool=False,
-                   is_recursive: bool=True, num_threads: int=4, num_classes: int=None):
+def test_shadownet(dataset_dir: str, weights_path: str, cfg: EasyDict, is_vis: bool,
+                   process_all_data: bool=True, num_threads: int=4, num_classes: int=None):
     """
 
     :param dataset_dir:
     :param weights_path:
     :param cfg: configuration EasyDict (e.g. global_config.config.cfg)
     :param is_vis: whether to visualise the result
-    :param is_recursive:
+    :param process_all_data:
     :param num_threads: Number of threads for tf.train.(shuffle_)batch
     :param num_classes: Number of different characters in the dataset
     """
@@ -60,7 +63,7 @@ def test_shadownet(dataset_dir: str, weights_path: str, cfg: EasyDict, is_vis: b
     decoder = data_utils.TextFeatureIO().reader
     images_t, labels_t, imagenames_t = decoder.read_features(
         ops.join(dataset_dir, 'test_feature.tfrecords'), num_epochs=None)
-    if not is_recursive:
+    if not process_all_data:
         images_sh, labels_sh, imagenames_sh = tf.train.shuffle_batch(tensors=[images_t, labels_t, imagenames_t],
                                                                      batch_size=cfg.TEST.BATCH_SIZE,
                                                                      capacity=1000 + 2*cfg.TEST.BATCH_SIZE,
@@ -111,7 +114,7 @@ def test_shadownet(dataset_dir: str, weights_path: str, cfg: EasyDict, is_vis: b
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
         print('Start predicting ......')
-        if not is_recursive:
+        if not process_all_data:
             predictions, images, labels, imagenames = sess.run([decoded, images_sh, labels_sh, imagenames_sh])
             imagenames = np.reshape(imagenames, newshape=imagenames.shape[0])
             imagenames = [tmp.decode('utf-8') for tmp in imagenames]
@@ -206,5 +209,6 @@ if __name__ == '__main__':
         config = importlib.import_module("global_configuration.config")
 
     test_shadownet(dataset_dir=args.dataset_dir, weights_path=args.weights_path,
-                   cfg=config.cfg, is_recursive=args.is_recursive,
-                   num_threads=args.num_threads, num_classes=args.num_classes)
+                   cfg=config.cfg, process_all_data=not args.one_batch,
+                   is_vis=args.visualise, num_threads=args.num_threads,
+                   num_classes=args.num_classes)
