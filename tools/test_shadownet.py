@@ -48,7 +48,7 @@ def init_args() -> argparse.Namespace:
 
 
 def test_shadownet(dataset_dir: str, weights_path: str, cfg: EasyDict, is_vis: bool,
-                   process_all_data: bool=True, num_threads: int=4, num_classes: int=None):
+                   process_all_data: bool=True, num_threads: int=4, num_classes: int=0):
     """
 
     :param dataset_dir:
@@ -77,7 +77,7 @@ def test_shadownet(dataset_dir: str, weights_path: str, cfg: EasyDict, is_vis: b
     images_sh = tf.cast(x=images_sh, dtype=tf.float32)
 
     # build shadownet
-    num_classes = len(decoder.char_dict) + 1 if num_classes is None else num_classes
+    num_classes = len(decoder.char_dict) + 1 if num_classes == 0 else num_classes
     net = crnn_model.ShadowNet(phase='Test', hidden_nums=cfg.ARCH.HIDDEN_UNITS,
                                layers_nums=cfg.ARCH.HIDDEN_LAYERS,
                                num_classes=num_classes)
