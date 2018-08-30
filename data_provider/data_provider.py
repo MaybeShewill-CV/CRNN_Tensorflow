@@ -182,6 +182,10 @@ class TextDataProvider(object):
                 assert not any(map(lambda x: x is None, images_orig)),\
                     "Could not read some images. Check for whitespace in file names or invalid files"
                 images = np.array([cv2.resize(img, tuple(self.__input_size)) for img in images_orig])
+                max_label_len = max(map(len, info[:, 1]))
+                if max_label_len > config.cfg.ARCH.SEQ_LENGTH:
+                    print("WARNING: Some labels are longer ({:d} chars) than the maximum sequence length {:d}".format(
+                        max_label_len, config.cfg.ARCH.SEQ_LENGTH))
                 labels = np.array([x[:config.cfg.ARCH.SEQ_LENGTH] for x in info[:, 1]])
                 imagenames = np.array([ops.basename(imgname) for imgname in info[:, 0]])
 
