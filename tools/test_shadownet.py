@@ -8,8 +8,11 @@
 """
 Test shadow net script
 """
+import importlib
 import os
 import os.path as ops
+import sys
+
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import argparse
@@ -192,8 +195,15 @@ if __name__ == '__main__':
     args = init_args()
 
     if args.config_file:
-        import importlib
-        config = importlib.import_module(args.config_file)
+        # Remove extension in case the user gave it
+        args.config_file = os.path.splitext(args.config_file)[0]
+
+        module = os.path.basename(args.config_file)
+        path = os.path.abspath(os.path.dirname(args.config_file))
+        sys.path = [path] + sys.path  # Search here first
+        config = importlib.import_module(module)
+    else:
+        config = importlib.import_module("global_configuration.config")
 
     test_shadownet(dataset_dir=args.dataset_dir, weights_path=args.weights_path,
                    cfg=config.cfg, is_recursive=args.is_recursive,
