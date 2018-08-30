@@ -30,9 +30,9 @@ def init_args() -> argparse.Namespace:
                         help='Path to test tfrecords data')
     parser.add_argument('-w', '--weights_path', type=str, required=True,
                         help='Path to pre-trained weights')
-    parser.add_argument('-r', '--is_recursive', type=bool,
+    parser.add_argument('-r', '--is_recursive', type=bool, default=False,
                         help='Whether to recursively test the dataset')
-    parser.add_argument('-c', '--num_classes', type=int,
+    parser.add_argument('-c', '--num_classes', type=int, required=True,
                         help='Force number of character classes to this number. '
                              'Use 37 to run with the demo data.')
     parser.add_argument('-f', '--config_file', type=str,
