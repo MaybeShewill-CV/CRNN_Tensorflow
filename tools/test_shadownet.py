@@ -200,13 +200,21 @@ if __name__ == '__main__':
     if args.config_file:
         # Remove extension in case the user gave it
         args.config_file = os.path.splitext(args.config_file)[0]
-
-        module = os.path.basename(args.config_file)
         path = os.path.abspath(os.path.dirname(args.config_file))
-        sys.path = [path] + sys.path  # Search here first
-        config = importlib.import_module(module)
+        module = os.path.basename(args.config_file)
     else:
-        config = importlib.import_module("global_configuration.config")
+        path = "."
+        module = "global_configuration.config"
+
+    try:
+        save_path = sys.path
+        sys.path = [path] + sys.path  # Search here first
+        print("Importing configuration {:s} from {:s}".format(module, path))
+        config = importlib.import_module(module)
+        sys.path = save_path
+    except:
+        print("Configuration file not found or invalid")
+        exit(1)
 
     test_shadownet(dataset_dir=args.dataset_dir, weights_path=args.weights_path,
                    cfg=config.cfg, process_all_data=not args.one_batch,
