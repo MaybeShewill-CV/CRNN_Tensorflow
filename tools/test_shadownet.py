@@ -38,7 +38,7 @@ def init_args() -> argparse.Namespace:
                         help='Use this global configuration file')
     parser.add_argument('-v', '--visualise', type=bool, default=False,
                         help='Whether to display images')
-    parser.add_argument('-b', '--one_batch', type=bool, default=False,
+    parser.add_argument('-b', '--one_batch', default=False,
                         action='store_true', help='Test only one batch of the dataset')
     parser.add_argument('-j', '--num_threads', type=int,
                         default=int(os.cpu_count() / 2),
