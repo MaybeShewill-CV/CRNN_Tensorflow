@@ -43,7 +43,7 @@ class CharDictBuilder(object):
             raise ValueError('save path {:s} should be a json file'.format(save_path))
         os.makedirs(ops.dirname(save_path), exist_ok=True)
         with open(save_path, 'w', encoding='utf-8') as json_f:
-            json.dump(data, json_f)
+            json.dump(data, json_f, sort_keys=True, indent=4)
 
     @staticmethod
     def write_char_dict(origin_char_list: Union[str, List, Set], save_path: str):
