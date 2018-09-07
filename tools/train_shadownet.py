@@ -23,14 +23,15 @@ from global_configuration import config
 logger = log_utils.init_logger()
 
 
-def init_args():
+def init_args() -> argparse.Namespace:
     """
-
-    :return:
+    :return: an object containing all parsed arguments
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--dataset_dir', type=str, required=True,
                         help='Path to dir containing train/test data and annotation files.')
+    parser.add_argument('-c', '--charset_dir', type=str, default='data/char_dict',
+                        help='Path to dir where character sets for the dataset were stored')
     parser.add_argument('-w', '--weights_path', type=str, help='Path to pre-trained weights.')
     parser.add_argument('-j', '--num_threads', type=int, default=int(os.cpu_count()/2),
                         help='Number of threads to use in batch shuffling')
@@ -38,16 +39,17 @@ def init_args():
     return parser.parse_args()
 
 
-def train_shadownet(dataset_dir, weights_path=None, num_threads=4):
+def train_shadownet(dataset_dir: str, charset_dir: str, weights_path: str=None, num_threads: int=4):
     """
 
-    :param dataset_dir:
-    :param weights_path:
+    :param dataset_dir: Path to Train and Test directories
+    :param charset_dir: Path to char_dict.json and ord_map.json (generated with write_text_features.py)
+    :param weights_path: Path to stored weights
     :param num_threads: Number of threads to use in tf.train.shuffle_batch
-    :return:
     """
     # decode the tf records to get the training data
-    decoder = data_utils.TextFeatureIO().reader
+    decoder = data_utils.TextFeatureIO(char_dict_path=ops.join(charset_dir, 'char_dict.json'),
+                                       ord_map_dict_path=ops.join(charset_dir, 'ord_map.json')).reader
     images, labels, imagenames = decoder.read_features(ops.join(dataset_dir, 'train_feature.tfrecords'),
                                                        num_epochs=None)
     inputdata, input_labels, input_imagenames = tf.train.shuffle_batch(
@@ -168,17 +170,12 @@ def train_shadownet(dataset_dir, weights_path=None, num_threads=4):
         coord.request_stop()
         coord.join(threads=threads)
 
-    sess.close()
-
-    return
-
 
 if __name__ == '__main__':
-    # init args
     args = init_args()
 
     if not ops.exists(args.dataset_dir):
         raise ValueError('{:s} doesn\'t exist'.format(args.dataset_dir))
 
-    train_shadownet(args.dataset_dir, args.weights_path, args.num_threads)
+    train_shadownet(args.dataset_dir, args.charset_dir, args.weights_path, args.num_threads)
     print('Done')
