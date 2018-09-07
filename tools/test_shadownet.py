@@ -217,8 +217,8 @@ if __name__ == '__main__':
         print("Importing configuration {:s} from {:s}".format(module, path))
         config = importlib.import_module(module)
         sys.path = save_path
-    except:
-        print("Configuration file not found or invalid")
+    except (ModuleNotFoundError, SyntaxError) as e:
+        print("Configuration file not found or invalid: %s" % str(e))
         exit(1)
 
     test_shadownet(dataset_dir=args.dataset_dir, charset_dir=args.charset_dir,
