@@ -38,18 +38,18 @@ def init_args() -> argparse.Namespace:
                         help='Fraction of training data to use for validation. Set to 0 to disable.')
     parser.add_argument('-n', '--normalization', type=str, default=None,
                         help="Perform normalization on images. Can be either 'divide_255' or 'divide_256'")
-    parser.add_argument('-c', '--char_maps', type=str, default=None,
-                        help='Set the path where character maps will be saved from labels in training and test sets.')
+    parser.add_argument('-c', '--charset_dir', type=str, default=None,
+                        help='Path were character maps extracted from the labels in training and test sets will be saved.')
     return parser.parse_args()
 
 
-def write_tfrecords(dataset: TextDataset, name: str, save_dir: str, char_maps_dir: str=None):
+def write_tfrecords(dataset: TextDataset, name: str, save_dir: str, charset_dir: str=None):
     """
 
     :param dataset:
     :param name: Name of the dataset (e.g. "train", "test", or "validation")
     :param save_dir: Where to store the tf records
-    :param char_maps_dir: If not None, extract character maps from labels and merge with any char_dict already present
+    :param charset_dir: If not None, extract character maps from labels and merge with any char_dict already present
     """
     tfrecord_path = ops.join(save_dir, '%s_feature.tfrecords' % name)
     print('Writing tf records for %s at %s...' % (name, tfrecord_path))
@@ -60,21 +60,21 @@ def write_tfrecords(dataset: TextDataset, name: str, save_dir: str, char_maps_di
     labels = dataset.labels
     imagenames = dataset.imagenames
 
-    if char_maps_dir is not None:
-        os.makedirs(os.path.dirname(char_maps_dir), exist_ok=True)
+    if charset_dir is not None:
+        os.makedirs(os.path.dirname(charset_dir), exist_ok=True)
         # FIXME: rereading every time is a bit silly...
         try:
-            d = CharDictBuilder.read_char_dict(os.path.join(char_maps_dir, "char_dict.json"))
+            d = CharDictBuilder.read_char_dict(os.path.join(charset_dir, "char_dict.json"))
             all_chars = set(map(lambda k: chr(int(k)), d.keys()))
         except FileNotFoundError:
             all_chars = set()
         all_chars = all_chars.union(reduce(lambda a, b: set(a).union(set(b)), labels))
-        CharDictBuilder.write_char_dict(all_chars, os.path.join(char_maps_dir, "char_dict.json"))
-        CharDictBuilder.map_ord_to_index(all_chars, os.path.join(char_maps_dir, "ord_map.json"))
+        CharDictBuilder.write_char_dict(all_chars, os.path.join(charset_dir, "char_dict.json"))
+        CharDictBuilder.map_ord_to_index(all_chars, os.path.join(charset_dir, "ord_map.json"))
         print("  (character maps written)")
 
-        char_dict_path=os.path.join(char_maps_dir, "char_dict.json")
-        ord_map_dict_path=os.path.join(char_maps_dir, "ord_map.json")
+        char_dict_path=os.path.join(charset_dir, "char_dict.json")
+        ord_map_dict_path=os.path.join(charset_dir, "ord_map.json")
     else:
         char_dict_path = os.path.join("data/char_dict", "char_dict.json")
         ord_map_dict_path = os.path.join("data/char_dict", "ord_map.json")
@@ -100,6 +100,6 @@ if __name__ == '__main__':
                                               normalization=args.normalization, input_size=config.cfg.ARCH.INPUT_SIZE)
     print('done.')
 
-    write_tfrecords(provider.train, "train", args.save_dir, args.char_maps)
-    write_tfrecords(provider.test, "test", args.save_dir, args.char_maps)
-    write_tfrecords(provider.validation, "val", args.save_dir, args.char_maps)
+    write_tfrecords(provider.train, "train", args.save_dir, args.charset_dir)
+    write_tfrecords(provider.test, "test", args.save_dir, args.charset_dir)
+    write_tfrecords(provider.validation, "val", args.save_dir, args.charset_dir)
