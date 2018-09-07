@@ -36,17 +36,21 @@ def init_args() -> argparse.Namespace:
                         default='data/test_images/test_01.jpg')
     parser.add_argument('--weights_path', type=str, help='Where you store the weights',
                         default='model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999')
-    parser.add_argument('-c', '--num_classes', type=int, default=37,
-                        help='Force number of character classes to this number. Set to 0 for auto.')
+    parser.add_argument('-c', '--charset_dir', type=str, default='data/char_dict',
+                        help='Path to dir where character sets for the dataset were stored')
+    parser.add_argument('-n', '--num_classes', type=int, default=37,
+                        help='Force number of character classes to this number. '
+                             'Set to 0 for auto (read from charset_dir)')
 
     return parser.parse_args()
 
 
-def recognize(image_path: str, weights_path: str, is_vis: bool=True, num_classes: int=0):
+def recognize(image_path: str, charset_dir: str, weights_path: str, is_vis: bool=True, num_classes: int=0):
     """
 
     :param image_path:
-    :param weights_path:
+    :param charset_dir: Path to char_dict.json and ord_map.json (generated with write_text_features.py)
+    :param weights_path: Path to stored weights
     :param is_vis:
     :param num_classes:
     """
@@ -58,7 +62,9 @@ def recognize(image_path: str, weights_path: str, is_vis: bool=True, num_classes
     w, h = config.cfg.ARCH.INPUT_SIZE
     inputdata = tf.placeholder(dtype=tf.float32, shape=[1, h, w, 3], name='input')
 
-    codec = data_utils.TextFeatureIO()
+    codec = data_utils.TextFeatureIO(char_dict_path=ops.join(charset_dir, 'char_dict.json'),
+                                     ord_map_dict_path=ops.join(charset_dir, 'ord_map.json'))
+
     num_classes = len(codec.reader.char_dict) + 1 if num_classes == 0 else num_classes
 
     net = crnn_model.ShadowNet(phase='Test',
@@ -105,5 +111,5 @@ if __name__ == '__main__':
     if not ops.exists(args.image_path):
         raise ValueError('{:s} doesn\'t exist'.format(args.image_path))
 
-    # recognize the image
-    recognize(image_path=args.image_path, weights_path=args.weights_path, num_classes=args.num_classes)
+    recognize(image_path=args.image_path, charset_dir=args.charset_dir,
+              weights_path=args.weights_path, num_classes=args.num_classes)

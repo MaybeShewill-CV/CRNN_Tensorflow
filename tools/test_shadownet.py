@@ -30,10 +30,12 @@ def init_args() -> argparse.Namespace:
                         help='Path to test tfrecords data')
     parser.add_argument('-w', '--weights_path', type=str, required=True,
                         help='Path to pre-trained weights')
-    parser.add_argument('-c', '--num_classes', type=int, required=True,
+    parser.add_argument('-c', '--charset_dir', type=str, default='data/char_dict',
+                        help='Path to dir where character sets for the dataset were stored')
+    parser.add_argument('-n', '--num_classes', type=int, required=True,
                         help='Force number of character classes to this number. '
                              'Use 37 to run with the demo data. '
-                             'Set to 0 for auto (read from char_dict)')
+                             'Set to 0 for auto (read from files in charset_dir)')
     parser.add_argument('-f', '--config_file', type=str,
                         help='Use this global configuration file')
     parser.add_argument('-v', '--visualise', type=bool, default=False,
@@ -47,12 +49,13 @@ def init_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def test_shadownet(dataset_dir: str, weights_path: str, cfg: EasyDict, is_vis: bool,
+def test_shadownet(dataset_dir: str, charset_dir: str, weights_path: str, cfg: EasyDict, is_vis: bool,
                    process_all_data: bool=True, num_threads: int=4, num_classes: int=0):
     """
 
-    :param dataset_dir:
-    :param weights_path:
+    :param dataset_dir: Path to Train and Test directories
+    :param charset_dir: Path to char_dict.json and ord_map.json (generated with write_text_features.py)
+    :param weights_path: Path to stored weights
     :param cfg: configuration EasyDict (e.g. global_config.config.cfg)
     :param is_vis: whether to visualise the result
     :param process_all_data:
@@ -60,7 +63,8 @@ def test_shadownet(dataset_dir: str, weights_path: str, cfg: EasyDict, is_vis: b
     :param num_classes: Number of different characters in the dataset
     """
     # Initialize the record decoder
-    decoder = data_utils.TextFeatureIO().reader
+    decoder = data_utils.TextFeatureIO(char_dict_path=ops.join(charset_dir, 'char_dict.json'),
+                                       ord_map_dict_path=ops.join(charset_dir, 'ord_map.json')).reader
     images_t, labels_t, imagenames_t = decoder.read_features(
         ops.join(dataset_dir, 'test_feature.tfrecords'), num_epochs=None)
     if not process_all_data:
@@ -197,6 +201,7 @@ if __name__ == '__main__':
 
     args = init_args()
 
+    config = {}  # Silence PyCharm's checks
     if args.config_file:
         # Remove extension in case the user gave it
         args.config_file = os.path.splitext(args.config_file)[0]
@@ -212,11 +217,10 @@ if __name__ == '__main__':
         print("Importing configuration {:s} from {:s}".format(module, path))
         config = importlib.import_module(module)
         sys.path = save_path
-    except:
-        print("Configuration file not found or invalid")
+    except (ModuleNotFoundError, SyntaxError) as e:
+        print("Configuration file not found or invalid: %s" % str(e))
         exit(1)
 
-    test_shadownet(dataset_dir=args.dataset_dir, weights_path=args.weights_path,
-                   cfg=config.cfg, process_all_data=not args.one_batch,
-                   is_vis=args.visualise, num_threads=args.num_threads,
-                   num_classes=args.num_classes)
+    test_shadownet(dataset_dir=args.dataset_dir, charset_dir=args.charset_dir,
+                   weights_path=args.weights_path, cfg=config.cfg, process_all_data=not args.one_batch,
+                   is_vis=args.visualise, num_threads=args.num_threads, num_classes=args.num_classes)
