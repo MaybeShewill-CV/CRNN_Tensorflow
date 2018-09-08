@@ -88,7 +88,7 @@ def train_shadownet(dataset_dir: str, charset_dir: str, weights_path: str=None, 
         optimizer = tf.train.AdadeltaOptimizer(learning_rate=learning_rate).minimize(loss=cost, global_step=global_step)
 
     # Set tf summary
-    tboard_save_path = 'tboard/shadownet'
+    tboard_save_path = config.cfg.PATH.TBOARD_SAVE_PATH
     if not ops.exists(tboard_save_path):
         os.makedirs(tboard_save_path)
     tf.summary.scalar(name='Cost', tensor=cost)
@@ -98,7 +98,7 @@ def train_shadownet(dataset_dir: str, charset_dir: str, weights_path: str=None, 
 
     # Set saver configuration
     saver = tf.train.Saver()
-    model_save_dir = 'model/shadownet'
+    model_save_dir = config.cfg.PATH.MODEL_SAVE_DIR
     if not ops.exists(model_save_dir):
         os.makedirs(model_save_dir)
     train_start_time = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time()))
