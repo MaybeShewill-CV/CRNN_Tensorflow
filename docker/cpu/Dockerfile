@@ -22,5 +22,4 @@ EXPOSE 6006
 # JupyterLab
 EXPOSE 8888
 
-CMD ["/usr/local/bin/jupyter-lab", "--allow-root", "--no-browser"]
-
+CMD ["/bin/bash"]
