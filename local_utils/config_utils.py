@@ -1,9 +1,7 @@
 import importlib
 import os
 import sys
-
 from easydict import EasyDict
-
 
 def load_config(config_file: str = None) -> EasyDict:
     if config_file:
@@ -21,6 +19,6 @@ def load_config(config_file: str = None) -> EasyDict:
         config = importlib.import_module(module)
         sys.path.remove(path)
         return config
-    except (ModuleNotFoundError, SyntaxError) as e:
+    except (ImportError, SyntaxError, NameError) as e:
         print("Configuration file not found or invalid: %s" % str(e))
         exit(1)
