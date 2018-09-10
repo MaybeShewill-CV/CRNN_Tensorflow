@@ -60,6 +60,10 @@ def write_tfrecords(dataset: TextDataset, name: str, save_dir: str, charset_dir:
     labels = dataset.labels
     imagenames = dataset.imagenames
 
+    if dataset.num_examples < 1:
+        print("ERROR: No samples or labels or any found. Is your dataset ok?")
+        return
+
     if charset_dir is not None:
         os.makedirs(os.path.dirname(charset_dir), exist_ok=True)
         # FIXME: rereading every time is a bit silly...
