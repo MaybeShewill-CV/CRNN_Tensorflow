@@ -31,6 +31,10 @@ def init_args() -> argparse.Namespace:
                         help='Path to "Train" and "Test" folders with data')
     parser.add_argument('-s', '--save_dir', type=str, required=True,
                         help='Where to store the generated tfrecords')
+    parser.add_argument('-c', '--charset_dir', type=str, default=None,
+                        help='Path were character maps extracted from the labels in the dataset will be saved')
+    parser.add_argument('-f', '--config_file', type=str,
+                        help='Use this global configuration file')
     parser.add_argument('-a', '--annotation_file', type=str, default='sample.txt',
                         help='Name of annotations file (in dataset_dir/Train and dataset_dir/Test). '
                              'The encoding is assumed to be utf-8')
@@ -38,8 +42,6 @@ def init_args() -> argparse.Namespace:
                         help='Fraction of training data to use for validation. Set to 0 to disable.')
     parser.add_argument('-n', '--normalization', type=str, default=None,
                         help="Perform normalization on images. Can be either 'divide_255' or 'divide_256'")
-    parser.add_argument('-c', '--charset_dir', type=str, default=None,
-                        help='Path were character maps extracted from the labels in training and test sets will be saved.')
     return parser.parse_args()
 
 
@@ -89,9 +91,9 @@ def write_tfrecords(dataset: TextDataset, name: str, save_dir: str, charset_dir:
 
 
 if __name__ == '__main__':
-    config = load_config()
-
     args = init_args()
+
+    config = load_config(args.config_file)
 
     if not ops.exists(args.dataset_dir):
         raise ValueError('Dataset {:s} doesn\'t exist'.format(args.dataset_dir))
