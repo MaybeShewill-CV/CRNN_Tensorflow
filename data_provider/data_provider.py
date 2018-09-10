@@ -19,7 +19,6 @@ try:
 except ImportError:
     pass
 
-from global_configuration import config
 from data_provider import base_data_provider
 
 
@@ -134,12 +133,13 @@ class TextDataProvider(object):
     """
         Implement the text data provider for training and testing the shadow net
     """
-    def __init__(self, dataset_dir, annotation_name, validation_set=None, validation_split=None, shuffle=None,
-                 normalization=None, input_size: Tuple[int, int]=None):
+    def __init__(self, dataset_dir, annotation_name, input_size: Tuple[int, int],
+                 validation_set=None, validation_split=None, shuffle=None, normalization=None):
         """
 
         :param dataset_dir: Directory with all data.
         :param annotation_name: Annotations file name
+        :param input_size: Target size (width, height) to which all images will be resized.
         :param validation_set: See `validation_split`
         :param validation_split: `float` or None. If a float, ratio of training data which will will be used as
                                  validation data. If None and if 'validation set' == True, the validation set will be a
@@ -151,9 +151,9 @@ class TextDataProvider(object):
                               'divide_255': divide all pixels by 255
                               'divide_256': divide all pixels by 256
                               'by_chanels': subtract the mean and divide by the standard deviation in each channel
-        :param input_size: Target size to which all images will be resized.
         """
-        self.__input_size = input_size if input_size is not None else config.cfg.ARCH.INPUT_SIZE
+        self.__input_size = input_size
+        self.__seq_length = int(input_size[0] / 4)
         self.__dataset_dir = dataset_dir
         self.__validation_split = validation_split
         self.__shuffle = shuffle
@@ -183,10 +183,10 @@ class TextDataProvider(object):
                     "Could not read some images. Check for whitespace in file names or invalid files"
                 images = np.array([cv2.resize(img, tuple(self.__input_size)) for img in images_orig])
                 max_label_len = max(map(len, info[:, 1]))
-                if max_label_len > config.cfg.ARCH.SEQ_LENGTH:
+                if max_label_len > self.__seq_length:
                     print("WARNING: Some labels are longer ({:d} chars) than the maximum sequence length {:d}".format(
-                        max_label_len, config.cfg.ARCH.SEQ_LENGTH))
-                labels = np.array([x[:config.cfg.ARCH.SEQ_LENGTH] for x in info[:, 1]])
+                        max_label_len, self.__seq_length))
+                labels = np.array([x[:self.__seq_length] for x in info[:, 1]])
                 imagenames = np.array([ops.basename(imgname) for imgname in info[:, 0]])
 
             if split is None:

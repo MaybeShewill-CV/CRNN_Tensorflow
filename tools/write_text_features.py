@@ -13,10 +13,10 @@ import os.path as ops
 import argparse
 from functools import reduce
 import numpy as np
-from global_configuration import config
 
 from data_provider import data_provider
 from data_provider.data_provider import TextDataset
+from local_utils.config_utils import load_config
 from local_utils.data_utils import TextFeatureIO
 from local_utils.establish_char_dict import CharDictBuilder
 
@@ -89,6 +89,8 @@ def write_tfrecords(dataset: TextDataset, name: str, save_dir: str, charset_dir:
 
 
 if __name__ == '__main__':
+    config = load_config()
+
     args = init_args()
 
     if not ops.exists(args.dataset_dir):
