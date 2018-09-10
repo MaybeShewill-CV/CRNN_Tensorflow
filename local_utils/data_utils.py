@@ -212,7 +212,7 @@ class TextFeatureReader(FeatureIO):
         :param input_channels:
         :return:
         """
-        assert ops.exists(tfrecords_path)
+        assert ops.exists(tfrecords_path), "tfrecords file not found: %s" % tfrecords_path
 
         filename_queue = tf.train.string_input_producer([tfrecords_path], num_epochs=num_epochs)
         reader = tf.TFRecordReader()
