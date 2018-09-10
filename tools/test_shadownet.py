@@ -20,6 +20,7 @@ import numpy as np
 import math
 
 from local_utils import data_utils
+from local_utils.log_utils import compute_accuracy
 from crnn_model import crnn_model
 from easydict import EasyDict
 
@@ -38,7 +39,7 @@ def init_args() -> argparse.Namespace:
                              'Set to 0 for auto (read from files in charset_dir)')
     parser.add_argument('-f', '--config_file', type=str,
                         help='Use this global configuration file')
-    parser.add_argument('-v', '--visualise', type=bool, default=False,
+    parser.add_argument('-v', '--visualize', type=bool, default=False,
                         help='Whether to display images')
     parser.add_argument('-b', '--one_batch', default=False,
                         action='store_true', help='Test only one batch of the dataset')
@@ -49,7 +50,7 @@ def init_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def test_shadownet(dataset_dir: str, charset_dir: str, weights_path: str, cfg: EasyDict, is_vis: bool,
+def test_shadownet(dataset_dir: str, charset_dir: str, weights_path: str, cfg: EasyDict, visualize: bool,
                    process_all_data: bool=True, num_threads: int=4, num_classes: int=0):
     """
 
@@ -57,7 +58,7 @@ def test_shadownet(dataset_dir: str, charset_dir: str, weights_path: str, cfg: E
     :param charset_dir: Path to char_dict.json and ord_map.json (generated with write_text_features.py)
     :param weights_path: Path to stored weights
     :param cfg: configuration EasyDict (e.g. global_config.config.cfg)
-    :param is_vis: whether to visualise the result
+    :param visualize: whether to display the images
     :param process_all_data:
     :param num_threads: Number of threads for tf.train.(shuffle_)batch
     :param num_classes: Number of different characters in the dataset
@@ -103,95 +104,42 @@ def test_shadownet(dataset_dir: str, charset_dir: str, weights_path: str, cfg: E
 
     sess = tf.Session(config=sess_config)
 
-    test_sample_count = 0
-    for record in tf.python_io.tf_record_iterator(ops.join(dataset_dir, 'test_feature.tfrecords')):
-        test_sample_count += 1
-    loops_nums = int(math.ceil(test_sample_count / cfg.TEST.BATCH_SIZE))
-    # loops_nums = 100
+    test_sample_count = sum(1 for _ in tf.python_io.tf_record_iterator(
+        ops.join(dataset_dir, 'test_feature.tfrecords')))
+    num_iterations = int(math.ceil(test_sample_count / cfg.TEST.BATCH_SIZE)) if process_all_data \
+        else 1
 
     with sess.as_default():
-
-        # restore the model weights
         saver.restore(sess=sess, save_path=weights_path)
 
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
-        print('Start predicting ......')
-        if not process_all_data:
+        print('Start predicting...')
+
+        accuracy = 0
+        for epoch in range(num_iterations):
             predictions, images, labels, imagenames = sess.run([decoded, images_sh, labels_sh, imagenames_sh])
             imagenames = np.reshape(imagenames, newshape=imagenames.shape[0])
             imagenames = [tmp.decode('utf-8') for tmp in imagenames]
-            preds_res = decoder.sparse_tensor_to_str(predictions[0])
-            gt_res = decoder.sparse_tensor_to_str(labels)
 
-            accuracy = []
+            labels = decoder.sparse_tensor_to_str(labels)
+            predictions = decoder.sparse_tensor_to_str(predictions[0])
 
-            for index, gt_label in enumerate(gt_res):
-                pred = preds_res[index]
-                totol_count = len(gt_label)
-                correct_count = 0
-                try:
-                    for i, tmp in enumerate(gt_label):
-                        if tmp == pred[i]:
-                            correct_count += 1
-                except IndexError:
-                    continue
-                finally:
-                    try:
-                        accuracy.append(correct_count / totol_count)
-                    except ZeroDivisionError:
-                        if len(pred) == 0:
-                            accuracy.append(1)
-                        else:
-                            accuracy.append(0)
-
-            accuracy = np.mean(np.array(accuracy).astype(np.float32), axis=0)
-            print('Mean test accuracy is {:5f}'.format(accuracy))
+            accuracy += compute_accuracy(labels, predictions, display=False)
 
             for index, image in enumerate(images):
-                print('Predict {:s} image with gt label: {:s} **** predict label: {:s}'.format(
-                    imagenames[index], gt_res[index], preds_res[index]))
-                if is_vis:
+                print('Predict {:s} image with gt label: {:s} **** predicted label: {:s}'.format(
+                    imagenames[index], labels[index], predictions[index]))
+                # avoid accidentally displaying for the whole dataset
+                if visualize and not process_all_data:
                     plt.imshow(image[:, :, (2, 1, 0)])
                     plt.show()
-        else:
-            accuracy = []
-            for epoch in range(loops_nums):
-                predictions, images, labels, imagenames = sess.run([decoded, images_sh, labels_sh, imagenames_sh])
-                imagenames = np.reshape(imagenames, newshape=imagenames.shape[0])
-                imagenames = [tmp.decode('utf-8') for tmp in imagenames]
-                preds_res = decoder.sparse_tensor_to_str(predictions[0])
-                gt_res = decoder.sparse_tensor_to_str(labels)
 
-                for index, gt_label in enumerate(gt_res):
-                    pred = preds_res[index]
-                    totol_count = len(gt_label)
-                    correct_count = 0
-                    try:
-                        for i, tmp in enumerate(gt_label):
-                            if tmp == pred[i]:
-                                correct_count += 1
-                    except IndexError:
-                        continue
-                    finally:
-                        try:
-                            accuracy.append(correct_count / totol_count)
-                        except ZeroDivisionError:
-                            if len(pred) == 0:
-                                accuracy.append(1)
-                            else:
-                                accuracy.append(0)
-
-                for index, image in enumerate(images):
-                    print('Predict {:s} image with gt label: {:s} **** predict label: {:s}'.format(
-                        imagenames[index], gt_res[index], preds_res[index]))
-                    # if is_vis:
-                    #     plt.imshow(image[:, :, (2, 1, 0)])
-                    #     plt.show()
-
-            accuracy = np.mean(np.array(accuracy).astype(np.float32), axis=0)
-            print('Test accuracy is {:5f}'.format(accuracy))
+        # We compute a mean of means, so we need the sample sizes to be constant
+        # (BATCH_SIZE) for this to equal the actual mean
+        accuracy /= num_iterations
+        print('Mean test accuracy is {:5f}'.format(accuracy))
 
         coord.request_stop()
         coord.join(threads=threads)
@@ -223,4 +171,4 @@ if __name__ == '__main__':
 
     test_shadownet(dataset_dir=args.dataset_dir, charset_dir=args.charset_dir,
                    weights_path=args.weights_path, cfg=config.cfg, process_all_data=not args.one_batch,
-                   is_vis=args.visualise, num_threads=args.num_threads, num_classes=args.num_classes)
+                   visualize=args.visualise, num_threads=args.num_threads, num_classes=args.num_classes)

@@ -18,7 +18,7 @@ import argparse
 from crnn_model import crnn_model
 from local_utils import data_utils, log_utils
 from global_configuration import config
-
+from local_utils.log_utils import compute_accuracy
 
 logger = log_utils.init_logger()
 
@@ -32,6 +32,8 @@ def init_args() -> argparse.Namespace:
                         help='Path to dir containing train/test data and annotation files.')
     parser.add_argument('-c', '--charset_dir', type=str, default='data/char_dict',
                         help='Path to dir where character sets for the dataset were stored')
+    parser.add_argument('-e', '--decode_outputs', action='store_true', default=False,
+                        help='Activate decoding of predictions during training (slow!)')
     parser.add_argument('-w', '--weights_path', type=str, help='Path to pre-trained weights.')
     parser.add_argument('-j', '--num_threads', type=int, default=int(os.cpu_count()/2),
                         help='Number of threads to use in batch shuffling')
@@ -39,12 +41,14 @@ def init_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def train_shadownet(dataset_dir: str, charset_dir: str, weights_path: str=None, num_threads: int=4):
+def train_shadownet(dataset_dir: str, charset_dir: str, weights_path: str=None,
+                    decode: bool=False, num_threads: int=4):
     """
 
     :param dataset_dir: Path to Train and Test directories
     :param charset_dir: Path to char_dict.json and ord_map.json (generated with write_text_features.py)
     :param weights_path: Path to stored weights
+    :param decode: Whether to perform CTC decoding to report progress during training
     :param num_threads: Number of threads to use in tf.train.shuffle_batch
     """
     # decode the tf records to get the training data
@@ -124,45 +128,29 @@ def train_shadownet(dataset_dir: str, charset_dir: str, weights_path: str=None, 
             init = tf.global_variables_initializer()
             sess.run(init)
         else:
-            logger.info('Restore model from {:s}'.format(weights_path))
+            logger.info(~'Restore model from {:s}'.format(weights_path))
             saver.restore(sess=sess, save_path=weights_path)
 
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
         for epoch in range(train_epochs):
-            _, c, seq_distance, preds, gt_labels, summary = sess.run(
-                [optimizer, cost, sequence_dist, decoded, input_labels, merge_summary_op])
+            if decode:
+                _, c, seq_distance, predictions, labels, summary = sess.run(
+                    [optimizer, cost, sequence_dist, decoded, input_labels, merge_summary_op])
 
-            # calculate the precision
-            preds = decoder.sparse_tensor_to_str(preds[0])
-            gt_labels = decoder.sparse_tensor_to_str(gt_labels)
+                labels = decoder.sparse_tensor_to_str(labels)
+                predictions = decoder.sparse_tensor_to_str(predictions[0])
+                accuracy = compute_accuracy(labels, predictions)
 
-            accuracy = []
+                if epoch % config.cfg.TRAIN.DISPLAY_STEP == 0:
+                    logger.info('Epoch: {:d} cost= {:9f} seq distance= {:9f} train accuracy= {:9f}'.format(
+                        epoch + 1, c, seq_distance, accuracy))
 
-            for index, gt_label in enumerate(gt_labels):
-                pred = preds[index]
-                total_count = len(gt_label)
-                correct_count = 0
-                try:
-                    for i, tmp in enumerate(gt_label):
-                        if tmp == pred[i]:
-                            correct_count += 1
-                except IndexError:
-                    continue
-                finally:
-                    try:
-                        accuracy.append(correct_count / total_count)
-                    except ZeroDivisionError:
-                        if len(pred) == 0:
-                            accuracy.append(1)
-                        else:
-                            accuracy.append(0)
-            accuracy = np.mean(np.array(accuracy).astype(np.float32), axis=0)
-            #
-            if epoch % config.cfg.TRAIN.DISPLAY_STEP == 0:
-                logger.info('Epoch: {:d} cost= {:9f} seq distance= {:9f} train accuracy= {:9f}'.format(
-                    epoch + 1, c, seq_distance, accuracy))
+            else:
+                _, c, summary = sess.run([optimizer, cost, merge_summary_op])
+                if epoch % config.cfg.TRAIN.DISPLAY_STEP == 0:
+                    logger.info('Epoch: {:d} cost= {:9f}'.format(epoch + 1, c))
 
             summary_writer.add_summary(summary=summary, global_step=epoch)
             saver.save(sess=sess, save_path=model_save_path, global_step=epoch)
@@ -177,5 +165,6 @@ if __name__ == '__main__':
     if not ops.exists(args.dataset_dir):
         raise ValueError('{:s} doesn\'t exist'.format(args.dataset_dir))
 
-    train_shadownet(args.dataset_dir, args.charset_dir, args.weights_path, args.num_threads)
+    train_shadownet(dataset_dir=args.dataset_dir, charset_dir=args.charset_dir,
+                    weights_path=args.weights_path, decode=args.decode_outputs, num_threads=args.num_threads)
     print('Done')
