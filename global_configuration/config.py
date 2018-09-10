@@ -73,4 +73,5 @@ __C.PATH.MODEL_SAVE_DIR = 'model/shadownet'
 __C.PATH.TBOARD_SAVE_DIR = 'tboard/shadownet'
 # Path to character dictionaries
 __C.PATH.CHAR_DICT_DIR = 'data/char_dict'
-
+# Path to tfrecords
+__C.PATH.TFRECORDS_DIR = 'data'

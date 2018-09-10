@@ -31,8 +31,8 @@ def init_args() -> argparse.Namespace:
     cfg = load_config().cfg
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dataset_dir', type=str, required=True,
-                        help='Directory containing Train / Test data directories and annotation files')
+    parser.add_argument('-d', '--dataset_dir', type=str, default=cfg.PATH.TFRECORDS_DIR,
+                        help='Directory containing train_features.tfrecords')
     parser.add_argument('-c', '--char_dir', type=str, default=cfg.PATH.CHAR_DICT_DIR,
                         help='Directory where character dictionaries for the dataset were stored')
     parser.add_argument('-m', '--model_dir', type=str, default=cfg.PATH.MODEL_SAVE_DIR,
@@ -50,11 +50,11 @@ def init_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def train_shadownet(dataset_dir: str, charset_dir: str, model_dir: str, tboard_dir: str, cfg: EasyDict,
+def train_shadownet(tfrecords_dir: str, charset_dir: str, model_dir: str, tboard_dir: str, cfg: EasyDict,
                     weights_path: str=None, decode: bool=False, num_threads: int=4):
     """
 
-    :param dataset_dir: Path to Train and Test directories
+    :param tfrecords_dir: Directory with train_feature.tfrecords
     :param charset_dir: Path to char_dict.json and ord_map.json (generated with write_text_features.py)
     :param model_dir: Directory where to store model checkpoints
     :param tboard_dir: Directory where to store tensorboard logs
@@ -66,7 +66,7 @@ def train_shadownet(dataset_dir: str, charset_dir: str, model_dir: str, tboard_d
     # decode the tf records to get the training data
     decoder = data_utils.TextFeatureIO(char_dict_path=ops.join(charset_dir, 'char_dict.json'),
                                        ord_map_dict_path=ops.join(charset_dir, 'ord_map.json')).reader
-    images, labels, imagenames = decoder.read_features(ops.join(dataset_dir, 'train_feature.tfrecords'),
+    images, labels, imagenames = decoder.read_features(ops.join(tfrecords_dir, 'train_feature.tfrecords'),
                                                        num_epochs=None, input_size=cfg.ARCH.INPUT_SIZE,
                                                        input_channels=cfg.ARCH.INPUT_CHANNELS)
     inputdata, input_labels, input_imagenames = tf.train.shuffle_batch(
@@ -176,7 +176,7 @@ if __name__ == '__main__':
 
     config = load_config(args.config_file)
 
-    train_shadownet(dataset_dir=args.dataset_dir, charset_dir=args.charset_dir, model_dir=args.model_dir,
+    train_shadownet(tfrecords_dir=args.dataset_dir, charset_dir=args.charset_dir, model_dir=args.model_dir,
                     tboard_dir=args.tboard_dir, cfg=config.cfg, weights_path=args.weights_path,
                     decode=args.decode_outputs, num_threads=args.num_threads)
     print('Done')
