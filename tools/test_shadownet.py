@@ -171,4 +171,4 @@ if __name__ == '__main__':
 
     test_shadownet(dataset_dir=args.dataset_dir, charset_dir=args.charset_dir,
                    weights_path=args.weights_path, cfg=config.cfg, process_all_data=not args.one_batch,
-                   visualize=args.visualise, num_threads=args.num_threads, num_classes=args.num_classes)
+                   visualize=args.visualize, num_threads=args.num_threads, num_classes=args.num_classes)

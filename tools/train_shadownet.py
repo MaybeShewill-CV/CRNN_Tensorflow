@@ -128,7 +128,7 @@ def train_shadownet(dataset_dir: str, charset_dir: str, weights_path: str=None,
             init = tf.global_variables_initializer()
             sess.run(init)
         else:
-            logger.info(~'Restore model from {:s}'.format(weights_path))
+            logger.info('Restore model from {:s}'.format(weights_path))
             saver.restore(sess=sess, save_path=weights_path)
 
         coord = tf.train.Coordinator()
