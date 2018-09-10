@@ -39,7 +39,7 @@ def init_args() -> argparse.Namespace:
                         default='data/test_images/test_01.jpg')
     parser.add_argument('--weights_path', type=str, help='Path to the pre-trained weights to use',
                         default='model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999')
-    parser.add_argument('-c', '--char_dir', type=str, default=cfg.PATH.CHAR_DICT_DIR,
+    parser.add_argument('-c', '--chardict_dir', type=str, default=cfg.PATH.CHAR_DICT_DIR,
                         help='Directory where character dictionaries for the dataset were stored')
     parser.add_argument('-n', '--num_classes', type=int, default=37,
                         help='Force number of character classes to this number. '
@@ -117,5 +117,5 @@ if __name__ == '__main__':
 
     config = load_config(args.config_file)
 
-    recognize(image_path=args.image_path, charset_dir=args.charset_dir, cfg=config.cfg,
+    recognize(image_path=args.image_path, charset_dir=args.chardict_dir, cfg=config.cfg,
               weights_path=args.weights_path, num_classes=args.num_classes)

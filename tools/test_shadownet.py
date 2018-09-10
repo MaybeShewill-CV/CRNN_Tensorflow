@@ -35,7 +35,7 @@ def init_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--dataset_dir', type=str, default=cfg.PATH.TFRECORDS_DIR,
                         help='Directory containing test_features.tfrecords')
-    parser.add_argument('-c', '--char_dir', type=str, default=cfg.PATH.CHAR_DICT_DIR,
+    parser.add_argument('-c', '--chardict_dir', type=str, default=cfg.PATH.CHAR_DICT_DIR,
                         help='Directory where character dictionaries for the dataset were stored')
     parser.add_argument('-w', '--weights_path', type=str, required=True,
                         help='Path to pre-trained weights')
@@ -158,6 +158,6 @@ if __name__ == '__main__':
 
     config = load_config(args.config_file)
 
-    test_shadownet(tfrecords_dir=args.dataset_dir, charset_dir=args.charset_dir,
+    test_shadownet(tfrecords_dir=args.dataset_dir, charset_dir=args.chardict_dir,
                    weights_path=args.weights_path, cfg=config.cfg, process_all_data=not args.one_batch,
                    visualize=args.visualize, num_threads=args.num_threads, num_classes=args.num_classes)
