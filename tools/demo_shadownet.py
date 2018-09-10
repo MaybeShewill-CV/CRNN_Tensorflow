@@ -8,6 +8,8 @@
 """
 Use shadow net to recognize the scene text
 """
+from typing import Tuple
+
 import tensorflow as tf
 import os.path as ops
 import numpy as np
@@ -28,27 +30,32 @@ from local_utils.config_utils import load_config
 logger = log_utils.init_logger()
 
 
-def init_args() -> argparse.Namespace:
+def init_args() -> Tuple[argparse.Namespace, EasyDict]:
     """
 
-    :return:
+    :return: parsed arguments and (updated) config.cfg object
     """
-    cfg = load_config().cfg
     parser = argparse.ArgumentParser()
     parser.add_argument('--image_path', type=str, help='Path to the image to be tested',
                         default='data/test_images/test_01.jpg')
     parser.add_argument('--weights_path', type=str, help='Path to the pre-trained weights to use',
                         default='model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999')
-    parser.add_argument('-c', '--chardict_dir', type=str, default=cfg.PATH.CHAR_DICT_DIR,
+    parser.add_argument('-c', '--chardict_dir', type=str,
                         help='Directory where character dictionaries for the dataset were stored')
     parser.add_argument('-n', '--num_classes', type=int, default=37,
                         help='Force number of character classes to this number. '
                              'Set to 0 for auto (read from charset_dir)')
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    config = load_config(args.config_file)
+    if args.chardict_dir:
+        config.cfg.PATH.CHAR_DICT_DIR = args.chardict_dir
+
+    return args, config.cfg
 
 
-def recognize(image_path: str, charset_dir: str, weights_path: str, cfg: EasyDict, is_vis: bool=True,
+def recognize(image_path: str, weights_path: str, cfg: EasyDict, is_vis: bool=True,
               num_classes: int=0):
     """
 
@@ -66,8 +73,8 @@ def recognize(image_path: str, charset_dir: str, weights_path: str, cfg: EasyDic
     w, h = cfg.ARCH.INPUT_SIZE
     inputdata = tf.placeholder(dtype=tf.float32, shape=[1, h, w, cfg.ARCH.INPUT_CHANNELS], name='input')
 
-    codec = data_utils.TextFeatureIO(char_dict_path=ops.join(charset_dir, 'char_dict.json'),
-                                     ord_map_dict_path=ops.join(charset_dir, 'ord_map.json'))
+    codec = data_utils.TextFeatureIO(char_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'char_dict.json'),
+                                     ord_map_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'ord_map.json'))
 
     num_classes = len(codec.reader.char_dict) + 1 if num_classes == 0 else num_classes
 
@@ -111,11 +118,8 @@ def recognize(image_path: str, charset_dir: str, weights_path: str, cfg: EasyDic
 
 
 if __name__ == '__main__':
-    args = init_args()
+    args, cfg = init_args()
     if not ops.exists(args.image_path):
         raise ValueError('{:s} doesn\'t exist'.format(args.image_path))
 
-    config = load_config(args.config_file)
-
-    recognize(image_path=args.image_path, charset_dir=args.chardict_dir, cfg=config.cfg,
-              weights_path=args.weights_path, num_classes=args.num_classes)
+    recognize(image_path=args.image_path, cfg=cfg, weights_path=args.weights_path, num_classes=args.num_classes)

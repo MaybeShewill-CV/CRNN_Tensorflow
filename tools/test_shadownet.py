@@ -12,6 +12,7 @@ import importlib
 import os
 import os.path as ops
 import sys
+from typing import Tuple
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -26,16 +27,14 @@ from crnn_model import crnn_model
 from easydict import EasyDict
 
 
-def init_args() -> argparse.Namespace:
+def init_args() -> Tuple[argparse.Namespace, EasyDict]:
     """
-    :return: an object containing all parsed arguments
+    :return: parsed arguments and (updated) config.cfg object
     """
-    cfg = load_config().cfg
-
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dataset_dir', type=str, default=cfg.PATH.TFRECORDS_DIR,
+    parser.add_argument('-d', '--dataset_dir', type=str,
                         help='Directory containing test_features.tfrecords')
-    parser.add_argument('-c', '--chardict_dir', type=str, default=cfg.PATH.CHAR_DICT_DIR,
+    parser.add_argument('-c', '--chardict_dir', type=str,
                         help='Directory where character dictionaries for the dataset were stored')
     parser.add_argument('-w', '--weights_path', type=str, required=True,
                         help='Path to pre-trained weights')
@@ -53,11 +52,18 @@ def init_args() -> argparse.Namespace:
                         default=int(os.cpu_count() / 2),
                         help='Number of threads to use in batch shuffling')
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    config = load_config(args.config_file)
+    if args.dataset_dir:
+        config.cfg.PATH.TFRECORDS_DIR = args.dataset_dir
+    if args.chardict_dir:
+        config.cfg.PATH.CHAR_DICT_DIR = args.chardict_dir
+
+    return args, config.cfg
 
 
-def test_shadownet(tfrecords_dir: str, charset_dir: str, weights_path: str, cfg: EasyDict, visualize: bool,
-                   process_all_data: bool=True, num_threads: int=4, num_classes: int=0):
+def test_shadownet(weights_path: str, cfg: EasyDict, visualize: bool, process_all_data: bool=True, num_threads: int=4,
+                   num_classes: int=0):
     """
 
     :param tfrecords_dir: Directory with test_feature.tfrecords
@@ -70,11 +76,11 @@ def test_shadownet(tfrecords_dir: str, charset_dir: str, weights_path: str, cfg:
     :param num_classes: Number of different characters in the dataset
     """
     # Initialize the record decoder
-    decoder = data_utils.TextFeatureIO(char_dict_path=ops.join(charset_dir, 'char_dict.json'),
-                                       ord_map_dict_path=ops.join(charset_dir, 'ord_map.json')).reader
-    images_t, labels_t, imagenames_t = decoder.read_features(
-        ops.join(tfrecords_dir, 'test_feature.tfrecords'), num_epochs=None,
-        input_size=cfg.ARCH.INPUT_SIZE, input_channels=cfg.ARCH.INPUT_CHANNELS)
+    decoder = data_utils.TextFeatureIO(char_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'char_dict.json'),
+                                       ord_map_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'ord_map.json')).reader
+    images_t, labels_t, imagenames_t = decoder.read_features(ops.join(cfg.PATH.TFRECORDS_DIR, 'test_feature.tfrecords'),
+                                                             num_epochs=None, input_size=cfg.ARCH.INPUT_SIZE,
+                                                             input_channels=cfg.ARCH.INPUT_CHANNELS)
     if not process_all_data:
         images_sh, labels_sh, imagenames_sh = tf.train.shuffle_batch(tensors=[images_t, labels_t, imagenames_t],
                                                                      batch_size=cfg.TEST.BATCH_SIZE,
@@ -112,7 +118,7 @@ def test_shadownet(tfrecords_dir: str, charset_dir: str, weights_path: str, cfg:
     sess = tf.Session(config=sess_config)
 
     test_sample_count = sum(1 for _ in tf.python_io.tf_record_iterator(
-        ops.join(tfrecords_dir, 'test_feature.tfrecords')))
+        ops.join(cfg.PATH.TFRECORDS_DIR, 'test_feature.tfrecords')))
     num_iterations = int(math.ceil(test_sample_count / cfg.TEST.BATCH_SIZE)) if process_all_data \
         else 1
 
@@ -153,11 +159,7 @@ def test_shadownet(tfrecords_dir: str, charset_dir: str, weights_path: str, cfg:
 
 
 if __name__ == '__main__':
+    args, cfg = init_args()
 
-    args = init_args()
-
-    config = load_config(args.config_file)
-
-    test_shadownet(tfrecords_dir=args.dataset_dir, charset_dir=args.chardict_dir,
-                   weights_path=args.weights_path, cfg=config.cfg, process_all_data=not args.one_batch,
+    test_shadownet(weights_path=args.weights_path, cfg=cfg, process_all_data=not args.one_batch,
                    visualize=args.visualize, num_threads=args.num_threads, num_classes=args.num_classes)
