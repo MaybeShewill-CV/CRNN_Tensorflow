@@ -40,6 +40,8 @@ def init_args() -> Tuple[argparse.Namespace, EasyDict]:
                         default='data/test_images/test_01.jpg')
     parser.add_argument('--weights_path', type=str, help='Path to the pre-trained weights to use',
                         default='model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999')
+    parser.add_argument('-f', '--config_file', type=str,
+                        help='Use this global configuration file')
     parser.add_argument('-c', '--chardict_dir', type=str,
                         help='Directory where character dictionaries for the dataset were stored')
     parser.add_argument('-n', '--num_classes', type=int, default=37,
