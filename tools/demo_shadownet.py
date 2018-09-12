@@ -57,13 +57,12 @@ def init_args() -> Tuple[argparse.Namespace, EasyDict]:
     return args, config.cfg
 
 
-def recognize(image_path: str, weights_path: str, cfg: EasyDict, is_vis: bool=True,
-              num_classes: int=0):
+def recognize(image_path: str, weights_path: str, cfg: EasyDict, is_vis: bool=True, num_classes: int=0):
     """
 
     :param image_path:
-    :param charset_dir: Path to char_dict.json and ord_map.json (generated with write_text_features.py)
     :param weights_path: Path to stored weights
+    :param cfg:
     :param is_vis:
     :param num_classes:
     """
