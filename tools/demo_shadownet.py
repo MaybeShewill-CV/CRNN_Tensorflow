@@ -8,80 +8,92 @@
 """
 Use shadow net to recognize the scene text
 """
+from typing import Tuple
+
 import tensorflow as tf
 import os.path as ops
 import numpy as np
 import cv2
 import argparse
 import matplotlib.pyplot as plt
+from easydict import EasyDict
+
 try:
     from cv2 import cv2
 except ImportError:
     pass
 
 from crnn_model import crnn_model
-from global_configuration import config
 from local_utils import log_utils, data_utils
+from local_utils.config_utils import load_config
 
 logger = log_utils.init_logger()
 
 
-def init_args() -> argparse.Namespace:
+def init_args() -> Tuple[argparse.Namespace, EasyDict]:
     """
 
-    :return:
+    :return: parsed arguments and (updated) config.cfg object
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--image_path', type=str, help='Where you store the image',
+    parser.add_argument('--image_path', type=str, help='Path to the image to be tested',
                         default='data/test_images/test_01.jpg')
-    parser.add_argument('--weights_path', type=str, help='Where you store the weights',
+    parser.add_argument('--weights_path', type=str, help='Path to the pre-trained weights to use',
                         default='model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999')
-    parser.add_argument('-c', '--charset_dir', type=str, default='data/char_dict',
-                        help='Path to dir where character sets for the dataset were stored')
+    parser.add_argument('-f', '--config_file', type=str,
+                        help='Use this global configuration file')
+    parser.add_argument('-c', '--chardict_dir', type=str,
+                        help='Directory where character dictionaries for the dataset were stored')
     parser.add_argument('-n', '--num_classes', type=int, default=37,
                         help='Force number of character classes to this number. '
                              'Set to 0 for auto (read from charset_dir)')
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    config = load_config(args.config_file)
+    if args.chardict_dir:
+        config.cfg.PATH.CHAR_DICT_DIR = args.chardict_dir
+
+    return args, config.cfg
 
 
-def recognize(image_path: str, charset_dir: str, weights_path: str, is_vis: bool=True, num_classes: int=0):
+def recognize(image_path: str, weights_path: str, cfg: EasyDict, is_vis: bool=True, num_classes: int=0):
     """
 
     :param image_path:
-    :param charset_dir: Path to char_dict.json and ord_map.json (generated with write_text_features.py)
     :param weights_path: Path to stored weights
+    :param cfg:
     :param is_vis:
     :param num_classes:
     """
 
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-    image = cv2.resize(image, tuple(config.cfg.ARCH.INPUT_SIZE))
+    image = cv2.resize(image, tuple(cfg.ARCH.INPUT_SIZE))
     image = np.expand_dims(image, axis=0).astype(np.float32)
 
-    w, h = config.cfg.ARCH.INPUT_SIZE
-    inputdata = tf.placeholder(dtype=tf.float32, shape=[1, h, w, 3], name='input')
+    w, h = cfg.ARCH.INPUT_SIZE
+    inputdata = tf.placeholder(dtype=tf.float32, shape=[1, h, w, cfg.ARCH.INPUT_CHANNELS], name='input')
 
-    codec = data_utils.TextFeatureIO(char_dict_path=ops.join(charset_dir, 'char_dict.json'),
-                                     ord_map_dict_path=ops.join(charset_dir, 'ord_map.json'))
+    codec = data_utils.TextFeatureIO(char_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'char_dict.json'),
+                                     ord_map_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'ord_map.json'))
 
     num_classes = len(codec.reader.char_dict) + 1 if num_classes == 0 else num_classes
 
     net = crnn_model.ShadowNet(phase='Test',
-                               hidden_nums=config.cfg.ARCH.HIDDEN_UNITS,
-                               layers_nums=config.cfg.ARCH.HIDDEN_LAYERS,
+                               hidden_nums=cfg.ARCH.HIDDEN_UNITS,
+                               layers_nums=cfg.ARCH.HIDDEN_LAYERS,
                                num_classes=num_classes)
 
     with tf.variable_scope('shadow'):
         net_out = net.build_shadownet(inputdata=inputdata)
 
-    decodes, _ = tf.nn.ctc_beam_search_decoder(inputs=net_out, sequence_length=config.cfg.ARCH.SEQ_LENGTH*np.ones(1),
+    decodes, _ = tf.nn.ctc_beam_search_decoder(inputs=net_out, sequence_length=cfg.ARCH.SEQ_LENGTH*np.ones(1),
                                                merge_repeated=False)
 
     # config tf session
     sess_config = tf.ConfigProto()
-    sess_config.gpu_options.per_process_gpu_memory_fraction = config.cfg.TRAIN.GPU_MEMORY_FRACTION
-    sess_config.gpu_options.allow_growth = config.cfg.TRAIN.TF_ALLOW_GROWTH
+    sess_config.gpu_options.per_process_gpu_memory_fraction = cfg.TRAIN.GPU_MEMORY_FRACTION
+    sess_config.gpu_options.allow_growth = cfg.TRAIN.TF_ALLOW_GROWTH
 
     # config tf saver
     saver = tf.train.Saver()
@@ -107,9 +119,8 @@ def recognize(image_path: str, charset_dir: str, weights_path: str, is_vis: bool
 
 
 if __name__ == '__main__':
-    args = init_args()
+    args, cfg = init_args()
     if not ops.exists(args.image_path):
         raise ValueError('{:s} doesn\'t exist'.format(args.image_path))
 
-    recognize(image_path=args.image_path, charset_dir=args.charset_dir,
-              weights_path=args.weights_path, num_classes=args.num_classes)
+    recognize(image_path=args.image_path, cfg=cfg, weights_path=args.weights_path, num_classes=args.num_classes)

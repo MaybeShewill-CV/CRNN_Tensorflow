@@ -25,6 +25,8 @@ __C.ARCH.HIDDEN_LAYERS = 2
 __C.ARCH.SEQ_LENGTH = 25
 # Width x height into which training / testing images are resized before feeding into the network
 __C.ARCH.INPUT_SIZE = (100, 32)
+# Number of channels in images
+__C.ARCH.INPUT_CHANNELS = 3
 
 # Train options
 __C.TRAIN = edict()
@@ -68,4 +70,8 @@ __C.PATH = edict()
 # Path to save the model checkpoints
 __C.PATH.MODEL_SAVE_DIR = 'model/shadownet'
 # Path to save log for tensorboard
-__C.PATH.TBOARD_SAVE_PATH = 'tboard/shadownet'
+__C.PATH.TBOARD_SAVE_DIR = 'tboard/shadownet'
+# Path to character dictionaries
+__C.PATH.CHAR_DICT_DIR = 'data/char_dict'
+# Path to tfrecords
+__C.PATH.TFRECORDS_DIR = 'data'

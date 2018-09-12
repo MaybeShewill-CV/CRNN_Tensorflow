@@ -12,6 +12,7 @@ import importlib
 import os
 import os.path as ops
 import sys
+from typing import Tuple
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -20,19 +21,23 @@ import numpy as np
 import math
 
 from local_utils import data_utils
+from local_utils.config_utils import load_config
 from local_utils.log_utils import compute_accuracy
 from crnn_model import crnn_model
 from easydict import EasyDict
 
 
-def init_args() -> argparse.Namespace:
+def init_args() -> Tuple[argparse.Namespace, EasyDict]:
+    """
+    :return: parsed arguments and (updated) config.cfg object
+    """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dataset_dir', type=str, required=True,
-                        help='Path to test tfrecords data')
+    parser.add_argument('-d', '--dataset_dir', type=str,
+                        help='Directory containing test_features.tfrecords')
+    parser.add_argument('-c', '--chardict_dir', type=str,
+                        help='Directory where character dictionaries for the dataset were stored')
     parser.add_argument('-w', '--weights_path', type=str, required=True,
                         help='Path to pre-trained weights')
-    parser.add_argument('-c', '--charset_dir', type=str, default='data/char_dict',
-                        help='Path to dir where character sets for the dataset were stored')
     parser.add_argument('-n', '--num_classes', type=int, required=True,
                         help='Force number of character classes to this number. '
                              'Use 37 to run with the demo data. '
@@ -47,14 +52,21 @@ def init_args() -> argparse.Namespace:
                         default=int(os.cpu_count() / 2),
                         help='Number of threads to use in batch shuffling')
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    config = load_config(args.config_file)
+    if args.dataset_dir:
+        config.cfg.PATH.TFRECORDS_DIR = args.dataset_dir
+    if args.chardict_dir:
+        config.cfg.PATH.CHAR_DICT_DIR = args.chardict_dir
+
+    return args, config.cfg
 
 
-def test_shadownet(dataset_dir: str, charset_dir: str, weights_path: str, cfg: EasyDict, visualize: bool,
-                   process_all_data: bool=True, num_threads: int=4, num_classes: int=0):
+def test_shadownet(weights_path: str, cfg: EasyDict, visualize: bool, process_all_data: bool=True, num_threads: int=4,
+                   num_classes: int=0):
     """
 
-    :param dataset_dir: Path to Train and Test directories
+    :param tfrecords_dir: Directory with test_feature.tfrecords
     :param charset_dir: Path to char_dict.json and ord_map.json (generated with write_text_features.py)
     :param weights_path: Path to stored weights
     :param cfg: configuration EasyDict (e.g. global_config.config.cfg)
@@ -64,10 +76,11 @@ def test_shadownet(dataset_dir: str, charset_dir: str, weights_path: str, cfg: E
     :param num_classes: Number of different characters in the dataset
     """
     # Initialize the record decoder
-    decoder = data_utils.TextFeatureIO(char_dict_path=ops.join(charset_dir, 'char_dict.json'),
-                                       ord_map_dict_path=ops.join(charset_dir, 'ord_map.json')).reader
-    images_t, labels_t, imagenames_t = decoder.read_features(
-        ops.join(dataset_dir, 'test_feature.tfrecords'), num_epochs=None)
+    decoder = data_utils.TextFeatureIO(char_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'char_dict.json'),
+                                       ord_map_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'ord_map.json')).reader
+    images_t, labels_t, imagenames_t = decoder.read_features(ops.join(cfg.PATH.TFRECORDS_DIR, 'test_feature.tfrecords'),
+                                                             num_epochs=None, input_size=cfg.ARCH.INPUT_SIZE,
+                                                             input_channels=cfg.ARCH.INPUT_CHANNELS)
     if not process_all_data:
         images_sh, labels_sh, imagenames_sh = tf.train.shuffle_batch(tensors=[images_t, labels_t, imagenames_t],
                                                                      batch_size=cfg.TEST.BATCH_SIZE,
@@ -105,7 +118,7 @@ def test_shadownet(dataset_dir: str, charset_dir: str, weights_path: str, cfg: E
     sess = tf.Session(config=sess_config)
 
     test_sample_count = sum(1 for _ in tf.python_io.tf_record_iterator(
-        ops.join(dataset_dir, 'test_feature.tfrecords')))
+        ops.join(cfg.PATH.TFRECORDS_DIR, 'test_feature.tfrecords')))
     num_iterations = int(math.ceil(test_sample_count / cfg.TEST.BATCH_SIZE)) if process_all_data \
         else 1
 
@@ -146,29 +159,7 @@ def test_shadownet(dataset_dir: str, charset_dir: str, weights_path: str, cfg: E
 
 
 if __name__ == '__main__':
+    args, cfg = init_args()
 
-    args = init_args()
-
-    config = {}  # Silence PyCharm's checks
-    if args.config_file:
-        # Remove extension in case the user gave it
-        args.config_file = os.path.splitext(args.config_file)[0]
-        path = os.path.abspath(os.path.dirname(args.config_file))
-        module = os.path.basename(args.config_file)
-    else:
-        path = "."
-        module = "global_configuration.config"
-
-    try:
-        save_path = sys.path
-        sys.path = [path] + sys.path  # Search here first
-        print("Importing configuration {:s} from {:s}".format(module, path))
-        config = importlib.import_module(module)
-        sys.path = save_path
-    except (ModuleNotFoundError, SyntaxError) as e:
-        print("Configuration file not found or invalid: %s" % str(e))
-        exit(1)
-
-    test_shadownet(dataset_dir=args.dataset_dir, charset_dir=args.charset_dir,
-                   weights_path=args.weights_path, cfg=config.cfg, process_all_data=not args.one_batch,
+    test_shadownet(weights_path=args.weights_path, cfg=cfg, process_all_data=not args.one_batch,
                    visualize=args.visualize, num_threads=args.num_threads, num_classes=args.num_classes)

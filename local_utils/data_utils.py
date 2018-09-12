@@ -203,14 +203,16 @@ class TextFeatureReader(FeatureIO):
         return
 
     @staticmethod
-    def read_features(tfrecords_path, num_epochs):
+    def read_features(tfrecords_path: str, num_epochs: int, input_size: Tuple[int, int], input_channels: int):
         """
 
         :param tfrecords_path:
         :param num_epochs:
+        :param input_size:
+        :param input_channels:
         :return:
         """
-        assert ops.exists(tfrecords_path)
+        assert ops.exists(tfrecords_path), "tfrecords file not found: %s" % tfrecords_path
 
         filename_queue = tf.train.string_input_producer([tfrecords_path], num_epochs=num_epochs)
         reader = tf.TFRecordReader()
@@ -223,8 +225,8 @@ class TextFeatureReader(FeatureIO):
                                                'labels': tf.VarLenFeature(tf.int64),
                                            })
         image = tf.decode_raw(features['images'], tf.uint8)
-        w, h = config.cfg.ARCH.INPUT_SIZE
-        images = tf.reshape(image, [h, w, 3])
+        w, h = input_size
+        images = tf.reshape(image, [h, w, input_channels])
         labels = features['labels']
         labels = tf.cast(labels, tf.int32)
         imagenames = features['imagenames']
