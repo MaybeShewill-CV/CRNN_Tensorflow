@@ -217,16 +217,43 @@ class TextFeatureReader(FeatureIO):
         filename_queue = tf.train.string_input_producer([tfrecords_path], num_epochs=num_epochs)
         reader = tf.TFRecordReader()
         _, serialized_example = reader.read(filename_queue)
+        return TextFeatureReader.extract_features(serialized_example, input_size, input_channels)
 
-        features = tf.parse_single_example(serialized_example,
-                                           features={
-                                               'images': tf.FixedLenFeature((), tf.string),
-                                               'imagenames': tf.FixedLenFeature([1], tf.string),
-                                               'labels': tf.VarLenFeature(tf.int64),
-                                           })
+    @staticmethod
+    def extract_features(serialized_sample, input_size: Tuple[int, int], input_channels: int) \
+            -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
+        """
+
+        :param serialized_sample:
+        :param input_size:
+        :param input_channels:
+        :return:
+        """
+        features = tf.parse_single_example(serialized_sample, features={
+            'images': tf.FixedLenFeature((), tf.string),
+            'imagenames': tf.FixedLenFeature([1], tf.string),
+            'labels': tf.VarLenFeature(tf.int64)})
         image = tf.decode_raw(features['images'], tf.uint8)
         w, h = input_size
-        images = tf.reshape(image, [h, w, input_channels])
+        image = tf.cast(x=image, dtype=tf.float32)
+        image = tf.reshape(image, [h, w, input_channels])
+        label = features['labels']
+        label = tf.cast(label, tf.int32)
+        image_name = features['imagenames']
+        return image, label, image_name
+
+
+    @staticmethod
+    def extract_features_batch(serialized_batch, input_size: Tuple[int, int], input_channels: int) \
+            -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
+        features = tf.parse_example(serialized_batch, features={'images': tf.FixedLenFeature((), tf.string),
+                                                                'imagenames': tf.FixedLenFeature([1], tf.string),
+                                                                'labels': tf.VarLenFeature(tf.int64), })
+        bs = features['images'].shape[0]
+        images = tf.decode_raw(features['images'], tf.uint8)
+        w, h = input_size
+        images = tf.cast(x=images, dtype=tf.float32)
+        images = tf.reshape(images, [bs, h, w, input_channels])
         labels = features['labels']
         labels = tf.cast(labels, tf.int32)
         imagenames = features['imagenames']
