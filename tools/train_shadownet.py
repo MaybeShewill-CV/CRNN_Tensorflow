@@ -74,14 +74,15 @@ def train_shadownet(cfg: EasyDict, weights_path: str=None, decode: bool=False, n
     decoder = data_utils.TextFeatureIO(char_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'char_dict.json'),
                                        ord_map_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'ord_map.json')).reader
 
-    dataset = tf.data.TFRecordDataset(cfg.PATH.TFRECORDS_DIR)
+    dataset = tf.data.TFRecordDataset(os.path.join(cfg.PATH.TFRECORDS_DIR, "train_feature.tfrecords"))
     dataset = dataset.batch(cfg.TRAIN.BATCH_SIZE, drop_remainder=True)
-    dataset = dataset.map(decoder.extract_features_batch, num_parallel_calls=num_threads)
-    # dataset = dataset.apply(tf.contrib.data.map_and_batch(map_func=decoder.extract_features,
+    extract_batch = lambda x: decoder.extract_features_batch(x, cfg.ARCH.INPUT_SIZE, cfg.ARCH.INPUT_CHANNELS)
+    dataset = dataset.map(extract_batch, num_parallel_calls=num_threads)
+    # dataset = dataset.apply(tf.contrib.data.map_and_batch(map_func=extract_single,
     #                                                       batch_size=config.cfg.TRAIN.BATCH_SIZE,
     #                                                       num_parallel_batches=num_threads,
     #                                                       drop_remainder=True))
-    dataset = dataset.apply(tf.contrib.data.shuffle_and_repeat(cfg.TRAIN.BATCH_SIZE*num_threads*16))
+    dataset = dataset.apply(tf.contrib.data.shuffle_and_repeat(cfg.TRAIN.BATCH_SIZE*num_threads))
     dataset = dataset.prefetch(buffer_size=cfg.TRAIN.BATCH_SIZE*num_threads)
     iterator = dataset.make_one_shot_iterator()
     input_images, input_labels, input_image_names = iterator.get_next()
