@@ -114,7 +114,8 @@ def train_shadownet(cfg: EasyDict, weights_path: str=None, decode: bool=False, n
     os.makedirs(cfg.PATH.TBOARD_SAVE_DIR, exist_ok=True)
     tf.summary.scalar(name='Cost', tensor=cost)
     tf.summary.scalar(name='Learning_Rate', tensor=learning_rate)
-    tf.summary.scalar(name='Seq_Dist', tensor=sequence_dist)
+    if decode:
+        tf.summary.scalar(name='Seq_Dist', tensor=sequence_dist)
     merge_summary_op = tf.summary.merge_all()
 
     # Set saver configuration
