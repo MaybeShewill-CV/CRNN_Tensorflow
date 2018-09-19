@@ -33,7 +33,6 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
         self.__hidden_nums = hidden_nums
         self.__layers_nums = layers_nums
         self.__num_classes = num_classes
-        return
 
     @property
     def phase(self):

@@ -16,7 +16,8 @@ import os
 import os.path as ops
 import sys
 
-from global_configuration import config
+from easydict import EasyDict
+
 from local_utils import establish_char_dict
 
 
@@ -203,52 +204,37 @@ class TextFeatureReader(FeatureIO):
         return
 
     @staticmethod
-    def read_features(tfrecords_path: str, num_epochs: int, input_size: Tuple[int, int], input_channels: int):
+    def read_features(cfg: EasyDict, batch_size: int, num_threads: int) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
         """
 
-        :param tfrecords_path:
-        :param num_epochs:
-        :param input_size:
-        :param input_channels:
-        :return:
+        :param cfg:
+        :param batch_size:
+        :param num_threads:
+        :return: input_images, input_labels, input_image_names
         """
+
+        tfrecords_path = os.path.join(cfg.PATH.TFRECORDS_DIR, "train_feature.tfrecords")
         assert ops.exists(tfrecords_path), "tfrecords file not found: %s" % tfrecords_path
 
-        filename_queue = tf.train.string_input_producer([tfrecords_path], num_epochs=num_epochs)
-        reader = tf.TFRecordReader()
-        _, serialized_example = reader.read(filename_queue)
-        return TextFeatureReader.extract_features(serialized_example, input_size, input_channels)
+        def extract_batch(x):
+            return TextFeatureReader.extract_features_batch(x, cfg.ARCH.INPUT_SIZE, cfg.ARCH.INPUT_CHANNELS)
 
-    @staticmethod
-    def extract_features(serialized_sample, input_size: Tuple[int, int], input_channels: int) \
-            -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
-        """
-
-        :param serialized_sample:
-        :param input_size:
-        :param input_channels:
-        :return:
-        """
-        features = tf.parse_single_example(serialized_sample, features={
-            'images': tf.FixedLenFeature((), tf.string),
-            'imagenames': tf.FixedLenFeature([1], tf.string),
-            'labels': tf.VarLenFeature(tf.int64)})
-        image = tf.decode_raw(features['images'], tf.uint8)
-        w, h = input_size
-        image = tf.cast(x=image, dtype=tf.float32)
-        image = tf.reshape(image, [h, w, input_channels])
-        label = features['labels']
-        label = tf.cast(label, tf.int32)
-        image_name = features['imagenames']
-        return image, label, image_name
-
+        dataset = tf.data.TFRecordDataset(tfrecords_path)
+        dataset = dataset.batch(cfg.TRAIN.BATCH_SIZE, drop_remainder=True)
+        dataset = dataset.map(extract_batch, num_parallel_calls=num_threads)
+        dataset = dataset.apply(tf.contrib.data.shuffle_and_repeat(batch_size * num_threads))
+        dataset = dataset.prefetch(buffer_size=batch_size * num_threads)
+        iterator = dataset.make_one_shot_iterator()
+        input_images, input_labels, input_image_names = iterator.get_next()
+        return input_images, input_labels, input_image_names
 
     @staticmethod
     def extract_features_batch(serialized_batch, input_size: Tuple[int, int], input_channels: int) \
             -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
-        features = tf.parse_example(serialized_batch, features={'images': tf.FixedLenFeature((), tf.string),
-                                                                'imagenames': tf.FixedLenFeature([1], tf.string),
-                                                                'labels': tf.VarLenFeature(tf.int64), })
+        features = tf.parse_example(serialized_batch,
+                                    features={'images': tf.FixedLenFeature((), tf.string),
+                                              'imagenames': tf.FixedLenFeature([1], tf.string),
+                                              'labels': tf.VarLenFeature(tf.int64), })
         bs = features['images'].shape[0]
         images = tf.decode_raw(features['images'], tf.uint8)
         w, h = input_size
