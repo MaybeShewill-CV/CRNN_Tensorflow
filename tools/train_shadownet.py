@@ -154,9 +154,9 @@ def train_shadownet(cfg: EasyDict, weights_path: str=None, decode: bool=False, n
         patience_counter = 1
         cost_history = [np.inf]
         for epoch in range(train_epochs):
-            if cfg.TRAIN.EARLY_STOPPING:
+            if epoch > 1 and cfg.TRAIN.EARLY_STOPPING:
                 # We always compare to the first point where cost didn't improve
-                if cost_history[epoch - patience_counter] - cost_history[epoch] > cfg.TRAIN.PATIENCE_DELTA:
+                if cost_history[-1 - patience_counter] - cost_history[-1] > cfg.TRAIN.PATIENCE_DELTA:
                     patience_counter = 1
                 else:
                     patience_counter += 1
