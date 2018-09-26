@@ -31,6 +31,13 @@ __C.ARCH.INPUT_CHANNELS = 3
 # Train options
 __C.TRAIN = edict()
 
+# Use early stopping?
+__C.TRAIN.EARLY_STOPPING = True
+# Wait at least this many epochs without improvement in the cost function
+__C.TRAIN.PATIENCE_EPOCHS = 6
+# Expect at least this improvement in one epoch in order to reset the early stopping counter
+__C.TRAIN.PATIENCE_DELTA = 1e-3
+
 # Set the shadownet training epochs
 __C.TRAIN.EPOCHS = 40000
 # Set the display step

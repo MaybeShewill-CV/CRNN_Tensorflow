@@ -62,12 +62,13 @@ def init_args() -> Tuple[argparse.Namespace, EasyDict]:
     return args, config.cfg
 
 
-def train_shadownet(cfg: EasyDict, weights_path: str=None, decode: bool=False, num_threads: int=4):
+def train_shadownet(cfg: EasyDict, weights_path: str=None, decode: bool=False, num_threads: int=4) -> np.array:
     """
     :param cfg: configuration EasyDict (e.g. global_config.config.cfg)
     :param weights_path: Path to stored weights
     :param decode: Whether to perform CTC decoding to report progress during training
     :param num_threads: Number of threads to use in tf.train.shuffle_batch
+    :return History of values of the cost function
     """
     # decode the tf records to get the training data
     decoder = data_utils.TextFeatureIO(char_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'char_dict.json'),
@@ -150,7 +151,19 @@ def train_shadownet(cfg: EasyDict, weights_path: str=None, decode: bool=False, n
         coord = tf.train.Coordinator()
         threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
+        patience_counter = 1
+        cost_history = [np.inf]
         for epoch in range(train_epochs):
+            if cfg.TRAIN.EARLY_STOPPING:
+                # We always compare to the first point where cost didn't improve
+                if cost_history[epoch - patience_counter] - cost_history[epoch] > cfg.TRAIN.PATIENCE_DELTA:
+                    patience_counter = 1
+                else:
+                    patience_counter += 1
+                if patience_counter > cfg.TRAIN.PATIENCE_EPOCHS:
+                    logger.info("Cost didn't improve beyond {:f} for {:d} epochs, stopping early.".
+                                format(cfg.TRAIN.PATIENCE_DELTA, patience_counter))
+                    break
             if decode:
                 _, c, seq_distance, predictions, labels, summary = sess.run(
                     [optimizer, cost, sequence_dist, decoded, input_labels, merge_summary_op])
@@ -168,11 +181,14 @@ def train_shadownet(cfg: EasyDict, weights_path: str=None, decode: bool=False, n
                 if epoch % cfg.TRAIN.DISPLAY_STEP == 0:
                     logger.info('Epoch: {:d} cost= {:9f}'.format(epoch + 1, c))
 
+            cost_history.append(c)
             summary_writer.add_summary(summary=summary, global_step=epoch)
             saver.save(sess=sess, save_path=model_save_path, global_step=epoch)
 
         coord.request_stop()
         coord.join(threads=threads)
+
+        return np.array(cost_history[1:])  # Don't return the first np.inf
 
 
 if __name__ == '__main__':
