@@ -92,7 +92,7 @@ class FeatureIO(object):
         :param char:
         :return:
         """
-        temp = ord(char.lower())
+        temp = ord(char)
         for k, v in self.__ord_map.items():
             if v == str(temp):
                 temp = int(k)
