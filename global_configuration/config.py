@@ -53,6 +53,8 @@ __C.TRAIN.VAL_BATCH_SIZE = 32
 __C.TRAIN.LR_DECAY_STEPS = 10000
 # Set the learning rate decay rate
 __C.TRAIN.LR_DECAY_RATE = 0.1
+# Update learning rate in jumps?
+__C.TRAIN.LR_STAIRCASE = False
 
 # Test options
 __C.TEST = edict()

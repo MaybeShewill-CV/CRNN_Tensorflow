@@ -104,7 +104,7 @@ def train_shadownet(cfg: EasyDict, weights_path: str=None, decode: bool=False, n
     starter_learning_rate = cfg.TRAIN.LEARNING_RATE
     learning_rate = tf.train.exponential_decay(starter_learning_rate, global_step,
                                                cfg.TRAIN.LR_DECAY_STEPS, cfg.TRAIN.LR_DECAY_RATE,
-                                               staircase=True)
+                                               staircase=cfg.TRAIN.LR_STAIRCASE)
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 
     with tf.control_dependencies(update_ops):
