@@ -175,27 +175,38 @@ class TextDataProvider(object):
             assert ops.exists(annotation_path)
 
             with open(annotation_path, 'r', encoding='utf-8') as fd:
+                print("Reading labels in {}... ".format(annotation_path), end='', flush=True)
                 info = np.array(list(filter(lambda x: len(x) == 2,  # discard bogus entries with no label
-                                            [line.strip().split(maxsplit=1) for line in fd.readlines()])))
-
-                images_orig = [cv2.imread(ops.join(dir, imgname), cv2.IMREAD_COLOR) for imgname in info[:, 0]]
-                assert not any(map(lambda x: x is None, images_orig)),\
-                    "Could not read some images. Check for whitespace in file names or invalid files"
-                images = np.array([cv2.resize(img, tuple(self.__input_size)) for img in images_orig])
+                                            (line.strip().split(maxsplit=1) for line in fd.readlines()))))
+                print("Done.")
+                print("Reading and scaling images... ", end='', flush=True)
+                images = []
+                for name in info[:, 0]:
+                    img = cv2.imread(ops.join(dir, name), cv2.IMREAD_COLOR)
+                    if img is None:
+                        raise Exception("Error reading '{}'. Check for whitespace in file names or invalid files".
+                                        format(name))
+                    images.append(cv2.resize(img, tuple(self.__input_size)))
+                images = np.array(images)
+                print("Done.")
+                print("Checking label lengths... ", end='', flush=True)
                 max_label_len = max(map(len, info[:, 1]))
                 if max_label_len > self.__seq_length:
                     print("WARNING: Some labels are longer ({:d} chars) than the maximum sequence length {:d}".format(
                         max_label_len, self.__seq_length))
+                print("Done.")
+                print("Generating arrays... ", end='', flush=True)
                 labels = np.array([x[:self.__seq_length] for x in info[:, 1]])
-                imagenames = np.array([ops.basename(imgname) for imgname in info[:, 0]])
+                image_names = np.array([ops.basename(name) for name in info[:, 0]])
+                print("Done.")
 
             if split is None:
-                return TextDataset(images, labels, imagenames, shuffle=shuffle, normalization=normalization), None
+                return TextDataset(images, labels, image_names, shuffle=shuffle, normalization=normalization), None
             else:
                 split_idx = int(images.shape[0] * (1.0 - split))
-                return TextDataset(images[:split_idx], labels[:split_idx], imagenames[:split_idx],
+                return TextDataset(images[:split_idx], labels[:split_idx], image_names[:split_idx],
                                    shuffle=shuffle, normalization=normalization), \
-                       TextDataset(images[split_idx:], labels[split_idx:], imagenames[split_idx:],
+                       TextDataset(images[split_idx:], labels[split_idx:], image_names[split_idx:],
                                    shuffle=shuffle, normalization=normalization)
 
         self.test, _ = make_datasets(self.__test_dataset_dir)
