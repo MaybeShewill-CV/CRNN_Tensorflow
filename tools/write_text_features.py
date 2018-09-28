@@ -100,13 +100,12 @@ if __name__ == '__main__':
 
     os.makedirs(args.save_dir, exist_ok=True)
 
-    print('Initializing the dataset provider... ', end='', flush=True)
+    print('Initializing the dataset provider...')
 
     provider = data_provider.TextDataProvider(dataset_dir=args.dataset_dir, annotation_name=args.annotation_file,
                                               validation_set=args.validation_split > 0,
                                               validation_split=args.validation_split, shuffle='every_epoch',
                                               normalization=args.normalization, input_size=config.cfg.ARCH.INPUT_SIZE)
-    print('done.')
 
     write_tfrecords(provider.train, "train", args.save_dir, args.charset_dir)
     write_tfrecords(provider.test, "test", args.save_dir, args.charset_dir)
