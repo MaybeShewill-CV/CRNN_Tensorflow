@@ -87,9 +87,7 @@ train, test and validation set. Check `global_config/config.py` and run `python 
 
 #### Training
 
-The original experiment run for 40000 epochs, with a batch size of 32, an initial learning rate of 0.1 and exponential
-decay of 0.1 every 10000 epochs. For more training parameters you can check `global_configuration/config.py`.
-Then train your model with
+For all the available training parameters, check `global_configuration/config.py`, then train your model with
 
 ```
 python tools/train_shadownet.py --dataset_dir path/to/your/tfrecords
@@ -116,13 +114,14 @@ to all scripts.
 
 ## Experiment
 
-During training in the original experiment the `loss` drops as follows  
+The original experiment run for 40000 epochs, with a batch size of 32, an initial learning rate of 0.1 and exponential
+decay of 0.1 every 10000 epochs. During training the `loss` dropped as follows  
 ![Training loss](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/train_loss.png)
 
-The distance between the ground truth and the prediction drops as follows  
+The distance between the ground truth and the prediction dropped as follows  
 ![Sequence distance](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/seq_distance.png)
 
-The accuracy rises as follows  
+The accuracy rose as follows  
 ![Training accuracy](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/training_accuracy.md)
 
 ## TODO
