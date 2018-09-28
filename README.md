@@ -1,22 +1,22 @@
 # CRNN_Tensorflow
-This is a TensorFlow implementation of a Deep Neural Network for scene text recognition mainly based on the paper 
+This is a TensorFlow implementation of a Deep Neural Network for scene text recognition. It is  mainly based on the paper 
 ["An End-to-End Trainable Neural Network for Image-based Sequence Recognition and Its Application to Scene Text Recognition"](http://arxiv.org/abs/1507.05717). 
-You can refer to their paper for details. Thanks to the author [Baoguang Shi](https://github.com/bgshih).
+You can refer to the paper for architecture details. Thanks to the author [Baoguang Shi](https://github.com/bgshih).
   
-This model consists of a CNN stage extracting features which are fed to an RNN stage (Bi-LSTM) and a CTC loss.
+The model consists of a CNN stage extracting features which are fed to an RNN stage (Bi-LSTM) and a CTC loss.
 
 ## Installation
 
-This software has been developed on Ubuntu 16.04(x64) using python3.5 and TensorFlow 1.10. Since it uses the data
-API it is incompatible with older versions of TensorFlow.
+This software has been developed on Ubuntu 16.04(x64) using python 3.5 and TensorFlow 1.10. Since it uses some recent
+features of TensorFlow it is incompatible with older versions.
 
 The following methods are provided to install dependencies:
 
-## Docker
+### Docker
 
 There are Dockerfiles inside the folder `docker`. Follow the instructions inside `docker/README.md` to build the images.
 
-## Conda
+### Conda
 
 You can create a conda environment with the required dependencies using: 
 
@@ -24,7 +24,7 @@ You can create a conda environment with the required dependencies using:
 conda env create -f crnntf-env.yml
 ```
 
-## Pip
+### Pip
 
 Required packages may be installed with
 
@@ -32,7 +32,7 @@ Required packages may be installed with
 pip3 install -r requirements.txt
 ```
 
-## Test model
+## Testing the pre-trained model
 In this repo you will find a model pre-trained on a subset of the [Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/)
 dataset. You can find the data as TensorFlow records in the `data` folder. The trained model can be tested with
 
@@ -48,7 +48,7 @@ If you want to test a single image you can do it with
 python tools/demo_shadownet.py --image_path data/test_images/test_01.jpg --weights_path model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999
 ```
 
-Here are some example images:
+### Example images
  
 ![Example image1](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/text_example_image1.png)  
 
