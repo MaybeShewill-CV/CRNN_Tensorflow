@@ -52,7 +52,6 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
         if not isinstance(value, str) or value.lower() not in ['test', 'train']:
             raise ValueError('value should be a str \'Test\' or \'Train\'')
         self.__phase = value.lower()
-        return
 
     def __conv_stage(self, inputdata: tf.Tensor, out_dims: int, name: str=None) -> tf.Tensor:
         """ Standard VGG convolutional stage: 2d conv, relu, and maxpool
