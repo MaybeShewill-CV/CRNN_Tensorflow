@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:1.3.0-gpu-py3
+FROM tensorflow/tensorflow:1.10.0-gpu-py3
 
 RUN apt update && \
     apt install -y --no-install-recommends \

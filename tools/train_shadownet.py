@@ -73,23 +73,16 @@ def train_shadownet(cfg: EasyDict, weights_path: str=None, decode: bool=False, n
     # decode the tf records to get the training data
     decoder = data_utils.TextFeatureIO(char_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'char_dict.json'),
                                        ord_map_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'ord_map.json')).reader
-    images, labels, imagenames = decoder.read_features(ops.join(cfg.PATH.TFRECORDS_DIR, 'train_feature.tfrecords'),
-                                                       num_epochs=None, input_size=cfg.ARCH.INPUT_SIZE,
-                                                       input_channels=cfg.ARCH.INPUT_CHANNELS)
-    inputdata, input_labels, input_imagenames = tf.train.shuffle_batch(
-        tensors=[images, labels, imagenames], batch_size=cfg.TRAIN.BATCH_SIZE,
-        capacity=1000 + 2*cfg.TRAIN.BATCH_SIZE, min_after_dequeue=100, num_threads=num_threads)
 
-    inputdata = tf.cast(x=inputdata, dtype=tf.float32)
+    input_images, input_labels, input_image_names = decoder.read_features(cfg, cfg.TRAIN.BATCH_SIZE, num_threads)
 
-    # initialise the net model
     shadownet = crnn_model.ShadowNet(phase='Train',
                                      hidden_nums=cfg.ARCH.HIDDEN_UNITS,
                                      layers_nums=cfg.ARCH.HIDDEN_LAYERS,
                                      num_classes=len(decoder.char_dict)+1)
 
     with tf.variable_scope('shadow', reuse=False):
-        net_out = shadownet.build_shadownet(inputdata=inputdata)
+        net_out = shadownet.build_shadownet(inputdata=input_images)
 
     cost = tf.reduce_mean(tf.nn.ctc_loss(labels=input_labels, inputs=net_out,
                                          sequence_length=cfg.ARCH.SEQ_LENGTH*np.ones(cfg.TRAIN.BATCH_SIZE)))
@@ -148,9 +141,6 @@ def train_shadownet(cfg: EasyDict, weights_path: str=None, decode: bool=False, n
             logger.info('Restore model from {:s}'.format(weights_path))
             saver.restore(sess=sess, save_path=weights_path)
 
-        coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-
         patience_counter = 1
         cost_history = [np.inf]
         for epoch in range(train_epochs):
@@ -184,9 +174,6 @@ def train_shadownet(cfg: EasyDict, weights_path: str=None, decode: bool=False, n
             cost_history.append(c)
             summary_writer.add_summary(summary=summary, global_step=epoch)
             saver.save(sess=sess, save_path=model_save_path, global_step=epoch)
-
-        coord.request_stop()
-        coord.join(threads=threads)
 
         return np.array(cost_history[1:])  # Don't return the first np.inf
 

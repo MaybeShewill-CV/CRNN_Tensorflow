@@ -33,7 +33,6 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
         self.__hidden_nums = hidden_nums
         self.__layers_nums = layers_nums
         self.__num_classes = num_classes
-        return
 
     @property
     def phase(self):
@@ -50,12 +49,9 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
         :param value:
         :return:
         """
-        if not isinstance(value, str):
-            raise TypeError('value should be a str \'Test\' or \'Train\'')
-        if value.lower() not in ['test', 'train']:
+        if not isinstance(value, str) or value.lower() not in ['test', 'train']:
             raise ValueError('value should be a str \'Test\' or \'Train\'')
         self.__phase = value.lower()
-        return
 
     def __conv_stage(self, inputdata: tf.Tensor, out_dims: int, name: str=None) -> tf.Tensor:
         """ Standard VGG convolutional stage: 2d conv, relu, and maxpool
@@ -84,16 +80,10 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
         max_pool4 = self.maxpooling(inputdata=relu4, kernel_size=[2, 1], stride=[2, 1], padding='VALID')  # batch*4*25*256
         conv5 = self.conv2d(inputdata=max_pool4, out_channel=512, kernel_size=3, stride=1, use_bias=False, name='conv5')  # batch*4*25*512
         relu5 = self.relu(conv5)  # batch*4*25*512
-        if self.phase.lower() == 'train':
-            bn5 = self.layerbn(inputdata=relu5, is_training=True)
-        else:
-            bn5 = self.layerbn(inputdata=relu5, is_training=False)  # batch*4*25*512
+        bn5 = self.layerbn(inputdata=relu5, is_training=self.phase == 'train')  # batch*4*25*512
         conv6 = self.conv2d(inputdata=bn5, out_channel=512, kernel_size=3, stride=1, use_bias=False, name='conv6')  # batch*4*25*512
         relu6 = self.relu(conv6)  # batch*4*25*512
-        if self.phase.lower() == 'train':
-            bn6 = self.layerbn(inputdata=relu6, is_training=True)
-        else:
-            bn6 = self.layerbn(inputdata=relu6, is_training=False)  # batch*4*25*512
+        bn6 = self.layerbn(inputdata=relu6, is_training=self.phase == 'train')  # batch*4*25*512
         max_pool6 = self.maxpooling(inputdata=bn6, kernel_size=[2, 1], stride=[2, 1])  # batch*2*25*512
         conv7 = self.conv2d(inputdata=max_pool6, out_channel=512, kernel_size=2, stride=[2, 1], use_bias=False, name='conv7')  # batch*1*25*512
         relu7 = self.relu(conv7)  # batch*1*25*512
