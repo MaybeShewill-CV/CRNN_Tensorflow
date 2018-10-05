@@ -213,7 +213,7 @@ class TextFeatureReader(FeatureIO):
         :return: input_images, input_labels, input_image_names
         """
 
-        tfrecords_path = os.path.join(cfg.PATH.TFRECORDS_DIR, "train_feature.tfrecords")
+        tfrecords_path = os.path.join(cfg.PATH.TFRECORDS_DIR, "test_feature.tfrecords")
         assert ops.exists(tfrecords_path), "tfrecords file not found: %s" % tfrecords_path
 
         def extract_batch(x):
