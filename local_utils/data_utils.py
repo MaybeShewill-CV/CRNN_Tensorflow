@@ -204,7 +204,7 @@ class TextFeatureReader(FeatureIO):
         return
 
     @staticmethod
-    def read_features(cfg: EasyDict, batch_size: int, num_threads: int) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
+    def read_features(cfg: EasyDict, batch_size: int, num_threads: int, isTrain: bool=True) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor]:
         """
 
         :param cfg:
@@ -212,10 +212,13 @@ class TextFeatureReader(FeatureIO):
         :param num_threads:
         :return: input_images, input_labels, input_image_names
         """
-
-        tfrecords_path = os.path.join(cfg.PATH.TFRECORDS_DIR, "train_feature.tfrecords")
-        assert ops.exists(tfrecords_path), "tfrecords file not found: %s" % tfrecords_path
-
+        if isTrain:
+            tfrecords_path = os.path.join(cfg.PATH.TFRECORDS_DIR, "train_feature.tfrecords")
+            assert ops.exists(tfrecords_path), "tfrecords file not found: %s" % tfrecords_path
+        else:
+            tfrecords_path = os.path.join(cfg.PATH.TFRECORDS_DIR, "test_feature.tfrecords")
+            assert ops.exists(tfrecords_path), "tfrecords file not found: %s" % tfrecords_path            
+        
         def extract_batch(x):
             return TextFeatureReader.extract_features_batch(x, cfg.ARCH.INPUT_SIZE, cfg.ARCH.INPUT_CHANNELS)
 
