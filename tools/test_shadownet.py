@@ -77,7 +77,7 @@ def test_shadownet(weights_path: str, cfg: EasyDict, visualize: bool, process_al
     """
     decoder = data_utils.TextFeatureIO(char_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'char_dict.json'),
                                        ord_map_dict_path=ops.join(cfg.PATH.CHAR_DICT_DIR, 'ord_map.json')).reader
-    input_images, input_labels, input_image_names = decoder.read_features(cfg, cfg.TEST.BATCH_SIZE, num_threads)
+    input_images, input_labels, input_image_names = decoder.read_features(cfg, cfg.TEST.BATCH_SIZE, num_threads, False)
 
     num_classes = len(decoder.char_dict) + 1 if num_classes == 0 else num_classes
     net = crnn_model.ShadowNet(phase='Test', hidden_nums=cfg.ARCH.HIDDEN_UNITS,
