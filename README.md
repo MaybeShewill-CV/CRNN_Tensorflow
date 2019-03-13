@@ -128,7 +128,8 @@ The accuracy rose as follows
 ![Training accuracy](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/training_accuracy.md)
 
 ## TODO
--[ ] Add new model weights trained on the whold synth90k dataset
--[ ] Add multiple gpu training scripts
--[ ] Add an online toy demo
--[ ] Add tensorflow service script
+
+- [ ] Add new model weights trained on the whold synth90k dataset
+- [ ] Add multiple gpu training scripts
+- [ ] Add an online toy demo
+- [ ] Add tensorflow service script
