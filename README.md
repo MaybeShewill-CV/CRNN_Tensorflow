@@ -7,8 +7,9 @@ The model consists of a CNN stage extracting features which are fed to an RNN st
 
 ## Installation
 
-This software has been developed on Ubuntu 16.04(x64) using python 3.5 and TensorFlow 1.10. Since it uses some recent
-features of TensorFlow it is incompatible with older versions.
+This software has been developed on Ubuntu 16.04(x64) using python 3.5 and 
+TensorFlow 1.12. Since it uses some recent features of TensorFlow it is 
+incompatible with older versions.
 
 The following methods are provided to install dependencies:
 
@@ -33,11 +34,15 @@ pip3 install -r requirements.txt
 ```
 
 ## Testing the pre-trained model
-In this repo you will find a model pre-trained on a subset of the [Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/)
-dataset. You can find the data as TensorFlow records in the `data` folder. The trained model can be tested with
+In this repo you will find a model pre-trained on the 
+[Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/)dataset. When the tfrecords
+file of synth90k dataset has been successfully generated you may evaluated the
+model by the following script
 
 ```
-python tools/test_shadownet.py --dataset_dir data/ --weights_path model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999
+python tools/evaluate_shadownet.py --dataset_dir PATH/TO/YOUR/DATASET_DIR --weights_path PATH/TO/YOUR/MODEL_WEIGHTS_PATH
+--char_dict_path PATH/TO/CHAR_DICT_PATH --ord_map_dict_path PATH/TO/ORD_MAP_PATH
+--process_all True --visualize True
 ```
 
 The expected output is
@@ -45,7 +50,9 @@ The expected output is
 
 If you want to test a single image you can do it with
 ```
-python tools/demo_shadownet.py --image_path data/test_images/test_01.jpg --weights_path model/shadownet/shadownet_2017-09-29-19-16-33.ckpt-39999
+python tools/test_shadownet.py --image_path PATH/TO/IMAGE 
+--weights_path PATH/TO/MODEL_WEIGHTS
+--char_dict_path PATH/TO/CHAR_DICT_PATH --ord_map_dict_path PATH/TO/ORD_MAP_PATH
 ```
 
 ### Example images
@@ -67,42 +74,37 @@ python tools/demo_shadownet.py --image_path data/test_images/test_01.jpg --weigh
 ![Example image4 output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/chinese_version_debug/data/images/demo_chinese_2_ouput.png)
 
 ## Training your own model
+
 #### Data preparation
-First you need to store all your image data in a root folder then you need to supply a txt file named `sample.txt` to
-specify the image paths (relative to the image data dir) and their corresponding text labels. For example
+Download the whole synth90k dataset [here](http://www.robots.ox.ac.uk/~vgg/data/text/)
+And extract all th files into a root dir which should contain several txt file and
+several folders filled up with pictures. Then you need to convert the whole 
+dataset into tensorflow records as follows
 
 ```
-path/1/2/373_coley_14845.jpg coley
-path/17/5/176_Nevadans_51437.jpg nevadans
+python tools/write_text_features --dataset_dir PATH/TO/SYNTH90K_DATASET_ROOT_DIR
+--save_dir PATH/TO/TFRECORDS_DIR
 ```
 
-Second you need to convert your dataset into TensorFlow records, as well as extract the character set, with
-
-```
-python tools/write_text_features --dataset_dir path/to/your/dataset --save_dir path/to/tfrecords_dir --charset_dir path/to/charset_dir
-```
-
-All the training images will be scaled to a fixed size (by default (32, 100, 3)) and the dataset will be divided into
-train, test and validation set. Check `global_config/config.py` and run `python tools/write_text_features.py` for options.
+During converting all the source image will be scaled into (32, 100)
 
 #### Training
 
 For all the available training parameters, check `global_configuration/config.py`, then train your model with
 
 ```
-python tools/train_shadownet.py --dataset_dir path/to/your/tfrecords
+python tools/train_shadownet.py --dataset_dir PATH/TO/YOUR/TFRECORDS
+--char_dict_path PATH/TO/CHAR_DICT_PATH --ord_map_dict_path PATH/TO/ORD_MAP_PATH
 ```
 
 If you wish, you can add more metrics to the training progress messages with `--decode_outputs`, but this will slow
 training down. You can also continue the training process from a snapshot with
 
 ```
-python tools/train_shadownet.py --dataset_dir path/to/your/tfrecords --weights_path path/to/your/last/checkpoint
+python tools/train_shadownet.py --dataset_dir PATH/TO/YOUR/TFRECORDS
+--weights_path PATH/TO/YOUR/PRETRAINED_MODEL_WEIGHTS
+--char_dict_path PATH/TO/CHAR_DICT_PATH --ord_map_dict_path PATH/TO/ORD_MAP_PATH
 ```
-
-After several iterations you can check the tensorboard logs in `logs/`. You should see something like:
-
-![Training log](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/train_log.png)
 
 The sequence distance is computed by calculating the distance between two sparse tensors so the lower the accuracy value
 is the better the model performs. The training accuracy is computed by calculating the character-wise precision between
@@ -114,8 +116,9 @@ to all scripts.
 
 ## Experiment
 
-The original experiment run for 40000 epochs, with a batch size of 32, an initial learning rate of 0.1 and exponential
-decay of 0.1 every 10000 epochs. During training the `loss` dropped as follows  
+The original experiment run for 2000000 epochs, with a batch size of 32, 
+an initial learning rate of 0.1 and exponential
+decay of 0.1 every 500000 epochs. During training the `loss` dropped as follows  
 ![Training loss](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/train_loss.png)
 
 The distance between the ground truth and the prediction dropped as follows  
@@ -125,6 +128,7 @@ The accuracy rose as follows
 ![Training accuracy](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/training_accuracy.md)
 
 ## TODO
-The model is trained on a subset of [Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/). It would make sense to
-train on the whole dataset to get a more robust model, since the crnn model needs a large amount of training data in
-order to achieve good performance.
+-[ ] Add new model weights trained on the whold synth90k dataset
+-[ ] Add multiple gpu training scripts
+-[ ] Add an online toy demo
+-[ ] Add tensorflow service script
