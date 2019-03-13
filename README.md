@@ -1,9 +1,12 @@
 # CRNN_Tensorflow
-This is a TensorFlow implementation of a Deep Neural Network for scene text recognition. It is  mainly based on the paper 
+This is a TensorFlow implementation of a Deep Neural Network for scene 
+text recognition. It is  mainly based on the paper 
 ["An End-to-End Trainable Neural Network for Image-based Sequence Recognition and Its Application to Scene Text Recognition"](http://arxiv.org/abs/1507.05717). 
-You can refer to the paper for architecture details. Thanks to the author [Baoguang Shi](https://github.com/bgshih).
+You can refer to the paper for architecture details. Thanks to 
+the author [Baoguang Shi](https://github.com/bgshih).
   
-The model consists of a CNN stage extracting features which are fed to an RNN stage (Bi-LSTM) and a CTC loss.
+The model consists of a CNN stage extracting features which are fed 
+to an RNN stage (Bi-LSTM) and a CTC loss.
 
 ## Installation
 
@@ -15,7 +18,8 @@ The following methods are provided to install dependencies:
 
 ### Docker
 
-There are Dockerfiles inside the folder `docker`. Follow the instructions inside `docker/README.md` to build the images.
+There are Dockerfiles inside the folder `docker`. Follow the instructions 
+inside `docker/README.md` to build the images.
 
 ### Conda
 
@@ -40,8 +44,10 @@ file of synth90k dataset has been successfully generated you may evaluated the
 model by the following script
 
 ```
-python tools/evaluate_shadownet.py --dataset_dir PATH/TO/YOUR/DATASET_DIR --weights_path PATH/TO/YOUR/MODEL_WEIGHTS_PATH
---char_dict_path PATH/TO/CHAR_DICT_PATH --ord_map_dict_path PATH/TO/ORD_MAP_PATH
+python tools/evaluate_shadownet.py --dataset_dir PATH/TO/YOUR/DATASET_DIR 
+--weights_path PATH/TO/YOUR/MODEL_WEIGHTS_PATH
+--char_dict_path PATH/TO/CHAR_DICT_PATH 
+--ord_map_dict_path PATH/TO/ORD_MAP_PATH
 --process_all True --visualize True
 ```
 
@@ -52,7 +58,8 @@ If you want to test a single image you can do it with
 ```
 python tools/test_shadownet.py --image_path PATH/TO/IMAGE 
 --weights_path PATH/TO/MODEL_WEIGHTS
---char_dict_path PATH/TO/CHAR_DICT_PATH --ord_map_dict_path PATH/TO/ORD_MAP_PATH
+--char_dict_path PATH/TO/CHAR_DICT_PATH 
+--ord_map_dict_path PATH/TO/ORD_MAP_PATH
 ```
 
 ### Example images
@@ -82,7 +89,8 @@ several folders filled up with pictures. Then you need to convert the whole
 dataset into tensorflow records as follows
 
 ```
-python tools/write_text_features --dataset_dir PATH/TO/SYNTH90K_DATASET_ROOT_DIR
+python tools/write_text_features 
+--dataset_dir PATH/TO/SYNTH90K_DATASET_ROOT_DIR
 --save_dir PATH/TO/TFRECORDS_DIR
 ```
 
@@ -90,14 +98,17 @@ During converting all the source image will be scaled into (32, 100)
 
 #### Training
 
-For all the available training parameters, check `global_configuration/config.py`, then train your model with
+For all the available training parameters, check `global_configuration/config.py`, 
+then train your model with
 
 ```
 python tools/train_shadownet.py --dataset_dir PATH/TO/YOUR/TFRECORDS
---char_dict_path PATH/TO/CHAR_DICT_PATH --ord_map_dict_path PATH/TO/ORD_MAP_PATH
+--char_dict_path PATH/TO/CHAR_DICT_PATH 
+--ord_map_dict_path PATH/TO/ORD_MAP_PATH
 ```
 
-If you wish, you can add more metrics to the training progress messages with `--decode_outputs`, but this will slow
+If you wish, you can add more metrics to the training progress messages with 
+`--decode_outputs`, but this will slow
 training down. You can also continue the training process from a snapshot with
 
 ```
@@ -106,11 +117,14 @@ python tools/train_shadownet.py --dataset_dir PATH/TO/YOUR/TFRECORDS
 --char_dict_path PATH/TO/CHAR_DICT_PATH --ord_map_dict_path PATH/TO/ORD_MAP_PATH
 ```
 
-The sequence distance is computed by calculating the distance between two sparse tensors so the lower the accuracy value
-is the better the model performs. The training accuracy is computed by calculating the character-wise precision between
+The sequence distance is computed by calculating the distance between two 
+sparse tensors so the lower the accuracy value
+is the better the model performs. The training accuracy is computed by 
+calculating the character-wise precision between
 the prediction and the ground truth so the higher the better the model performs.
 
-Finally, note that it is possible to use multiple config files for different experiments, via the option `--config_file`
+Finally, note that it is possible to use multiple config files for different 
+experiments, via the option `--config_file`
 to all scripts.
 
 
