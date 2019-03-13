@@ -3,7 +3,7 @@
 # @Time    : 17-9-22 下午3:25
 # @Author  : Luo Yao
 # @Site    : http://github.com/TJCVRS
-# @File    : config.py
+# @File    : global_config.py
 # @IDE: PyCharm Community Edition
 """
 Set some global configuration
@@ -27,19 +27,21 @@ __C.ARCH.SEQ_LENGTH = 25
 __C.ARCH.INPUT_SIZE = (100, 32)
 # Number of channels in images
 __C.ARCH.INPUT_CHANNELS = 3
+# Number of units in each LSTM cell
+__C.ARCH.NUM_CLASSES = 37
 
 # Train options
 __C.TRAIN = edict()
 
 # Use early stopping?
-__C.TRAIN.EARLY_STOPPING = True
+__C.TRAIN.EARLY_STOPPING = False
 # Wait at least this many epochs without improvement in the cost function
 __C.TRAIN.PATIENCE_EPOCHS = 6
 # Expect at least this improvement in one epoch in order to reset the early stopping counter
 __C.TRAIN.PATIENCE_DELTA = 1e-3
 
 # Set the shadownet training epochs
-__C.TRAIN.EPOCHS = 40000
+__C.TRAIN.EPOCHS = 2000000
 # Set the display step
 __C.TRAIN.DISPLAY_STEP = 1
 # Set the test display step during training process
@@ -47,9 +49,9 @@ __C.TRAIN.TEST_DISPLAY_STEP = 100
 # Set the momentum parameter of the optimizer
 __C.TRAIN.MOMENTUM = 0.9
 # Set the initial learning rate
-__C.TRAIN.LEARNING_RATE = 0.1
+__C.TRAIN.LEARNING_RATE = 0.01
 # Set the GPU resource used during training process
-__C.TRAIN.GPU_MEMORY_FRACTION = 0.85
+__C.TRAIN.GPU_MEMORY_FRACTION = 0.9
 # Set the GPU allow growth parameter during tensorflow training process
 __C.TRAIN.TF_ALLOW_GROWTH = True
 # Set the shadownet training batch size
@@ -57,17 +59,19 @@ __C.TRAIN.BATCH_SIZE = 32
 # Set the shadownet validation batch size
 __C.TRAIN.VAL_BATCH_SIZE = 32
 # Set the learning rate decay steps
-__C.TRAIN.LR_DECAY_STEPS = 10000
+__C.TRAIN.LR_DECAY_STEPS = 500000
 # Set the learning rate decay rate
 __C.TRAIN.LR_DECAY_RATE = 0.1
 # Update learning rate in jumps?
-__C.TRAIN.LR_STAIRCASE = False
+__C.TRAIN.LR_STAIRCASE = True
+# Set multi process nums
+__C.TRAIN.CPU_MULTI_PROCESS_NUMS = 6
 
 # Test options
 __C.TEST = edict()
 
 # Set the GPU resource used during testing process
-__C.TEST.GPU_MEMORY_FRACTION = 0.5
+__C.TEST.GPU_MEMORY_FRACTION = 0.9
 # Set the GPU allow growth parameter during tensorflow testing process
 __C.TEST.TF_ALLOW_GROWTH = False
 # Set the test batch size
