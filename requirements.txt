@@ -1,5 +1,7 @@
-tensorflow_gpu==1.10.0
-numpy==1.13.1
-opencv_python==3.2.0.7
-matplotlib==2.2.2
-easydict==1.6
+easydict==1.9
+matplotlib==3.0.2
+numpy==1.15.1
+glog==0.3.1
+opencv_python==3.4.1.15
+tensorflow_gpu==1.12.0
+tensorflow==1.12.0

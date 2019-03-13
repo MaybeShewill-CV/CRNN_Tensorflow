@@ -3,10 +3,10 @@
 # @Time    : 17-9-29 下午3:56
 # @Author  : Luo Yao
 # @Site    : http://github.com/TJCVRS
-# @File    : demo_shadownet.py
+# @File    : test_shadownet.py
 # @IDE: PyCharm Community Edition
 """
-Use shadow net to recognize the scene text
+Use shadow net to recognize the scene text of a single image
 """
 import argparse
 import os.path as ops

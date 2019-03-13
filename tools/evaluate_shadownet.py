@@ -3,14 +3,15 @@
 # @Time    : 17-9-25 下午3:56
 # @Author  : Luo Yao
 # @Site    : http://github.com/TJCVRS
-# @File    : test_shadownet.py
+# @File    : evaluate_shadownet.py
 # @IDE: PyCharm Community Edition
 """
-Test shadow net script
+Evaluate the crnn model on the synth90k test dataset
 """
 import argparse
 import os.path as ops
 import math
+import time
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -42,13 +43,15 @@ def init_args():
                         help='Path to pre-trained weights')
     parser.add_argument('-v', '--visualize', type=bool, default=False,
                         help='Whether to display images')
+    parser.add_argument('-p', '--process_all', type=bool, default=False,
+                        help='Whether to process all test dataset')
 
     return parser.parse_args()
 
 
-def test_shadownet(dataset_dir, weights_path, char_dict_path,
-                   ord_map_dict_path, is_visualize=True,
-                   is_process_all_data=False):
+def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
+                       ord_map_dict_path, is_visualize=True,
+                       is_process_all_data=False):
     """
 
     :param dataset_dir:
@@ -64,17 +67,20 @@ def test_shadownet(dataset_dir, weights_path, char_dict_path,
         dataset_dir=dataset_dir,
         char_dict_path=char_dict_path,
         ord_map_dict_path=ord_map_dict_path,
-        flags='train'
+        flags='test'
     )
     test_images, test_labels, test_images_paths = test_dataset.inputs(
         batch_size=CFG.TEST.BATCH_SIZE,
         num_epochs=1
     )
+    test_images = tf.multiply(tf.add(test_images, 1.0), 127.5)
 
     # set up test sample count
-    log.info('Start computing test dataset sample counts')
     if is_process_all_data:
+        log.info('Start computing test dataset sample counts')
+        t_start = time.time()
         test_sample_count = test_dataset.sample_counts()
+        log.info('Computing test dataset sample counts finished, cost time: {:.5f}'.format(time.time() - t_start))
         num_iterations = int(math.ceil(test_sample_count / CFG.TEST.BATCH_SIZE))
     else:
         num_iterations = 1
@@ -120,34 +126,44 @@ def test_shadownet(dataset_dir, weights_path, char_dict_path,
         log.info('Start predicting...')
 
         accuracy = 0
-        for epoch in range(num_iterations):
-            test_predictions_value, test_images_value, test_labels_value, \
-            test_images_paths_value = sess.run(
-                [test_decoded, test_images, test_labels, test_images_paths]
-            )
-            test_images_paths_value = np.reshape(
-                test_images_paths_value,
-                newshape=test_images_paths_value.shape[0]
-            )
-            test_images_paths_value = [tmp.decode('utf-8') for tmp in test_images_paths_value]
-            test_images_names_value = [ops.split(tmp)[0] for tmp in test_images_paths_value]
-            test_labels_value = decoder.sparse_tensor_to_str(test_labels_value)
-            test_predictions_value = decoder.sparse_tensor_to_str(test_predictions_value[0])
 
-            accuracy += evaluation_tools.compute_accuracy(
-                test_labels_value, test_predictions_value, display=False
-            )
+        while True:
+            try:
 
-            for index, test_image in enumerate(test_images_value):
-                print('Predict {:s} image with gt label: {:s} **** predicted label: {:s}'.format(
-                    test_images_names_value[index], test_labels_value[index], test_predictions_value[index]))
+                for epoch in range(num_iterations):
+                    test_predictions_value, test_images_value, test_labels_value, \
+                    test_images_paths_value = sess.run(
+                        [test_decoded, test_images, test_labels, test_images_paths]
+                    )
+                    test_images_paths_value = np.reshape(
+                        test_images_paths_value,
+                        newshape=test_images_paths_value.shape[0]
+                    )
+                    test_images_paths_value = [tmp.decode('utf-8') for tmp in test_images_paths_value]
+                    test_images_names_value = [ops.split(tmp)[0] for tmp in test_images_paths_value]
+                    test_labels_value = decoder.sparse_tensor_to_str(test_labels_value)
+                    test_predictions_value = decoder.sparse_tensor_to_str(test_predictions_value[0])
 
-                # avoid accidentally displaying for the whole dataset
-                if is_visualize and not is_process_all_data:
-                    plt.imshow(np.array(test_image, np.uint8)[:, :, (2, 1, 0)])
-                    plt.show()
+                    accuracy += evaluation_tools.compute_accuracy(
+                        test_labels_value, test_predictions_value, display=False
+                    )
 
-        # We compute a mean of means, so we need the sample sizes to be constant
+                    for index, test_image in enumerate(test_images_value):
+                        print('Predict {:s} image with gt label: {:s} **** predicted label: {:s}'.format(
+                            test_images_names_value[index], test_labels_value[index], test_predictions_value[index]))
+
+                        # avoid accidentally displaying for the whole dataset
+                        if is_visualize and not is_process_all_data:
+                            plt.imshow(np.array(test_image, np.uint8)[:, :, (2, 1, 0)])
+                            plt.show()
+            except tf.errors.OutOfRangeError:
+                print('End of tfrecords sequence')
+                break
+            except Exception as err:
+                print(err)
+                break
+
+        # we compute a mean of means, so we need the sample sizes to be constant
         # (BATCH_SIZE) for this to equal the actual mean
         accuracy /= num_iterations
         log.info('Mean test accuracy is {:5f}'.format(accuracy))
@@ -159,10 +175,11 @@ if __name__ == '__main__':
     """
     args = init_args()
 
-    test_shadownet(
+    evaluate_shadownet(
         dataset_dir=args.dataset_dir,
         weights_path=args.weights_path,
         char_dict_path=args.char_dict_path,
         ord_map_dict_path=args.ord_map_dict_path,
-        is_visualize=args.visualize
+        is_visualize=args.visualize,
+        is_process_all_data=args.process_all
     )
