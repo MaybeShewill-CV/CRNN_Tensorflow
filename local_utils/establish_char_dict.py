@@ -9,9 +9,9 @@
 Establish the char dictionary in order to contain chinese character
 """
 import json
-import os.path as ops
 import os
-from typing import Union, List, Set, Iterable
+import os.path as ops
+from typing import Iterable
 
 
 class CharDictBuilder(object):
@@ -22,7 +22,7 @@ class CharDictBuilder(object):
         pass
 
     @staticmethod
-    def _read_chars(origin_char_list: Union[str, List, Set]):
+    def _read_chars(origin_char_list):
         """ Read a list of chars or a file containing it. """
         if isinstance(origin_char_list, str):
             assert ops.exists(origin_char_list), \
@@ -38,7 +38,7 @@ class CharDictBuilder(object):
         return chars
 
     @staticmethod
-    def _write_json(save_path: str, data: dict):
+    def _write_json(save_path, data):
         if not save_path.endswith('.json'):
             raise ValueError('save path {:s} should be a json file'.format(save_path))
         os.makedirs(ops.dirname(save_path), exist_ok=True)
@@ -46,7 +46,7 @@ class CharDictBuilder(object):
             json.dump(data, json_f, sort_keys=True, indent=4)
 
     @staticmethod
-    def write_char_dict(origin_char_list: Union[str, List, Set], save_path: str):
+    def write_char_dict(origin_char_list, save_path):
         """ Writes the ordinal to char map used in int_to_char to decode predictions and labels.
         The file is read with CharDictBuilder.read_char_dict()
 
@@ -58,7 +58,7 @@ class CharDictBuilder(object):
         CharDictBuilder._write_json(save_path, char_dict)
 
     @staticmethod
-    def read_char_dict(dict_path: str) -> dict:
+    def read_char_dict(dict_path):
         """
 
         :param dict_path:
@@ -69,7 +69,7 @@ class CharDictBuilder(object):
         return res
 
     @staticmethod
-    def map_ord_to_index(origin_char_list: Union[str, List, Set], save_path):
+    def map_ord_to_index(origin_char_list, save_path):
         """
             Map ord of character in origin char list into index start from 0 in order to meet the output of the DNN
         :param origin_char_list:
@@ -79,7 +79,7 @@ class CharDictBuilder(object):
         CharDictBuilder._write_json(save_path, char_dict)
 
     @staticmethod
-    def read_ord_map_dict(ord_map_dict_path: str) -> dict:
+    def read_ord_map_dict(ord_map_dict_path):
         """
 
         :param ord_map_dict_path:
