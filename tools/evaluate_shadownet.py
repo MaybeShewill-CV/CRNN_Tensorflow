@@ -153,7 +153,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
                             test_images_names_value[index], test_labels_value[index], test_predictions_value[index]))
 
                         # avoid accidentally displaying for the whole dataset
-                        if is_visualize and not is_process_all_data:
+                        if is_visualize:
                             plt.imshow(np.array(test_image, np.uint8)[:, :, (2, 1, 0)])
                             plt.show()
             except tf.errors.OutOfRangeError:

@@ -26,7 +26,7 @@ def init_args():
     args.add_argument('-c', '--char_dict_path', type=str, default=None,
                       help='The char dict file path. If it is None the char dict will be'
                            'generated automatically in folder data/char_dict')
-    args.add_argument('-o', '--ord_map_dict_path', type=str, default='None',
+    args.add_argument('-o', '--ord_map_dict_path', type=str, default=None,
                       help='The ord map dict file path. If it is None the ord map dict will be'
                            'generated automatically in folder data/char_dict')
     args.add_argument('--step_size', type=int, default=100000,

@@ -42,7 +42,7 @@ def init_args():
     parser.add_argument('-v', '--visualize', type=bool, default=True,
                         help='Whether to display images')
 
-    return args
+    return parser.parse_args()
 
 
 def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vis):
@@ -58,9 +58,9 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
     image = cv2.resize(image, tuple(CFG.ARCH.INPUT_SIZE), interpolation=cv2.INTER_LINEAR)
     image_vis = image
-    image = np.expand_dims(image, axis=0).astype(np.float32)
+    image = np.array(image, np.float32) / 127.5 - 1.0
 
-    [IMAGE_HEIGHT, IMAGE_WIDTH] = tuple(CFG.ARCH.INPUT_SIZE)
+    [IMAGE_WIDTH, IMAGE_HEIGHT] = tuple(CFG.ARCH.INPUT_SIZE)
     inputdata = tf.placeholder(
         dtype=tf.float32,
         shape=[1, IMAGE_HEIGHT, IMAGE_WIDTH, CFG.ARCH.INPUT_CHANNELS],
@@ -96,8 +96,8 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
 
     # config tf session
     sess_config = tf.ConfigProto(allow_soft_placement=True)
-    sess_config.gpu_options.per_process_gpu_memory_fraction = CFG.TRAIN.GPU_MEMORY_FRACTION
-    sess_config.gpu_options.allow_growth = CFG.TRAIN.TF_ALLOW_GROWTH
+    sess_config.gpu_options.per_process_gpu_memory_fraction = CFG.TEST.GPU_MEMORY_FRACTION
+    sess_config.gpu_options.allow_growth = CFG.TEST.TF_ALLOW_GROWTH
 
     sess = tf.Session(config=sess_config)
 
@@ -105,7 +105,7 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
 
         saver.restore(sess=sess, save_path=weights_path)
 
-        preds = sess.run(decodes, feed_dict={inputdata: image})
+        preds = sess.run(decodes, feed_dict={inputdata: [image]})
 
         preds = codec.sparse_tensor_to_str(preds[0])
 
