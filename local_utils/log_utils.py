@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 17-9-18 下午4:11
-# @Author  : Luo Yao
-# @Site    : http://github.com/TJCVRS
+# @Author  : MaybeShewill-CV
+# @Site    : https://github.com/MaybeShewill-CV/CRNN_Tensorflow
 # @File    : log_utils.py
 # @IDE: PyCharm Community Edition
 """

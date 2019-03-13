@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 17-9-18 下午3:59
-# @Author  : Luo Yao
-# @Site    : https://github.com/MaybeShewill-CV/lanenet-lane-detection
+# @Author  : MaybeShewill-CV
+# @Site    : https://github.com/MaybeShewill-CV/CRNN_Tensorflow
 # @File    : cnn_basenet.py
 # @IDE: PyCharm Community Edition
 """

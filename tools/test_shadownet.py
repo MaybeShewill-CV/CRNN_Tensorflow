@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 17-9-29 下午3:56
-# @Author  : Luo Yao
-# @Site    : http://github.com/TJCVRS
+# @Author  : MaybeShewill-CV
+# @Site    : https://github.com/MaybeShewill-CV/CRNN_Tensorflow
 # @File    : test_shadownet.py
 # @IDE: PyCharm Community Edition
 """
@@ -19,7 +19,7 @@ import glog as logger
 
 from config import global_config
 from crnn_model import crnn_model
-from local_utils import data_utils
+from data_provider import tf_io_pipline_tools
 
 CFG = global_config.cfg
 
@@ -68,7 +68,7 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
         name='input'
     )
 
-    codec = data_utils.TextFeatureIO(
+    codec = tf_io_pipline_tools.TextFeatureIO(
         char_dict_path=char_dict_path,
         ord_map_dict_path=ord_map_dict_path
     ).reader

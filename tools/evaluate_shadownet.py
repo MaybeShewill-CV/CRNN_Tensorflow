@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 17-9-25 下午3:56
-# @Author  : Luo Yao
-# @Site    : http://github.com/TJCVRS
+# @Author  : MaybeShewill-CV
+# @Site    : https://github.com/MaybeShewill-CV/CRNN_Tensorflow
 # @File    : evaluate_shadownet.py
 # @IDE: PyCharm Community Edition
 """

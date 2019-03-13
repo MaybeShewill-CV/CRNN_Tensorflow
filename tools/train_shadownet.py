@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 17-9-22 下午1:39
-# @Author  : Luo Yao
-# @Site    : http://github.com/TJCVRS
+# @Author  : MaybeShewill-CV
+# @Site    : https://github.com/MaybeShewill-CV/CRNN_Tensorflow
 # @File    : train_shadownet.py
 # @IDE: PyCharm Community Edition
 """
