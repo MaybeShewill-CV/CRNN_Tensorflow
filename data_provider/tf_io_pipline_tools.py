@@ -8,7 +8,6 @@
 """
 Implement some utils used to convert image and it's corresponding label into tfrecords
 """
-import os
 import os.path as ops
 import sys
 

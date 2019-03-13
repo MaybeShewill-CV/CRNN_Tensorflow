@@ -12,8 +12,6 @@ import logging
 from logging import handlers
 import os
 import os.path as ops
-import numpy as np
-from typing import List
 
 
 def init_logger(level=logging.DEBUG, when="D", backup=7,
