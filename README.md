@@ -71,7 +71,7 @@ The model's main evaluation index are as follows:
 
 For Per char Precision:
 
-$$single_label_accuracy = correct_predicted_char_nums_of_single_sample / single_label_char_nums$$
+single_label_accuracy = correct_predicted_char_nums_of_single_sample / single_label_char_nums
 
 avg_label_accuracy = sum(single_label_accuracy) / label_nums
 
