@@ -54,7 +54,8 @@ python tools/evaluate_shadownet.py --dataset_dir PATH/TO/YOUR/DATASET_DIR
 ```
 
 The expected output is
-![Test output](data/images/test_output.png)
+
+![evaluate output](data/images/evaluate_output.png)
 
 ### Test the model on the single image
 
@@ -66,15 +67,19 @@ python tools/test_shadownet.py --image_path PATH/TO/IMAGE
 --ord_map_dict_path PATH/TO/ORD_MAP_PATH
 ```
 
-### Example images
+### Test example images
+
+Example test_01.jpg
  
-![Example image1](./data/images/text_example_image1.png)  
+![Example image1](./data/images/test_output_1.png)  
 
-![Example image1 output](./data/images/test_example_image1_output.png)  
+Example test_02.jpg
 
-![Example image2](./data/images/test_example_image2.png)  
+![Example image2](./data/images/test_output_2.png)  
 
-![Example image2 output](./data/images/test_example_image2_output.png) 
+Example test_03.jpg
+
+![Example image3](./data/images/test_output_3.png) 
 
 ## Training your own model
 
