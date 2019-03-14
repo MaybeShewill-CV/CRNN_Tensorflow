@@ -129,6 +129,15 @@ is the better the model performs. The training accuracy is computed by
 calculating the character-wise precision between
 the prediction and the ground truth so the higher the better the model performs.
 
+#### Export tensorflow saved model
+
+You can convert the ckpt model into tensorflow saved model for tensorflow service
+by running following script
+
+```
+bash tools/export_crnn_saved_model.sh
+```
+
 ## Experiment
 
 The original experiment run for 2000000 epochs, with a batch size of 32, 
