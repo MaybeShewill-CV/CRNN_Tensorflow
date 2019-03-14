@@ -82,15 +82,3 @@ __C.TEST.GPU_MEMORY_FRACTION = 0.6
 __C.TEST.TF_ALLOW_GROWTH = False
 # Set the test batch size
 __C.TEST.BATCH_SIZE = 32
-
-# Path config
-__C.PATH = edict()
-
-# Path to save the model checkpoints
-__C.PATH.MODEL_SAVE_DIR = 'model/shadownet'
-# Path to save log for tensorboard
-__C.PATH.TBOARD_SAVE_DIR = 'tboard/shadownet'
-# Path to character dictionaries
-__C.PATH.CHAR_DICT_DIR = 'data/char_dict'
-# Path to tfrecords
-__C.PATH.TFRECORDS_DIR = 'data'
