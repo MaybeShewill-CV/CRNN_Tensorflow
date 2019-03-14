@@ -157,7 +157,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
 
                         # avoid accidentally displaying for the whole dataset
                         if is_visualize:
-                            plt.imshow(np.array(test_image, np.uint8)[:, :, (2, 1, 0)])
+                            plt.imshow(np.array((test_image + 1) * 127.5, np.uint8)[:, :, (2, 1, 0)])
                             plt.show()
             except tf.errors.OutOfRangeError:
                 print('End of tfrecords sequence')
