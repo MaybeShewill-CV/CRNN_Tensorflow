@@ -81,6 +81,10 @@ single_label_accuracy = 1 if the prediction result is exactly the same as label 
 
 avg_label_accuracy = sum(single_label_accuracy) / label_nums
 
+Part of the confusion matrix of every single char looks like this:
+
+![evaluation_confusion_matrix](./data/images/evaluate_confusion_matrix.png)
+
 
 ### Test the model on the single image
 
