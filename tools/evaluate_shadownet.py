@@ -43,14 +43,14 @@ def init_args():
                         help='Path to pre-trained weights')
     parser.add_argument('-v', '--visualize', type=bool, default=False,
                         help='Whether to display images')
-    parser.add_argument('-p', '--process_all', type=bool, default=False,
+    parser.add_argument('-p', '--process_all', type=bool, default=True,
                         help='Whether to process all test dataset')
 
     return parser.parse_args()
 
 
 def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
-                       ord_map_dict_path, is_visualize=True,
+                       ord_map_dict_path, is_visualize=False,
                        is_process_all_data=False):
     """
 
@@ -107,6 +107,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
     test_decoded, test_log_prob = tf.nn.ctc_beam_search_decoder(
         test_inference_ret,
         CFG.ARCH.SEQ_LENGTH * np.ones(CFG.TEST.BATCH_SIZE),
+        beam_width=1,
         merge_repeated=False
     )
 
@@ -150,7 +151,9 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
 
                     for index, test_image in enumerate(test_images_value):
                         print('Predict {:s} image with gt label: {:s} **** predicted label: {:s}'.format(
-                            test_images_names_value[index], test_labels_value[index], test_predictions_value[index]))
+                            ops.split(test_images_names_value[index])[1],
+                            test_labels_value[index],
+                            test_predictions_value[index]))
 
                         # avoid accidentally displaying for the whole dataset
                         if is_visualize:
