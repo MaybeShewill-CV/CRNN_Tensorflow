@@ -32,16 +32,13 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
         :param num_classes: Number of classes (different symbols) to detect
         """
         super(ShadowNet, self).__init__()
-        self._phase = phase
-        if self._phase == 'train':
+        if phase == 'train':
             self._phase = tf.constant('train', dtype=tf.string)
         else:
             self._phase = tf.constant('test', dtype=tf.string)
         self._hidden_nums = hidden_nums
         self._layers_nums = layers_nums
         self._num_classes = num_classes
-        self._train_phase = tf.constant('train', dtype=tf.string)
-        self._test_phase = tf.constant('test', dtype=tf.string)
         self._is_training = self._init_phase()
 
     def _init_phase(self):
@@ -49,26 +46,7 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
 
         :return:
         """
-        return tf.equal(self._phase, self._train_phase)
-
-    @property
-    def phase(self):
-        """
-
-        :return:
-        """
-        return self._phase
-
-    @phase.setter
-    def phase(self, value: str):
-        """
-
-        :param value:
-        :return:
-        """
-        if not isinstance(value, str) or value.lower() not in ['test', 'train']:
-            raise ValueError('value should be a str \'Test\' or \'Train\'')
-        self._phase = value.lower()
+        return tf.equal(self._phase, tf.constant('train', dtype=tf.string))
 
     def _conv_stage(self, inputdata, out_dims, name):
         """ Standard VGG convolutional stage: 2d conv, relu, and maxpool
