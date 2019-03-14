@@ -211,7 +211,12 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
             shape = tf.shape(stack_lstm_layer)
             rnn_reshaped = tf.reshape(stack_lstm_layer, [shape[0] * shape[1], shape[2]])
 
-            w = tf.Variable(tf.truncated_normal([hidden_nums, self._num_classes], stddev=0.02), name="w")
+            w = tf.get_variable(
+                name='w',
+                shape=[hidden_nums, self._num_classes],
+                initializer=tf.truncated_normal_initializer(stddev=0.02),
+                trainable=True
+            )
 
             # Doing the affine projection
             logits = tf.matmul(rnn_reshaped, w, name='logits')
