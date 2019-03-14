@@ -17,6 +17,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 import glog as log
+from sklearn.metrics import confusion_matrix
 
 from crnn_model import crnn_model
 from config import global_config
@@ -143,7 +144,11 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
 
         log.info('Start predicting...')
 
-        accuracy = 0
+        per_char_accuracy = 0.0
+        full_sequence_accuracy = 0.0
+
+        total_labels_char_list = []
+        total_predictions_char_list = []
 
         while True:
             try:
@@ -162,8 +167,11 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
                     test_labels_value = decoder.sparse_tensor_to_str(test_labels_value)
                     test_predictions_value = decoder.sparse_tensor_to_str(test_predictions_value[0])
 
-                    accuracy += evaluation_tools.compute_accuracy(
-                        test_labels_value, test_predictions_value, display=False
+                    per_char_accuracy += evaluation_tools.compute_accuracy(
+                        test_labels_value, test_predictions_value, display=False, mode='per_char'
+                    )
+                    full_sequence_accuracy += evaluation_tools.compute_accuracy(
+                        test_labels_value, test_predictions_value, display=False, mode='full_sequence'
                     )
 
                     for index, test_image in enumerate(test_images_value):
@@ -172,10 +180,31 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
                             test_labels_value[index],
                             test_predictions_value[index]))
 
-                        # avoid accidentally displaying for the whole dataset
                         if is_visualize:
                             plt.imshow(np.array(test_image, np.uint8)[:, :, (2, 1, 0)])
                             plt.show()
+
+                        test_labels_char_list_value = [s for s in test_labels_value[index]]
+                        test_predictions_char_list_value = [s for s in test_predictions_value[index]]
+
+                        if not test_labels_char_list_value or not test_predictions_char_list_value:
+                            continue
+
+                        if len(test_labels_char_list_value) != len(test_predictions_char_list_value):
+                            min_length = min(len(test_labels_char_list_value),
+                                             len(test_predictions_char_list_value))
+                            test_labels_char_list_value = test_labels_char_list_value[:min_length - 1]
+                            test_predictions_char_list_value = test_predictions_char_list_value[:min_length - 1]
+
+                        assert len(test_labels_char_list_value) == len(test_predictions_char_list_value), \
+                            print('{}, {}'.format(test_labels_char_list_value, test_predictions_char_list_value))
+
+                        total_labels_char_list.extend(test_labels_char_list_value)
+                        total_predictions_char_list.extend(test_predictions_char_list_value)
+
+                        if is_visualize:
+                            plt.imshow(np.array(test_image, np.uint8)[:, :, (2, 1, 0)])
+
             except tf.errors.OutOfRangeError:
                 print('End of tfrecords sequence')
                 break
@@ -183,10 +212,17 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
                 print(err)
                 break
 
-        # we compute a mean of means, so we need the sample sizes to be constant
-        # (BATCH_SIZE) for this to equal the actual mean
-        accuracy /= num_iterations
-        log.info('Mean test accuracy is {:5f}'.format(accuracy))
+        avg_per_char_accuracy = per_char_accuracy / num_iterations
+        avg_full_sequence_accuracy = full_sequence_accuracy / num_iterations
+        log.info('Mean test per char accuracy is {:5f}'.format(avg_per_char_accuracy))
+        log.info('Mean test full sequence accuracy is {:5f}'.format(avg_full_sequence_accuracy))
+
+        # compute confusion matrix
+        cnf_matrix = confusion_matrix(total_labels_char_list, total_predictions_char_list)
+        np.set_printoptions(precision=2)
+        evaluation_tools.plot_confusion_matrix(cm=cnf_matrix, normalize=True)
+
+        plt.show()
 
 
 if __name__ == '__main__':

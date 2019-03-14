@@ -8,40 +8,102 @@
 """
 Some evaluation tools
 """
+import itertools
+
 import numpy as np
+import glog as log
+import matplotlib.pyplot as plt
 
 
-def compute_accuracy(ground_truth, predictions, display=False):
+SYNTH90K_CLASS_NAMES = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b',
+                        'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+                        'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', ' ']
+
+
+def compute_accuracy(ground_truth, predictions, display=False, mode='per_char'):
     """
     Computes accuracy
     :param ground_truth:
     :param predictions:
     :param display: Whether to print values to stdout
-    :return:
+    :param mode: if 'per_char' is selected then
+                 single_label_accuracy = correct_predicted_char_nums_of_single_sample / single_label_char_nums
+                 avg_label_accuracy = sum(single_label_accuracy) / label_nums
+                 if 'full_sequence' is selected then
+                 single_label_accuracy = 1 if the prediction result is exactly the same as label else 0
+                 avg_label_accuracy = sum(single_label_accuracy) / label_nums
+    :return: avg_label_accuracy
     """
-    accuracy = []
+    if mode == 'per_char':
 
-    for index, label in enumerate(ground_truth):
-        prediction = predictions[index]
-        total_count = len(label)
-        correct_count = 0
-        try:
-            for i, tmp in enumerate(label):
-                if tmp == prediction[i]:
-                    correct_count += 1
-        except IndexError:
-            continue
-        finally:
+        accuracy = []
+
+        for index, label in enumerate(ground_truth):
+            prediction = predictions[index]
+            total_count = len(label)
+            correct_count = 0
             try:
-                accuracy.append(correct_count / total_count)
-            except ZeroDivisionError:
-                if len(prediction) == 0:
-                    accuracy.append(1)
-                else:
-                    accuracy.append(0)
+                for i, tmp in enumerate(label):
+                    if tmp == prediction[i]:
+                        correct_count += 1
+            except IndexError:
+                continue
+            finally:
+                try:
+                    accuracy.append(correct_count / total_count)
+                except ZeroDivisionError:
+                    if len(prediction) == 0:
+                        accuracy.append(1)
+                    else:
+                        accuracy.append(0)
+        avg_accuracy = np.mean(np.array(accuracy).astype(np.float32), axis=0)
+    elif mode == 'full_sequence':
+        try:
+            avg_accuracy = len(set(ground_truth).intersection(predictions)) / len(ground_truth)
+        except ZeroDivisionError:
+            if not predictions:
+                avg_accuracy = 1
+            else:
+                avg_accuracy = 0
+    else:
+        raise NotImplementedError('Other accuracy compute mode has not been implemented')
 
-    accuracy = np.mean(np.array(accuracy).astype(np.float32), axis=0)
     if display:
-        print('Mean accuracy is {:5f}'.format(accuracy))
+        print('Mean accuracy is {:5f}'.format(avg_accuracy))
 
-    return accuracy
+    return avg_accuracy
+
+
+def plot_confusion_matrix(cm, classes=SYNTH90K_CLASS_NAMES,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        log.info("Normalized confusion matrix")
+    else:
+        log.info('Confusion matrix, without normalization')
+
+    print(cm)
+
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, format(cm[i, j], fmt),
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.tight_layout()
