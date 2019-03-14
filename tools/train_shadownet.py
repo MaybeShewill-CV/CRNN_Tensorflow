@@ -574,5 +574,5 @@ if __name__ == '__main__':
             weights_path=args.weights_path,
             char_dict_path=args.char_dict_path,
             ord_map_dict_path=args.ord_map_dict_path,
-            need_decode=False
+            need_decode=args.decode_outputs
         )
