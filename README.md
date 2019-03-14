@@ -53,9 +53,34 @@ python tools/evaluate_shadownet.py --dataset_dir PATH/TO/YOUR/DATASET_DIR
 --process_all 1 --visualize 1
 ```
 
-The expected output is
+If you set visualize true the expected output during evaluation process is
 
-![evaluate output](data/images/evaluate_output.png)
+![evaluate output](./data/images/evaluate_output.png)
+
+After all the evaluation process is done you should see some thing like this:
+
+![evaluation_result](./data/images/evaluate_result.png)
+
+The model's main evaluation index are as follows:
+
+**Test Dataset Size**: 891927 synth90k test images
+
+**Per char Precision**: 0.975194 without average weighted on each class
+
+**Full sequence Precision**: 0.935189 without average weighted on each class
+
+For Per char Precision:
+
+$$single_label_accuracy = correct_predicted_char_nums_of_single_sample / single_label_char_nums$$
+
+avg_label_accuracy = sum(single_label_accuracy) / label_nums
+
+For Full sequence Precision:
+
+single_label_accuracy = 1 if the prediction result is exactly the same as label else 0
+
+avg_label_accuracy = sum(single_label_accuracy) / label_nums
+
 
 ### Test the model on the single image
 
