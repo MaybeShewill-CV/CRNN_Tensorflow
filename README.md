@@ -38,6 +38,8 @@ pip3 install -r requirements.txt
 ```
 
 ## Testing the pre-trained model
+
+### Evaluate the model on the synth90k dataset
 In this repo you will find a model pre-trained on the 
 [Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/)dataset. When the tfrecords
 file of synth90k dataset has been successfully generated you may evaluated the
@@ -48,11 +50,13 @@ python tools/evaluate_shadownet.py --dataset_dir PATH/TO/YOUR/DATASET_DIR
 --weights_path PATH/TO/YOUR/MODEL_WEIGHTS_PATH
 --char_dict_path PATH/TO/CHAR_DICT_PATH 
 --ord_map_dict_path PATH/TO/ORD_MAP_PATH
---process_all True --visualize True
+--process_all 1 --visualize 1
 ```
 
 The expected output is
-![Test output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_output.png)
+![Test output](data/images/test_output.png)
+
+### Test the model on the single image
 
 If you want to test a single image you can do it with
 ```
@@ -64,21 +68,13 @@ python tools/test_shadownet.py --image_path PATH/TO/IMAGE
 
 ### Example images
  
-![Example image1](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/text_example_image1.png)  
+![Example image1](./data/images/text_example_image1.png)  
 
-![Example image1 output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image1_output.png)  
+![Example image1 output](./data/images/test_example_image1_output.png)  
 
-![Example image2](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image2.png)  
+![Example image2](./data/images/test_example_image2.png)  
 
-![Example image2 output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/test_example_image2_output.png) 
-
-![Example image3](https://github.com/TJCVRS/CRNN_Tensorflow/blob/chinese_version_debug/data/images/demo_chinese.png)  
-
-![Example image3 output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/chinese_version_debug/data/images/demo_chinese_output.png)
-
-![Example image4](https://github.com/TJCVRS/CRNN_Tensorflow/blob/chinese_version_debug/data/images/dmeo_chinese_2.png)  
-
-![Example image4 output](https://github.com/TJCVRS/CRNN_Tensorflow/blob/chinese_version_debug/data/images/demo_chinese_2_ouput.png)
+![Example image2 output](./data/images/test_example_image2_output.png) 
 
 ## Training your own model
 
@@ -108,7 +104,7 @@ python tools/train_shadownet.py --dataset_dir PATH/TO/YOUR/TFRECORDS
 ```
 
 If you wish, you can add more metrics to the training progress messages with 
-`--decode_outputs`, but this will slow
+`--decode_outputs 1`, but this will slow
 training down. You can also continue the training process from a snapshot with
 
 ```
@@ -117,29 +113,34 @@ python tools/train_shadownet.py --dataset_dir PATH/TO/YOUR/TFRECORDS
 --char_dict_path PATH/TO/CHAR_DICT_PATH --ord_map_dict_path PATH/TO/ORD_MAP_PATH
 ```
 
+If you has multiple gpus in your local machine you may use multiple gpu training
+to access a larger batch size input data. This will be supported as follows
+
+```
+python tools/train_shadownet.py --dataset_dir PATH/TO/YOUR/TFRECORDS
+--char_dict_path PATH/TO/CHAR_DICT_PATH --ord_map_dict_path PATH/TO/ORD_MAP_PATH
+--multi_gpus 1
+
+```
+
 The sequence distance is computed by calculating the distance between two 
 sparse tensors so the lower the accuracy value
 is the better the model performs. The training accuracy is computed by 
 calculating the character-wise precision between
 the prediction and the ground truth so the higher the better the model performs.
 
-Finally, note that it is possible to use multiple config files for different 
-experiments, via the option `--config_file`
-to all scripts.
-
-
 ## Experiment
 
 The original experiment run for 2000000 epochs, with a batch size of 32, 
-an initial learning rate of 0.1 and exponential
-decay of 0.1 every 500000 epochs. During training the `loss` dropped as follows  
-![Training loss](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/train_loss.png)
+an initial learning rate of 0.01 and exponential
+decay of 0.1 every 500000 epochs. During training the `train loss` dropped as 
+follows  
 
-The distance between the ground truth and the prediction dropped as follows  
-![Sequence distance](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/seq_distance.png)
+![Training loss](./data/images/avg_train_loss.png)
 
-The accuracy rose as follows  
-![Training accuracy](https://github.com/TJCVRS/CRNN_Tensorflow/blob/master/data/images/training_accuracy.md)
+The `val loss` dropped as follows
+  
+![Validation_loss](./data/images/avg_val_loss.png)
 
 ## TODO
 
