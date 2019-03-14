@@ -39,10 +39,25 @@ def init_args():
                         help='Directory where character dictionaries for the dataset were stored')
     parser.add_argument('-o', '--ord_map_dict_path', type=str,
                         help='Directory where ord map dictionaries for the dataset were stored')
-    parser.add_argument('-v', '--visualize', type=bool, default=True,
+    parser.add_argument('-v', '--visualize', type=args_str2bool, nargs='?', const=True,
                         help='Whether to display images')
 
     return parser.parse_args()
+
+
+def args_str2bool(arg_value):
+    """
+
+    :param arg_value:
+    :return:
+    """
+    if arg_value.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+
+    elif arg_value.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Unsupported value encountered.')
 
 
 def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vis):

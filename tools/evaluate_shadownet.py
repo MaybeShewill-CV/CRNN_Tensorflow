@@ -41,12 +41,27 @@ def init_args():
                         help='Directory where ord map dictionaries for the dataset were stored')
     parser.add_argument('-w', '--weights_path', type=str, required=True,
                         help='Path to pre-trained weights')
-    parser.add_argument('-v', '--visualize', type=bool, default=False,
+    parser.add_argument('-v', '--visualize', type=args_str2bool, nargs='?', const=False,
                         help='Whether to display images')
-    parser.add_argument('-p', '--process_all', type=bool, default=True,
+    parser.add_argument('-p', '--process_all', type=args_str2bool, nargs='?', const=True,
                         help='Whether to process all test dataset')
 
     return parser.parse_args()
+
+
+def args_str2bool(arg_value):
+    """
+
+    :param arg_value:
+    :return:
+    """
+    if arg_value.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+
+    elif arg_value.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Unsupported value encountered.')
 
 
 def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
