@@ -158,7 +158,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
                         newshape=test_images_paths_value.shape[0]
                     )
                     test_images_paths_value = [tmp.decode('utf-8') for tmp in test_images_paths_value]
-                    test_images_names_value = [ops.split(tmp)[0] for tmp in test_images_paths_value]
+                    test_images_names_value = [ops.split(tmp)[1] for tmp in test_images_paths_value]
                     test_labels_value = decoder.sparse_tensor_to_str(test_labels_value)
                     test_predictions_value = decoder.sparse_tensor_to_str(test_predictions_value[0])
 
@@ -168,7 +168,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
 
                     for index, test_image in enumerate(test_images_value):
                         print('Predict {:s} image with gt label: {:s} **** predicted label: {:s}'.format(
-                            ops.split(test_images_names_value[index])[1],
+                            test_images_names_value[index],
                             test_labels_value[index],
                             test_predictions_value[index]))
 
