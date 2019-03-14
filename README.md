@@ -183,7 +183,7 @@ The `val loss` dropped as follows
 
 ## TODO
 
-- [ ] Add new model weights trained on the whold synth90k dataset
-- [ ] Add multiple gpu training scripts
+- [x] Add new model weights trained on the whold synth90k dataset
+- [x] Add multiple gpu training scripts
 - [ ] Add an online toy demo
 - [ ] Add tensorflow service script
