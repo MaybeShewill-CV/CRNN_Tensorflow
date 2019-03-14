@@ -88,7 +88,6 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
         batch_size=CFG.TEST.BATCH_SIZE,
         num_epochs=1
     )
-    test_images = tf.multiply(tf.add(test_images, 1.0), 127.5)
 
     # set up test sample count
     if is_process_all_data:
@@ -125,6 +124,9 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
         beam_width=1,
         merge_repeated=False
     )
+
+    # recover image from [-1.0, 1.0] ---> [0.0, 255.0]
+    test_images = tf.multiply(tf.add(test_images, 1.0), 127.5, name='recoverd_test_images')
 
     # Set saver configuration
     saver = tf.train.Saver()
@@ -172,7 +174,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
 
                         # avoid accidentally displaying for the whole dataset
                         if is_visualize:
-                            plt.imshow(np.array((test_image + 1) * 127.5, np.uint8)[:, :, (2, 1, 0)])
+                            plt.imshow(np.array(test_image, np.uint8)[:, :, (2, 1, 0)])
                             plt.show()
             except tf.errors.OutOfRangeError:
                 print('End of tfrecords sequence')
