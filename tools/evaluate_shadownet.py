@@ -175,7 +175,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
                     )
 
                     for index, test_image in enumerate(test_images_value):
-                        print('Predict {:s} image with gt label: {:s} **** predicted label: {:s}'.format(
+                        log.info('Predict {:s} image with gt label: {:s} **** predicted label: {:s}'.format(
                             test_images_names_value[index],
                             test_labels_value[index],
                             test_predictions_value[index]))
@@ -197,7 +197,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
                             test_predictions_char_list_value = test_predictions_char_list_value[:min_length - 1]
 
                         assert len(test_labels_char_list_value) == len(test_predictions_char_list_value), \
-                            print('{}, {}'.format(test_labels_char_list_value, test_predictions_char_list_value))
+                            log.error('{}, {}'.format(test_labels_char_list_value, test_predictions_char_list_value))
 
                         total_labels_char_list.extend(test_labels_char_list_value)
                         total_predictions_char_list.extend(test_predictions_char_list_value)
@@ -206,10 +206,10 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
                             plt.imshow(np.array(test_image, np.uint8)[:, :, (2, 1, 0)])
 
             except tf.errors.OutOfRangeError:
-                print('End of tfrecords sequence')
+                log.error('End of tfrecords sequence')
                 break
             except Exception as err:
-                print(err)
+                log.error(err)
                 break
 
         avg_per_char_accuracy = per_char_accuracy / num_iterations
