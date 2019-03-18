@@ -108,14 +108,14 @@ def build_saved_model(ckpt_path, export_dir):
         signatur_def = sm.signature_def_utils.build_signature_def(
             inputs={'input_tensor': saved_input_tensor},
             outputs={'prediction': saved_prediction_tensor},
-            method_name='crnn_predict'
+            method_name=sm.signature_constants.PREDICT_METHOD_NAME
         )
 
         # add graph into MetaGraphDef protobuf
         saved_builder.add_meta_graph_and_variables(
             sess,
             tags=[sm.tag_constants.SERVING],
-            signature_def_map={sm.signature_constants.CLASSIFY_INPUTS: signatur_def}
+            signature_def_map={sm.signature_constants.PREDICT_OUTPUTS: signatur_def}
         )
 
         # save model
@@ -158,7 +158,7 @@ def test_load_saved_model(saved_model_dir, char_dict_path, ord_map_dict_path):
             export_dir=saved_model_dir)
 
         signature_def_d = meta_graphdef.signature_def
-        signature_def_d = signature_def_d[sm.signature_constants.CLASSIFY_INPUTS]
+        signature_def_d = signature_def_d[sm.signature_constants.PREDICT_OUTPUTS]
 
         image_input_tensor = signature_def_d.inputs['input_tensor']
         prediction_tensor = signature_def_d.outputs['prediction']
