@@ -292,13 +292,13 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
             if need_decode and epoch % 500 == 0:
                 # train part
                 _, train_ctc_loss_value, train_seq_dist_value, \
-                train_predictions, train_labels, merge_summary_value = sess.run(
+                train_predictions, train_labels_sparse, merge_summary_value = sess.run(
                     [optimizer, train_ctc_loss, train_sequence_dist,
                      train_decoded, train_labels, merge_summary_op])
 
-                train_labels = decoder.sparse_tensor_to_str(train_labels)
+                train_labels_str = decoder.sparse_tensor_to_str(train_labels_sparse)
                 train_predictions = decoder.sparse_tensor_to_str(train_predictions[0])
-                avg_train_accuracy = evaluation_tools.compute_accuracy(train_labels, train_predictions)
+                avg_train_accuracy = evaluation_tools.compute_accuracy(train_labels_str, train_predictions)
 
                 if epoch % CFG.TRAIN.DISPLAY_STEP == 0:
                     logger.info('Epoch_Train: {:d} cost= {:9f} seq distance= {:9f} train accuracy= {:9f}'.format(
@@ -306,12 +306,12 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
 
                 # validation part
                 val_ctc_loss_value, val_seq_dist_value, \
-                val_predictions, val_labels = sess.run(
+                val_predictions, val_labels_sparse = sess.run(
                     [val_ctc_loss, val_sequence_dist, val_decoded, val_labels])
 
-                val_labels = decoder.sparse_tensor_to_str(val_labels)
+                val_labels_str = decoder.sparse_tensor_to_str(val_labels_sparse)
                 val_predictions = decoder.sparse_tensor_to_str(val_predictions[0])
-                avg_val_accuracy = evaluation_tools.compute_accuracy(val_labels, val_predictions)
+                avg_val_accuracy = evaluation_tools.compute_accuracy(val_labels_str, val_predictions)
 
                 if epoch % CFG.TRAIN.DISPLAY_STEP == 0:
                     logger.info('Epoch_Val: {:d} cost= {:9f} seq distance= {:9f} train accuracy= {:9f}'.format(
