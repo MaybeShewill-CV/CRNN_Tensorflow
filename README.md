@@ -232,9 +232,9 @@ DATA_SET_DIRECTORY
 ├─annotation_test.txt
 ├─lexicon.txt
 └─images
-&emsp;&emsp;├─xxx.jpg
-&emsp;&emsp;├─xxx.jpg
-&emsp;&emsp;└─ ······
+    ├─xxx.jpg
+    ├─xxx.jpg
+    └─ ······
 ```
 
 The format of the annotation text file is as follows.
