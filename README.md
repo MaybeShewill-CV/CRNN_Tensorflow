@@ -225,6 +225,7 @@ Example test_03.jpg
 #### Data preparation
 
 The organization of your data set should be as follow.
+```
 DATA_SET_DIRECTORY
 ├─annotation_train.txt
 ├─annotation_val.txt
@@ -234,6 +235,7 @@ DATA_SET_DIRECTORY
 &emsp;&emsp;├─xxx.jpg
 &emsp;&emsp;├─xxx.jpg
 &emsp;&emsp;└─ ······
+```
 
 The format of the annotation text file is as follows.
 ```
