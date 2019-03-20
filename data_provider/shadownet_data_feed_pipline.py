@@ -27,6 +27,7 @@ class CrnnDataProducer(object):
     """
     Convert raw image file into tfrecords
     """
+
     def __init__(self, dataset_dir, char_dict_path=None, ord_map_dict_path=None):
         """
         init crnn data producer
@@ -38,7 +39,7 @@ class CrnnDataProducer(object):
             raise ValueError('Dataset dir {:s} not exist'.format(dataset_dir))
 
         # Check image source data
-        self._dataset_dir = dataset_dir
+        self._image_dir = ops.join(dataset_dir, 'images')
         self._train_annotation_file_path = ops.join(dataset_dir, 'annotation_train.txt')
         self._test_annotation_file_path = ops.join(dataset_dir, 'annotation_test.txt')
         self._val_annotation_file_path = ops.join(dataset_dir, 'annotation_val.txt')
@@ -67,7 +68,10 @@ class CrnnDataProducer(object):
             os.makedirs('./data/char_dict', exist_ok=True)
             self._char_dict_path = ops.join('./data/char_dict', 'char_dict.json')
             self._ord_map_dict_path = ops.join('./data/char_dict', 'ord_map.json')
-            self._generate_char_dict()
+        else:
+            self._char_dict_path = char_dict_path
+            self._ord_map_dict_path = ord_map_dict_path
+        self._generate_char_dict()
 
         # Init tfrecords writer
         self._tfrecords_io_writer = tf_io_pipline_tools.TextFeatureIO(
@@ -173,55 +177,31 @@ class CrnnDataProducer(object):
         :return:
         """
         # establish lexicon list
-        with open(self._lexicon_file_path, 'r') as file:
+        with open(self._lexicon_file_path, 'r', encoding='utf-8') as file:
             for line in file:
                 self._lexicon_list.append(line.rstrip('\r').rstrip('\n'))
 
         # establish train example info [(image_path1, label1), (image_path2, label2), ...]
-        with open(self._train_annotation_file_path, 'r') as file:
+        with open(self._train_annotation_file_path, 'r', encoding='utf-8') as file:
             for line in file:
-                image_name, label_index = line.rstrip('\r').rstrip('\n').split(' ')
-                image_path = ops.join(self._dataset_dir, image_name)
-                label_index = int(label_index)
-                try:
-                    image_label = self._lexicon_list[label_index]
-                except IndexError:
-                    raise ValueError('Lexicon list index error: {:d}'.format(label_index))
-                if not ops.exists(image_path):
-                    raise ValueError('Example image {:s} not exist'.format(image_path))
-
+                image_name, image_label = line.rstrip('\r').rstrip('\n').split(' ')
+                image_path = ops.join(self._image_dir, image_name)
                 self._train_example_paths.append(image_path)
                 self._train_example_labels.append(image_label)
 
         # establish val example info [(image_path1, label1), (image_path2, label2), ...]
-        with open(self._val_annotation_file_path, 'r') as file:
+        with open(self._val_annotation_file_path, 'r', encoding='utf-8') as file:
             for line in file:
-                image_name, label_index = line.rstrip('\r').rstrip('\n').split(' ')
-                image_path = ops.join(self._dataset_dir, image_name)
-                label_index = int(label_index)
-                try:
-                    image_label = self._lexicon_list[label_index]
-                except IndexError:
-                    raise ValueError('Lexicon list index error: {:d}'.format(label_index))
-                if not ops.exists(image_path):
-                    raise ValueError('Example image {:s} not exist'.format(image_path))
-
+                image_name, image_label = line.rstrip('\r').rstrip('\n').split(' ')
+                image_path = ops.join(self._image_dir, image_name)
                 self._val_example_paths.append(image_path)
                 self._val_example_labels.append(image_label)
 
         # establish test example info [(image_path1, label1), (image_path2, label2), ...]
-        with open(self._test_annotation_file_path, 'r') as file:
+        with open(self._test_annotation_file_path, 'r', encoding='utf-8') as file:
             for line in file:
-                image_name, label_index = line.rstrip('\r').rstrip('\n').split(' ')
-                image_path = ops.join(self._dataset_dir, image_name)
-                label_index = int(label_index)
-                try:
-                    image_label = self._lexicon_list[label_index]
-                except IndexError:
-                    raise ValueError('Lexicon list index error: {:d}'.format(label_index))
-                if not ops.exists(image_path):
-                    raise ValueError('Example image {:s} not exist'.format(image_path))
-
+                image_name, image_label = line.rstrip('\r').rstrip('\n').split(' ')
+                image_path = ops.join(self._image_dir, image_name)
                 self._test_example_paths.append(image_path)
                 self._test_example_labels.append(image_label)
 
@@ -249,6 +229,7 @@ class CrnnDataFeeder(object):
     """
     Read training examples from tfrecords for crnn model
     """
+
     def __init__(self, dataset_dir, char_dict_path, ord_map_dict_path, flags='train'):
         """
 

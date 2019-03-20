@@ -32,15 +32,19 @@ def init_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--image_path', type=str,
                         help='Path to the image to be tested',
-                        default='data/test_images/test_01.jpg')
+                        default='./data/test_images/test_01.jpg')
     parser.add_argument('--weights_path', type=str,
-                        help='Path to the pre-trained weights to use')
+                        help='Path to the pre-trained weights to use',
+                        default='./model/crnn_syn90k/shadownet.ckpt')
     parser.add_argument('-c', '--char_dict_path', type=str,
-                        help='Directory where character dictionaries for the dataset were stored')
+                        help='Directory where character dictionaries for the dataset were stored',
+                        default='./data/char_dict/char_dict.json')
     parser.add_argument('-o', '--ord_map_dict_path', type=str,
-                        help='Directory where ord map dictionaries for the dataset were stored')
+                        help='Directory where ord map dictionaries for the dataset were stored',
+                        default='./data/char_dict/ord_map.json')
     parser.add_argument('-v', '--visualize', type=args_str2bool, nargs='?', const=True,
-                        help='Whether to display images')
+                        help='Whether to display images',
+                        default=True)
 
     return parser.parse_args()
 

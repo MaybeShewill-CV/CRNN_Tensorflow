@@ -105,3 +105,6 @@ ENV/
 tboard/
 .idea/
 
+# Others
+tfrecords/
+
