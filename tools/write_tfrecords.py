@@ -52,7 +52,8 @@ def write_tfrecords(dataset_dir, char_dict_path, ord_map_dict_path, save_dir):
     producer = shadownet_data_feed_pipline.CrnnDataProducer(
         dataset_dir=dataset_dir,
         char_dict_path=char_dict_path,
-        ord_map_dict_path=ord_map_dict_path
+        ord_map_dict_path=ord_map_dict_path,
+        writer_process_nums=8
     )
 
     producer.generate_tfrecords(

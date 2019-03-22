@@ -98,22 +98,22 @@ class CrnnDataProducer(object):
         log.info('Generate training sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
 
         # generate val example tfrecords
-        # log.info('Generating validation sample tfrecords...')
-        # t_start = time.time()
-        #
-        # tfrecords_writer = tf_io_pipline_fast_tools.CrnnFeatureWriter(
-        #     annotation_infos=self._val_sample_infos,
-        #     lexicon_infos=self._lexicon_list,
-        #     char_dict_path=self._char_dict_path,
-        #     ord_map_dict_path=self._ord_map_dict_path,
-        #     tfrecords_save_dir=save_dir,
-        #     writer_process_nums=self._writer_process_nums,
-        #     dataset_flag='val'
-        # )
-        #
-        # tfrecords_writer.run()
-        #
-        # log.info('Generate validation sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
+        log.info('Generating validation sample tfrecords...')
+        t_start = time.time()
+
+        tfrecords_writer = tf_io_pipline_fast_tools.CrnnFeatureWriter(
+            annotation_infos=self._val_sample_infos,
+            lexicon_infos=self._lexicon_list,
+            char_dict_path=self._char_dict_path,
+            ord_map_dict_path=self._ord_map_dict_path,
+            tfrecords_save_dir=save_dir,
+            writer_process_nums=self._writer_process_nums,
+            dataset_flag='val'
+        )
+
+        tfrecords_writer.run()
+
+        log.info('Generate validation sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
 
         # generate test example tfrecords
         log.info('Generating testing sample tfrecords....')
