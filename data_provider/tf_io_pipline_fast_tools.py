@@ -10,9 +10,7 @@ Efficient tfrecords writer interface
 """
 import os
 import os.path as ops
-import queue
 from multiprocessing import Manager
-from multiprocessing import Queue
 from multiprocessing import Process
 import time
 
@@ -26,10 +24,8 @@ from config import global_config
 from local_utils import establish_char_dict
 
 CFG = global_config.cfg
-log.setLevel('DEBUG')
 
 _SAMPLE_INFO_QUEUE = Manager().Queue()
-
 _SENTINEL = ("", [])
 
 
