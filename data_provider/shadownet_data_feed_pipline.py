@@ -11,14 +11,16 @@ nsfw数据feed pipline
 import os
 import os.path as ops
 import random
+import time
 
 import glob
 import glog as log
+import tqdm
 import tensorflow as tf
 
 from config import global_config
 from local_utils import establish_char_dict
-from data_provider import tf_io_pipline_tools
+from data_provider import tf_io_pipline_fast_tools
 
 CFG = global_config.cfg
 
@@ -27,12 +29,15 @@ class CrnnDataProducer(object):
     """
     Convert raw image file into tfrecords
     """
-    def __init__(self, dataset_dir, char_dict_path=None, ord_map_dict_path=None):
+    def __init__(self, dataset_dir, char_dict_path=None, ord_map_dict_path=None,
+                 reader_threads_nums=12, writer_threads_nums=4):
         """
         init crnn data producer
         :param dataset_dir: image dataset root dir
         :param char_dict_path: char dict path
         :param ord_map_dict_path: ord map dict path
+        :param reader_threads_nums: the number of reader threads
+        :param writer_threads_nums: the number of writer threads
         """
         if not ops.exists(dataset_dir):
             raise ValueError('Dataset dir {:s} not exist'.format(dataset_dir))
@@ -45,6 +50,8 @@ class CrnnDataProducer(object):
         self._lexicon_file_path = ops.join(dataset_dir, 'lexicon.txt')
         self._char_dict_path = char_dict_path
         self._ord_map_dict_path = ord_map_dict_path
+        self._reader_threads_nums = reader_threads_nums
+        self._writer_threads_nums = writer_threads_nums
 
         if not self._is_source_data_complete():
             raise ValueError('Source image data is not complete, '
@@ -52,15 +59,11 @@ class CrnnDataProducer(object):
                              'or index file is not exist')
 
         # Init training example information
-        log.info('Start initialzie example information.....')
         self._lexicon_list = []
-        self._train_example_paths = []
-        self._train_example_labels = []
-        self._test_example_paths = []
-        self._test_example_labels = []
-        self._val_example_paths = []
-        self._val_example_labels = []
-        self._init_dataset_example_info()
+        self._train_sample_infos = []
+        self._test_sample_infos = []
+        self._val_sample_infos = []
+        self._init_dataset_sample_info()
 
         # Check if need generate char dict map
         if char_dict_path is None or ord_map_dict_path is None:
@@ -69,92 +72,71 @@ class CrnnDataProducer(object):
             self._ord_map_dict_path = ops.join('./data/char_dict', 'ord_map.json')
             self._generate_char_dict()
 
-        # Init tfrecords writer
-        self._tfrecords_io_writer = tf_io_pipline_tools.TextFeatureIO(
-            char_dict_path=self._char_dict_path, ord_map_dict_path=self._ord_map_dict_path).writer
-
-    def generate_tfrecords(self, save_dir, step_size=10000):
+    def generate_tfrecords(self, save_dir):
         """
         Generate tensorflow records file
-        :param save_dir:
-        :param step_size: generate a tfrecord every step_size examples
+        :param save_dir: tensorflow records save dir
         :return:
         """
-
-        def _split_writing_tfrecords_task(_example_paths, _example_labels, _flags='train'):
-
-            _split_example_paths = []
-            _split_example_labels = []
-            _split_tfrecords_save_paths = []
-
-            _example_nums = len(_example_paths)
-
-            for i in range(0, _example_nums, step_size):
-                _split_example_paths.append(_example_paths[i:i + step_size])
-                _split_example_labels.append(_example_labels[i:i + step_size])
-
-                if i + step_size > _example_nums:
-                    _split_tfrecords_save_paths.append(
-                        ops.join(save_dir, '{:s}_{:d}_{:d}.tfrecords'.format(_flags, i, _example_nums)))
-                else:
-                    _split_tfrecords_save_paths.append(
-                        ops.join(save_dir, '{:s}_{:d}_{:d}.tfrecords'.format(_flags, i, i + step_size)))
-
-            return _split_example_paths, _split_example_labels, _split_tfrecords_save_paths
-
         # make save dirs
         os.makedirs(save_dir, exist_ok=True)
 
         # generate training example tfrecords
-        log.info('Generating training example tfrecords')
-
-        train_example_paths_split, train_example_labels_split, train_tfrecords_save_paths = \
-            _split_writing_tfrecords_task(
-                self._train_example_paths, self._train_example_labels, _flags='train'
-            )
-
-        for index, example_paths in enumerate(train_example_paths_split):
-            self._tfrecords_io_writer.write_features(
-                example_image_paths=example_paths,
-                example_image_labels=train_example_labels_split[index],
-                tfrecords_save_path=train_tfrecords_save_paths[index]
-            )
-
-        log.info('Generate training example tfrecords complete')
+        # log.info('Generating training sample tfrecords...')
+        # t_start = time.time()
+        #
+        # tfrecords_writer = tf_io_pipline_fast_tools.CrnnFeatureWriter(
+        #     annotation_infos=self._train_sample_infos,
+        #     lexicon_infos=self._lexicon_list,
+        #     char_dict_path=self._char_dict_path,
+        #     ord_map_dict_path=self._ord_map_dict_path,
+        #     tfrecords_save_dir=save_dir,
+        #     reader_thread_nums=30,
+        #     writer_thread_nums=10,
+        #     dataset_flag='train'
+        # )
+        #
+        # tfrecords_writer.run()
+        #
+        # log.info('Generate training sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
 
         # generate val example tfrecords
-        log.info('Generating validation example tfrecords')
+        log.info('Generating validation sample tfrecords...')
+        t_start = time.time()
 
-        val_example_paths_split, val_example_labels_split, val_tfrecords_save_paths = \
-            _split_writing_tfrecords_task(
-                self._val_example_paths, self._val_example_labels, _flags='val'
-            )
+        tfrecords_writer = tf_io_pipline_fast_tools.CrnnFeatureWriter(
+            annotation_infos=self._val_sample_infos,
+            lexicon_infos=self._lexicon_list,
+            char_dict_path=self._char_dict_path,
+            ord_map_dict_path=self._ord_map_dict_path,
+            tfrecords_save_dir=save_dir,
+            reader_thread_nums=self._reader_threads_nums,
+            writer_thread_nums=self._writer_threads_nums,
+            dataset_flag='val'
+        )
 
-        for index, example_paths in enumerate(val_example_paths_split):
-            self._tfrecords_io_writer.write_features(
-                example_image_paths=example_paths,
-                example_image_labels=val_example_labels_split[index],
-                tfrecords_save_path=val_tfrecords_save_paths[index]
-            )
+        tfrecords_writer.run()
 
-        log.info('Generate validation example tfrecords complete')
+        log.info('Generate validation sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
 
         # generate test example tfrecords
-        log.info('Generating testing example tfrecords')
-
-        test_example_paths_split, test_example_labels_split, test_tfrecords_save_paths = \
-            _split_writing_tfrecords_task(
-                self._test_example_paths, self._test_example_labels, _flags='test'
-            )
-
-        for index, example_paths in enumerate(test_example_paths_split):
-            self._tfrecords_io_writer.write_features(
-                example_image_paths=example_paths,
-                example_image_labels=test_example_labels_split[index],
-                tfrecords_save_path=test_tfrecords_save_paths[index]
-            )
-
-        log.info('Generate testing example tfrecords complete')
+        # log.info('Generating testing sample tfrecords....')
+        # t_start = time.time()
+        #
+        # tfrecords_writer = tf_io_pipline_fast_tools.CrnnFeatureWriter(
+        #     annotation_infos=self._test_sample_infos,
+        #     lexicon_infos=self._lexicon_list,
+        #     char_dict_path=self._char_dict_path,
+        #     ord_map_dict_path=self._ord_map_dict_path,
+        #     tfrecords_save_dir=save_dir,
+        #     reader_thread_nums=15,
+        #     writer_thread_nums=7,
+        #     dataset_flag='test'
+        # )
+        #
+        # tfrecords_writer.run()
+        #
+        # log.info('Generate testing sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
 
         return
 
@@ -167,67 +149,67 @@ class CrnnDataProducer(object):
             ops.exists(self._train_annotation_file_path) and ops.exists(self._val_annotation_file_path) \
             and ops.exists(self._test_annotation_file_path) and ops.exists(self._lexicon_file_path)
 
-    def _init_dataset_example_info(self):
+    def _init_dataset_sample_info(self):
         """
-        organize dataset example information
+        organize dataset sample information, read all the lexicon information in lexicon list.
+        Train, test, val sample information are lists like
+        [(image_absolute_path_1, image_lexicon_index_1), (image_absolute_path_2, image_lexicon_index_2), ...]
         :return:
         """
         # establish lexicon list
-        with open(self._lexicon_file_path, 'r') as file:
-            for line in file:
+        log.info('Start initialize lexicon information list...')
+        num_lines = sum(1 for _ in open(self._lexicon_file_path, 'r'))
+        with open(self._lexicon_file_path, 'r', encoding='utf-8') as file:
+            for line in tqdm.tqdm(file, total=num_lines):
                 self._lexicon_list.append(line.rstrip('\r').rstrip('\n'))
 
-        # establish train example info [(image_path1, label1), (image_path2, label2), ...]
-        with open(self._train_annotation_file_path, 'r') as file:
-            for line in file:
+        # establish train example info
+        log.info('Start initialize train sample information list...')
+        num_lines = sum(1 for _ in open(self._train_annotation_file_path, 'r'))
+        with open(self._train_annotation_file_path, 'r', encoding='utf-8') as file:
+            for line in tqdm.tqdm(file, total=num_lines):
+
                 image_name, label_index = line.rstrip('\r').rstrip('\n').split(' ')
                 image_path = ops.join(self._dataset_dir, image_name)
                 label_index = int(label_index)
-                try:
-                    image_label = self._lexicon_list[label_index]
-                except IndexError:
-                    raise ValueError('Lexicon list index error: {:d}'.format(label_index))
+
                 if not ops.exists(image_path):
                     raise ValueError('Example image {:s} not exist'.format(image_path))
 
-                self._train_example_paths.append(image_path)
-                self._train_example_labels.append(image_label)
+                self._train_sample_infos.append((image_path, label_index))
 
-        # establish val example info [(image_path1, label1), (image_path2, label2), ...]
-        with open(self._val_annotation_file_path, 'r') as file:
-            for line in file:
+        # establish val example info
+        log.info('Start initialize validation sample information list...')
+        num_lines = sum(1 for _ in open(self._val_annotation_file_path, 'r'))
+        with open(self._val_annotation_file_path, 'r', encoding='utf-8') as file:
+            for line in tqdm.tqdm(file, total=num_lines):
                 image_name, label_index = line.rstrip('\r').rstrip('\n').split(' ')
                 image_path = ops.join(self._dataset_dir, image_name)
                 label_index = int(label_index)
-                try:
-                    image_label = self._lexicon_list[label_index]
-                except IndexError:
-                    raise ValueError('Lexicon list index error: {:d}'.format(label_index))
+
                 if not ops.exists(image_path):
                     raise ValueError('Example image {:s} not exist'.format(image_path))
 
-                self._val_example_paths.append(image_path)
-                self._val_example_labels.append(image_label)
+                self._val_sample_infos.append((image_path, label_index))
 
-        # establish test example info [(image_path1, label1), (image_path2, label2), ...]
-        with open(self._test_annotation_file_path, 'r') as file:
-            for line in file:
+        # establish test example info
+        log.info('Start initialize testing sample information list...')
+        num_lines = sum(1 for _ in open(self._test_annotation_file_path, 'r'))
+        with open(self._test_annotation_file_path, 'r', encoding='utf-8') as file:
+            for line in tqdm.tqdm(file, total=num_lines):
                 image_name, label_index = line.rstrip('\r').rstrip('\n').split(' ')
                 image_path = ops.join(self._dataset_dir, image_name)
                 label_index = int(label_index)
-                try:
-                    image_label = self._lexicon_list[label_index]
-                except IndexError:
-                    raise ValueError('Lexicon list index error: {:d}'.format(label_index))
+
                 if not ops.exists(image_path):
                     raise ValueError('Example image {:s} not exist'.format(image_path))
 
-                self._test_example_paths.append(image_path)
-                self._test_example_labels.append(image_label)
+                self._test_sample_infos.append((image_path, label_index))
 
     def _generate_char_dict(self):
         """
-
+        generate the char dict and ord map dict json file according to the lexicon list.
+        gather all the single characters used in lexicon list.
         :return:
         """
         char_lexicon_set = set()
@@ -251,11 +233,13 @@ class CrnnDataFeeder(object):
     """
     def __init__(self, dataset_dir, char_dict_path, ord_map_dict_path, flags='train'):
         """
-
-        :param dataset_dir:
-        :param char_dict_path:
-        :param ord_map_dict_path:
-        :param flags:
+        crnn net dataset io pip line
+        :param dataset_dir: the root dir of crnn dataset
+        :param char_dict_path: json file path which contains the map relation
+        between ord value and single character
+        :param ord_map_dict_path: json file path which contains the map relation
+        between int index value and char ord value
+        :param flags: flag to determinate for whom the data feeder was used
         """
         self._dataset_dir = dataset_dir
 
@@ -269,14 +253,14 @@ class CrnnDataFeeder(object):
 
         self._char_dict_path = char_dict_path
         self._ord_map_dict_path = ord_map_dict_path
-        self._tfrecords_io_reader = tf_io_pipline_tools.TextFeatureIO(
-            char_dict_path=self._char_dict_path, ord_map_dict_path=self._ord_map_dict_path).reader
+        self._tfrecords_io_reader = tf_io_pipline_fast_tools.CrnnFeatureReader(
+            char_dict_path=self._char_dict_path, ord_map_dict_path=self._ord_map_dict_path)
         self._tfrecords_io_reader.dataset_flags = self._dataset_flags
 
     def sample_counts(self):
         """
-
-        :return:
+        use tf records iter to count the total sample counts of all tfrecords file
+        :return: int: sample nums
         """
         tfrecords_file_paths = glob.glob('{:s}/{:s}*.tfrecords'.format(self._tfrecords_dir, self._dataset_flags))
         counts = 0
@@ -286,41 +270,67 @@ class CrnnDataFeeder(object):
 
         return counts
 
-    def inputs(self, batch_size, num_epochs):
+    def inputs(self, batch_size):
         """
-        dataset feed pipline input
+        Supply the batched data for training, testing and validation. For training and validation
+        this function will run in a infinite loop until user end it outside of the function.
+        For testing this function will raise an tf.errors.OutOfRangeError when reach the end of
+        the dataset. User may catch this exception to terminate a loop.
         :param batch_size:
-        :param num_epochs:
-        :return: A tuple (images, labels), where:
+        :return: A tuple (images, labels, image_paths), where:
                     * images is a float tensor with shape [batch_size, H, W, C]
-                      in the range [-0.5, 0.5].
-                    * labels is an int32 tensor with shape [batch_size] with the true label,
-                      a number in the range [0, CLASS_NUMS).
+                      in the range [-1.0, 1.0].
+                    * labels is an sparse tensor with shape [batch_size, None] with the true label
+                    * image_paths is an tensor with shape [batch_size] with the image's absolute file path
         """
-        if not num_epochs:
-            num_epochs = None
 
         tfrecords_file_paths = glob.glob('{:s}/{:s}*.tfrecords'.format(self._tfrecords_dir, self._dataset_flags))
+
+        if not tfrecords_file_paths:
+            raise ValueError('Dataset does not contain any tfrecords for {:s}'.format(self._dataset_flags))
+
         random.shuffle(tfrecords_file_paths)
 
         return self._tfrecords_io_reader.inputs(
             tfrecords_path=tfrecords_file_paths,
             batch_size=batch_size,
-            num_epochs=num_epochs,
             num_threads=CFG.TRAIN.CPU_MULTI_PROCESS_NUMS
         )
 
 
 if __name__ == '__main__':
     """
-    test code
     """
-    # test crnn data producer
-    producer = CrnnDataProducer(
-        dataset_dir='/media/baidu/Data/Sequence_Recognition/Synth_90K/90kDICT32px',
+
+    dataset_dir = '/media/baidu/Data/Sequence_Recognition/Chinese_Character'
+    char_dict_path = '/home/baidu/Silly_Project/ICode/baidu/beec/CRNN_Tensorflow/data/char_dict/char_dict.json'
+    ord_map_dict_path = '/home/baidu/Silly_Project/ICode/baidu/beec/CRNN_Tensorflow/data/char_dict/ord_map.json'
+
+    train_dataset = CrnnDataFeeder(
+        dataset_dir=dataset_dir,
+        char_dict_path=char_dict_path,
+        ord_map_dict_path=ord_map_dict_path,
+        flags='train'
     )
 
-    producer.generate_tfrecords(
-        save_dir='/media/baidu/Data/Sequence_Recognition/Synth_90K/tfrecords',
-        step_size=100000
+    train_images, train_labels, train_images_paths = train_dataset.inputs(
+        batch_size=32
     )
+
+    count = 0
+    image_path_set = set()
+
+    with tf.Session() as sess:
+
+        while True:
+            try:
+                images, image_labels, image_paths = sess.run([train_images, train_labels, train_images_paths])
+
+                for path in image_paths:
+                    image_path_set.add(path)
+
+                count += len(image_paths)
+            except tf.errors.OutOfRangeError:
+                print(count)
+                print(len(image_path_set))
+                break

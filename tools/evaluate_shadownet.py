@@ -22,7 +22,7 @@ from sklearn.metrics import confusion_matrix
 from crnn_model import crnn_model
 from config import global_config
 from data_provider import shadownet_data_feed_pipline
-from data_provider import tf_io_pipline_tools
+from data_provider import tf_io_pipline_fast_tools
 from local_utils import evaluation_tools
 
 
@@ -86,8 +86,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
         flags='test'
     )
     test_images, test_labels, test_images_paths = test_dataset.inputs(
-        batch_size=CFG.TEST.BATCH_SIZE,
-        num_epochs=1
+        batch_size=CFG.TEST.BATCH_SIZE
     )
 
     # set up test sample count
@@ -108,10 +107,10 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
         num_classes=CFG.ARCH.NUM_CLASSES
     )
     # set up decoder
-    decoder = tf_io_pipline_tools.TextFeatureIO(
+    decoder = tf_io_pipline_fast_tools.CrnnFeatureReader(
         char_dict_path=char_dict_path,
         ord_map_dict_path=ord_map_dict_path
-    ).reader
+    )
 
     # compute inference result
     test_inference_ret = shadownet.inference(
@@ -155,9 +154,8 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
 
                 for epoch in range(num_iterations):
                     test_predictions_value, test_images_value, test_labels_value, \
-                    test_images_paths_value = sess.run(
-                        [test_decoded, test_images, test_labels, test_images_paths]
-                    )
+                     test_images_paths_value = sess.run(
+                        [test_decoded, test_images, test_labels, test_images_paths])
                     test_images_paths_value = np.reshape(
                         test_images_paths_value,
                         newshape=test_images_paths_value.shape[0]

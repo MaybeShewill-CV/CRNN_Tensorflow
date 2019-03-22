@@ -20,7 +20,7 @@ from tensorflow import saved_model as sm
 
 from config import global_config
 from crnn_model import crnn_model
-from data_provider import tf_io_pipline_tools
+from data_provider import tf_io_pipline_fast_tools
 
 CFG = global_config.cfg
 
@@ -168,10 +168,10 @@ def test_load_saved_model(saved_model_dir, char_dict_path, ord_map_dict_path):
 
         prediction_val = sess.run(predictions, feed_dict={input_tensor: image})
 
-        codec = tf_io_pipline_tools.TextFeatureIO(
+        codec = tf_io_pipline_fast_tools.CrnnFeatureReader(
             char_dict_path=char_dict_path,
             ord_map_dict_path=ord_map_dict_path
-        ).reader
+        )
 
         prediction_val = codec.sparse_tensor_to_str(prediction_val)[0]
 

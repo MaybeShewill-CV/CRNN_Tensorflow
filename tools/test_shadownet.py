@@ -19,7 +19,7 @@ import glog as logger
 
 from config import global_config
 from crnn_model import crnn_model
-from data_provider import tf_io_pipline_tools
+from data_provider import tf_io_pipline_fast_tools
 
 CFG = global_config.cfg
 
@@ -75,17 +75,17 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
     image_vis = image
     image = np.array(image, np.float32) / 127.5 - 1.0
 
-    [IMAGE_WIDTH, IMAGE_HEIGHT] = tuple(CFG.ARCH.INPUT_SIZE)
+    [image_width, image_height] = tuple(CFG.ARCH.INPUT_SIZE)
     inputdata = tf.placeholder(
         dtype=tf.float32,
-        shape=[1, IMAGE_HEIGHT, IMAGE_WIDTH, CFG.ARCH.INPUT_CHANNELS],
+        shape=[1, image_height, image_width, CFG.ARCH.INPUT_CHANNELS],
         name='input'
     )
 
-    codec = tf_io_pipline_tools.TextFeatureIO(
+    codec = tf_io_pipline_fast_tools.CrnnFeatureReader(
         char_dict_path=char_dict_path,
         ord_map_dict_path=ord_map_dict_path
-    ).reader
+    )
 
     net = crnn_model.ShadowNet(
         phase='test',
