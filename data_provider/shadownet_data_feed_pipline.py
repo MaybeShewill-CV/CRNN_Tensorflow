@@ -30,14 +30,13 @@ class CrnnDataProducer(object):
     Convert raw image file into tfrecords
     """
     def __init__(self, dataset_dir, char_dict_path=None, ord_map_dict_path=None,
-                 reader_threads_nums=12, writer_threads_nums=4):
+                 writer_process_nums=4):
         """
         init crnn data producer
         :param dataset_dir: image dataset root dir
         :param char_dict_path: char dict path
         :param ord_map_dict_path: ord map dict path
-        :param reader_threads_nums: the number of reader threads
-        :param writer_threads_nums: the number of writer threads
+        :param writer_process_nums: the number of writer process
         """
         if not ops.exists(dataset_dir):
             raise ValueError('Dataset dir {:s} not exist'.format(dataset_dir))
@@ -50,8 +49,7 @@ class CrnnDataProducer(object):
         self._lexicon_file_path = ops.join(dataset_dir, 'lexicon.txt')
         self._char_dict_path = char_dict_path
         self._ord_map_dict_path = ord_map_dict_path
-        self._reader_threads_nums = reader_threads_nums
-        self._writer_threads_nums = writer_threads_nums
+        self._writer_process_nums = writer_process_nums
 
         if not self._is_source_data_complete():
             raise ValueError('Source image data is not complete, '
@@ -82,61 +80,58 @@ class CrnnDataProducer(object):
         os.makedirs(save_dir, exist_ok=True)
 
         # generate training example tfrecords
-        # log.info('Generating training sample tfrecords...')
-        # t_start = time.time()
-        #
-        # tfrecords_writer = tf_io_pipline_fast_tools.CrnnFeatureWriter(
-        #     annotation_infos=self._train_sample_infos,
-        #     lexicon_infos=self._lexicon_list,
-        #     char_dict_path=self._char_dict_path,
-        #     ord_map_dict_path=self._ord_map_dict_path,
-        #     tfrecords_save_dir=save_dir,
-        #     reader_thread_nums=30,
-        #     writer_thread_nums=10,
-        #     dataset_flag='train'
-        # )
-        #
-        # tfrecords_writer.run()
-        #
-        # log.info('Generate training sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
-
-        # generate val example tfrecords
-        log.info('Generating validation sample tfrecords...')
+        log.info('Generating training sample tfrecords...')
         t_start = time.time()
 
         tfrecords_writer = tf_io_pipline_fast_tools.CrnnFeatureWriter(
-            annotation_infos=self._val_sample_infos,
+            annotation_infos=self._train_sample_infos,
             lexicon_infos=self._lexicon_list,
             char_dict_path=self._char_dict_path,
             ord_map_dict_path=self._ord_map_dict_path,
             tfrecords_save_dir=save_dir,
-            reader_thread_nums=self._reader_threads_nums,
-            writer_thread_nums=self._writer_threads_nums,
-            dataset_flag='val'
+            writer_process_nums=self._writer_process_nums,
+            dataset_flag='train'
         )
 
         tfrecords_writer.run()
 
-        log.info('Generate validation sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
+        log.info('Generate training sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
 
-        # generate test example tfrecords
-        # log.info('Generating testing sample tfrecords....')
+        # generate val example tfrecords
+        # log.info('Generating validation sample tfrecords...')
         # t_start = time.time()
         #
         # tfrecords_writer = tf_io_pipline_fast_tools.CrnnFeatureWriter(
-        #     annotation_infos=self._test_sample_infos,
+        #     annotation_infos=self._val_sample_infos,
         #     lexicon_infos=self._lexicon_list,
         #     char_dict_path=self._char_dict_path,
         #     ord_map_dict_path=self._ord_map_dict_path,
         #     tfrecords_save_dir=save_dir,
-        #     reader_thread_nums=15,
-        #     writer_thread_nums=7,
-        #     dataset_flag='test'
+        #     writer_process_nums=self._writer_process_nums,
+        #     dataset_flag='val'
         # )
         #
         # tfrecords_writer.run()
         #
-        # log.info('Generate testing sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
+        # log.info('Generate validation sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
+
+        # generate test example tfrecords
+        log.info('Generating testing sample tfrecords....')
+        t_start = time.time()
+
+        tfrecords_writer = tf_io_pipline_fast_tools.CrnnFeatureWriter(
+            annotation_infos=self._test_sample_infos,
+            lexicon_infos=self._lexicon_list,
+            char_dict_path=self._char_dict_path,
+            ord_map_dict_path=self._ord_map_dict_path,
+            tfrecords_save_dir=save_dir,
+            writer_process_nums=self._writer_process_nums,
+            dataset_flag='test'
+        )
+
+        tfrecords_writer.run()
+
+        log.info('Generate testing sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
 
         return
 
@@ -296,41 +291,3 @@ class CrnnDataFeeder(object):
             batch_size=batch_size,
             num_threads=CFG.TRAIN.CPU_MULTI_PROCESS_NUMS
         )
-
-
-if __name__ == '__main__':
-    """
-    """
-
-    dataset_dir = '/media/baidu/Data/Sequence_Recognition/Chinese_Character'
-    char_dict_path = '/home/baidu/Silly_Project/ICode/baidu/beec/CRNN_Tensorflow/data/char_dict/char_dict.json'
-    ord_map_dict_path = '/home/baidu/Silly_Project/ICode/baidu/beec/CRNN_Tensorflow/data/char_dict/ord_map.json'
-
-    train_dataset = CrnnDataFeeder(
-        dataset_dir=dataset_dir,
-        char_dict_path=char_dict_path,
-        ord_map_dict_path=ord_map_dict_path,
-        flags='train'
-    )
-
-    train_images, train_labels, train_images_paths = train_dataset.inputs(
-        batch_size=32
-    )
-
-    count = 0
-    image_path_set = set()
-
-    with tf.Session() as sess:
-
-        while True:
-            try:
-                images, image_labels, image_paths = sess.run([train_images, train_labels, train_images_paths])
-
-                for path in image_paths:
-                    image_path_set.add(path)
-
-                count += len(image_paths)
-            except tf.errors.OutOfRangeError:
-                print(count)
-                print(len(image_path_set))
-                break
