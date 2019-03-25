@@ -19,7 +19,7 @@ import numpy as np
 import glog as log
 from sklearn.metrics import confusion_matrix
 
-from crnn_model import crnn_model
+from crnn_model import crnn_net
 from config import global_config
 from data_provider import shadownet_data_feed_pipline
 from data_provider import tf_io_pipline_fast_tools
@@ -100,7 +100,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
         num_iterations = 1
 
     # declare crnn net
-    shadownet = crnn_model.ShadowNet(
+    shadownet = crnn_net.ShadowNet(
         phase='test',
         hidden_nums=CFG.ARCH.HIDDEN_UNITS,
         layers_nums=CFG.ARCH.HIDDEN_LAYERS,

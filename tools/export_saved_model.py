@@ -19,7 +19,7 @@ import tensorflow as tf
 from tensorflow import saved_model as sm
 
 from config import global_config
-from crnn_model import crnn_model
+from crnn_model import crnn_net
 from data_provider import tf_io_pipline_fast_tools
 
 CFG = global_config.cfg
@@ -62,7 +62,7 @@ def build_saved_model(ckpt_path, export_dir):
         name='input_tensor')
 
     # set crnn net
-    net = crnn_model.ShadowNet(
+    net = crnn_net.ShadowNet(
         phase='test',
         hidden_nums=CFG.ARCH.HIDDEN_UNITS,
         layers_nums=CFG.ARCH.HIDDEN_LAYERS,

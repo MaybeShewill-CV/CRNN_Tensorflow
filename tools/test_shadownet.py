@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 import glog as logger
 
 from config import global_config
-from crnn_model import crnn_model
+from crnn_model import crnn_net
 from data_provider import tf_io_pipline_fast_tools
 
 CFG = global_config.cfg
@@ -87,7 +87,7 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
         ord_map_dict_path=ord_map_dict_path
     )
 
-    net = crnn_model.ShadowNet(
+    net = crnn_net.ShadowNet(
         phase='test',
         hidden_nums=CFG.ARCH.HIDDEN_UNITS,
         layers_nums=CFG.ARCH.HIDDEN_LAYERS,
