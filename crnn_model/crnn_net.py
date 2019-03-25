@@ -3,7 +3,7 @@
 # @Time    : 17-9-21 下午6:39
 # @Author  : MaybeShewill-CV
 # @Site    : https://github.com/MaybeShewill-CV/CRNN_Tensorflow
-# @File    : crnn_model.py
+# @File    : crnn_net.py
 # @IDE: PyCharm Community Edition
 """
 Implement the crnn model mentioned in An End-to-End Trainable Neural Network for Image-based Sequence
@@ -168,10 +168,10 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
             # construct stack lstm rcnn layer
             # forward lstm cell
             fw_cell_list = [tf.nn.rnn_cell.LSTMCell(nh, forget_bias=1.0) for
-                            nh in [self._hidden_nums]*self._layers_nums]
+                            nh in [self._hidden_nums] * self._layers_nums]
             # Backward direction cells
             bw_cell_list = [tf.nn.rnn_cell.LSTMCell(nh, forget_bias=1.0) for
-                            nh in [self._hidden_nums]*self._layers_nums]
+                            nh in [self._hidden_nums] * self._layers_nums]
 
             stack_lstm_layer, _, _ = rnn.stack_bidirectional_dynamic_rnn(
                 fw_cell_list, bw_cell_list, inputdata,
@@ -258,15 +258,3 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
         )
 
         return inference_ret, loss
-
-
-if __name__ == '__main__':
-    """
-    test
-    """
-    input_tensor = tf.placeholder(shape=[1, 32, 100, 3], dtype=tf.float32, name='input_tensor')
-    model = ShadowNet(phase='train',
-                      hidden_nums=CFG.ARCH.HIDDEN_UNITS,
-                      layers_nums=CFG.ARCH.HIDDEN_LAYERS,
-                      num_classes=38)
-    net_out = model.inference(inputdata=input_tensor, name='test_net')
