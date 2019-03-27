@@ -189,7 +189,8 @@ The `val loss` dropped as follows
 I have uploaded a newly trained crnn model on chinese dataset which can be found
 [here](https://pan.baidu.com/s/1ufYbnZAZ1q0AlK7yZ08cvQ). Sorry for not knowing 
 the owner of the dataset. But thanks for his great work. If someone knows it 
-you're welcome to let me know.
+you're welcome to let me know. The pretrained weights can be found 
+[here](https://www.dropbox.com/sh/z22xsn4byddalv3/AAAiIxAHJKbqy44M73ow5znSa?dl=0)
 
 Before start training you may need reorgnize the dataset's label information according 
 to the synth90k dataset's format if you want to use the same data feed pip line 
