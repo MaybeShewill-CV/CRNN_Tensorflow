@@ -132,7 +132,7 @@ def test_load_saved_model(saved_model_dir, char_dict_path, ord_map_dict_path):
     :param ord_map_dict_path:
     :return:
     """
-    image = cv2.imread('data/test_images/test_01.jpg', cv2.IMREAD_COLOR)
+    image = cv2.imdecode(np.fromfile('data/test_images/test_01.jpg', dtype=np.uint8), cv2.IMREAD_COLOR)
     image_vis = image
     image = cv2.resize(
         src=image,

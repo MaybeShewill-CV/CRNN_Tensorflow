@@ -202,7 +202,7 @@ class _TextFeatureWriter(_FeatureIO):
                     log.error('Image file {:s} is not complete'.format(image_path))
                     continue
 
-                image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+                image=cv2.imdecode(np.fromfile(image_path,dtype=np.uint8),cv2.IMREAD_COLOR)
                 image = cv2.resize(image, dsize=tuple(CFG.ARCH.INPUT_SIZE), interpolation=cv2.INTER_LINEAR)
                 image = image.tostring()
 
