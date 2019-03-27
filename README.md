@@ -185,9 +185,62 @@ The `val loss` dropped as follows
   
 ![Validation_loss](./data/images/avg_val_loss.png)
 
+## 2019.3.27 Updates
+I have uploaded a newly trained crnn model on chinese dataset which can be found
+[here](https://pan.baidu.com/s/1ufYbnZAZ1q0AlK7yZ08cvQ). Sorry for not knowing 
+the owner of the dataset. But thanks for his great work. If someone knows it 
+you're welcome to let me know.
+
+Before start training you may need reorgnize the dataset's label information according 
+to the synth90k dataset's format if you want to use the same data feed pip line 
+mentioned above. Now I have reimplemnted a more efficient tfrecords writer which will
+accelerate the process of generating tfrecords file. You may refer to the code for
+details. Some information about training is listed bellow:
+
+**image size**: (280, 32)
+
+**classes nums**: 5824 without blank
+
+**sequence length**: 70
+
+**training sample counts**: 2733004
+
+**validation sample counts**: 364401
+
+**testing sample counts**: 546601
+
+**batch size**: 32
+
+**training iter nums**: 200000
+
+**init lr**: 0.01
+
+### Test example images
+
+Example test_01.jpg
+ 
+![Example image1](./data/images/test_output_4.png)  
+
+Example test_02.jpg
+
+![Example image2](./data/images/test_output_5.png)  
+
+Example test_03.jpg
+
+![Example image3](./data/images/test_output_6.png) 
+
+### training tboard file
+
+![Training loss](./data/images/avg_train_loss_cn.png)
+
+The `val loss` dropped as follows
+  
+![Validation_loss](./data/images/avg_val_loss_cn.png)
+
 ## TODO
 
-- [x] Add new model weights trained on the whold synth90k dataset
+- [x] Add new model weights trained on the whole synth90k dataset
 - [x] Add multiple gpu training scripts
+- [x] Add new pretrained model on chinese dataset
 - [ ] Add an online toy demo
 - [ ] Add tensorflow service script

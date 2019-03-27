@@ -1,7 +1,12 @@
-easydict==1.9
-matplotlib==3.0.2
 numpy==1.15.1
-glog==0.3.1
+tensorflow_serving_api==1.13.0
 opencv_python==3.4.1.15
+glog==0.3.1
+grpcio==1.19.0
+tqdm==4.28.1
+matplotlib==3.0.2
 tensorflow_gpu==1.12.0
-tensorflow==1.12.0
+easydict==1.9
+typing==3.6.6
+grpc==0.3-19
+scikit_learn==0.20.3

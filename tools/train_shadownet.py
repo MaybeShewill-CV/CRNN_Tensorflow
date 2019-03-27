@@ -18,11 +18,11 @@ import tensorflow as tf
 import glog as logger
 import numpy as np
 
-from crnn_model import crnn_model
+from crnn_model import crnn_net
 from local_utils import evaluation_tools
 from config import global_config
 from data_provider import shadownet_data_feed_pipline
-from data_provider import tf_io_pipline_tools
+from data_provider import tf_io_pipline_fast_tools
 
 CFG = global_config.cfg
 
@@ -150,22 +150,20 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
         flags='val'
     )
     train_images, train_labels, train_images_paths = train_dataset.inputs(
-        batch_size=CFG.TRAIN.BATCH_SIZE,
-        num_epochs=1
+        batch_size=CFG.TRAIN.BATCH_SIZE
     )
     val_images, val_labels, val_images_paths = val_dataset.inputs(
-        batch_size=CFG.TRAIN.BATCH_SIZE,
-        num_epochs=1
+        batch_size=CFG.TRAIN.BATCH_SIZE
     )
 
     # declare crnn net
-    shadownet = crnn_model.ShadowNet(
+    shadownet = crnn_net.ShadowNet(
         phase='train',
         hidden_nums=CFG.ARCH.HIDDEN_UNITS,
         layers_nums=CFG.ARCH.HIDDEN_LAYERS,
         num_classes=CFG.ARCH.NUM_CLASSES
     )
-    shadownet_val = crnn_model.ShadowNet(
+    shadownet_val = crnn_net.ShadowNet(
         phase='test',
         hidden_nums=CFG.ARCH.HIDDEN_UNITS,
         layers_nums=CFG.ARCH.HIDDEN_LAYERS,
@@ -173,10 +171,10 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
     )
 
     # set up decoder
-    decoder = tf_io_pipline_tools.TextFeatureIO(
+    decoder = tf_io_pipline_fast_tools.CrnnFeatureReader(
         char_dict_path=char_dict_path,
         ord_map_dict_path=ord_map_dict_path
-    ).reader
+    )
 
     # set up training graph
     with tf.device('/gpu:1'):
@@ -292,9 +290,9 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
             if need_decode and epoch % 500 == 0:
                 # train part
                 _, train_ctc_loss_value, train_seq_dist_value, \
-                train_predictions, train_labels_sparse, merge_summary_value = sess.run(
-                    [optimizer, train_ctc_loss, train_sequence_dist,
-                     train_decoded, train_labels, merge_summary_op])
+                    train_predictions, train_labels_sparse, merge_summary_value = sess.run(
+                     [optimizer, train_ctc_loss, train_sequence_dist,
+                      train_decoded, train_labels, merge_summary_op])
 
                 train_labels_str = decoder.sparse_tensor_to_str(train_labels_sparse)
                 train_predictions = decoder.sparse_tensor_to_str(train_predictions[0])
@@ -306,8 +304,8 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
 
                 # validation part
                 val_ctc_loss_value, val_seq_dist_value, \
-                val_predictions, val_labels_sparse = sess.run(
-                    [val_ctc_loss, val_sequence_dist, val_decoded, val_labels])
+                    val_predictions, val_labels_sparse = sess.run(
+                     [val_ctc_loss, val_sequence_dist, val_decoded, val_labels])
 
                 val_labels_str = decoder.sparse_tensor_to_str(val_labels_sparse)
                 val_predictions = decoder.sparse_tensor_to_str(val_predictions[0])
@@ -357,22 +355,20 @@ def train_shadownet_multi_gpu(dataset_dir, weights_path, char_dict_path, ord_map
         flags='val'
     )
     train_images, train_labels, train_images_paths = train_dataset.inputs(
-        batch_size=CFG.TRAIN.BATCH_SIZE,
-        num_epochs=1
+        batch_size=CFG.TRAIN.BATCH_SIZE
     )
     val_images, val_labels, val_images_paths = val_dataset.inputs(
-        batch_size=CFG.TRAIN.BATCH_SIZE,
-        num_epochs=1
+        batch_size=CFG.TRAIN.BATCH_SIZE
     )
 
     # set crnn net
-    shadownet = crnn_model.ShadowNet(
+    shadownet = crnn_net.ShadowNet(
         phase='train',
         hidden_nums=CFG.ARCH.HIDDEN_UNITS,
         layers_nums=CFG.ARCH.HIDDEN_LAYERS,
         num_classes=CFG.ARCH.NUM_CLASSES
     )
-    shadownet_val = crnn_model.ShadowNet(
+    shadownet_val = crnn_net.ShadowNet(
         phase='test',
         hidden_nums=CFG.ARCH.HIDDEN_UNITS,
         layers_nums=CFG.ARCH.HIDDEN_LAYERS,
@@ -403,7 +399,7 @@ def train_shadownet_multi_gpu(dataset_dir, weights_path, char_dict_path, ord_map
         is_network_initialized = False
         for i in range(CFG.TRAIN.GPU_NUM):
             with tf.device('/gpu:{:d}'.format(i)):
-                with tf.name_scope('tower_{:d}'.format(i)) as scope:
+                with tf.name_scope('tower_{:d}'.format(i)) as _:
                     train_loss, grads = compute_net_gradients(
                         train_images, train_labels, shadownet, optimizer,
                         is_net_first_initialized=is_network_initialized)
@@ -418,7 +414,7 @@ def train_shadownet_multi_gpu(dataset_dir, weights_path, char_dict_path, ord_map
 
                     tower_grads.append(grads)
                     train_tower_loss.append(train_loss)
-                with tf.name_scope('validation_{:d}'.format(i)) as scope:
+                with tf.name_scope('validation_{:d}'.format(i)) as _:
                     val_loss, _ = compute_net_gradients(
                         val_images, val_labels, shadownet_val, optimizer,
                         is_net_first_initialized=is_network_initialized)

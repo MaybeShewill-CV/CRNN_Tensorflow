@@ -209,8 +209,8 @@ class CrnnDataProducer(object):
         """
         char_lexicon_set = set()
         for lexcion in self._lexicon_list:
-            char_list = [s for s in lexcion]
-            char_lexicon_set = char_lexicon_set.union(set(char_list))
+            for s in lexcion:
+                char_lexicon_set.add(s)
 
         log.info('Char set length: {:d}'.format(len(char_lexicon_set)))
 
