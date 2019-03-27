@@ -83,6 +83,37 @@ def _bytes_feature(value):
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=value))
 
 
+def _is_valid_jpg_file(image_path):
+    """
+
+    :param image_path:
+    :return:
+    """
+
+    if not ops.exists(image_path):
+        return False
+
+    file = open(image_path, 'rb')
+    data = file.read(11)
+    if data[:4] != '\xff\xd8\xff\xe0' and data[:4] != '\xff\xd8\xff\xe1':
+        file.close()
+        return False
+    if data[6:] != 'JFIF\0' and data[6:] != 'Exif\0':
+        file.close()
+        return False
+    file.close()
+
+    file = open(image_path, 'rb')
+    file.seek(-2, 2)
+    if file.read() != '\xff\xd9':
+        file.close()
+        return False
+
+    file.close()
+
+    return True
+
+
 def _write_tfrecords(tfrecords_writer):
     """
 
@@ -100,9 +131,19 @@ def _write_tfrecords(tfrecords_writer):
         sample_path = sample_info[0]
         sample_label = sample_info[1]
 
-        image = cv2.imread(sample_path, cv2.IMREAD_COLOR)
-        image = cv2.resize(image, dsize=tuple(CFG.ARCH.INPUT_SIZE), interpolation=cv2.INTER_LINEAR)
-        image = image.tostring()
+        if _is_valid_jpg_file(sample_path):
+            log.error('Image file: {:d} is not a valid jpg file'.format(sample_path))
+            continue
+
+        try:
+            image = cv2.imread(sample_path, cv2.IMREAD_COLOR)
+            if image is None:
+                continue
+            image = cv2.resize(image, dsize=tuple(CFG.ARCH.INPUT_SIZE), interpolation=cv2.INTER_LINEAR)
+            image = image.tostring()
+        except IOError as err:
+            log.error(err)
+            continue
 
         features = tf.train.Features(feature={
             'labels': _int64_feature(sample_label),
