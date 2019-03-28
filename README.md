@@ -45,6 +45,9 @@ In this repo you will find a model pre-trained on the
 file of synth90k dataset has been successfully generated you may evaluated the
 model by the following script
 
+The pretrained crnn model weights on Synth90k dataset can be found
+[here](https://www.dropbox.com/sh/y4eaunamardibnd/AAB4h8NkakASDoc6Ek4knEGIa?dl=0)
+
 ```
 python tools/evaluate_shadownet.py --dataset_dir PATH/TO/YOUR/DATASET_DIR 
 --weights_path PATH/TO/YOUR/MODEL_WEIGHTS_PATH
@@ -65,9 +68,9 @@ The model's main evaluation index are as follows:
 
 **Test Dataset Size**: 891927 synth90k test images
 
-**Per char Precision**: 0.975194 without average weighted on each class
+**Per char Precision**: 0.974325 without average weighted on each class
 
-**Full sequence Precision**: 0.935189 without average weighted on each class
+**Full sequence Precision**: 0.932981 without average weighted on each class
 
 For Per char Precision:
 
