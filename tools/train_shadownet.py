@@ -265,6 +265,7 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
     train_epochs = CFG.TRAIN.EPOCHS
 
     with sess.as_default():
+        epoch = 0
         if weights_path is None:
             logger.info('Training from scratch')
             init = tf.global_variables_initializer()
@@ -272,11 +273,12 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
         else:
             logger.info('Restore model from {:s}'.format(weights_path))
             saver.restore(sess=sess, save_path=weights_path)
+            epoch = sess.run(tf.train.get_global_step())
 
         patience_counter = 1
         cost_history = [np.inf]
-        for epoch in range(train_epochs):
-
+        while epoch < train_epochs:
+            epoch += 1
             # setup early stopping
             if epoch > 1 and CFG.TRAIN.EARLY_STOPPING:
                 # We always compare to the first point where cost didn't improve
@@ -482,7 +484,7 @@ def train_shadownet_multi_gpu(dataset_dir, weights_path, char_dict_path, ord_map
     summary_writer.add_graph(sess.graph)
 
     with sess.as_default():
-
+        epoch = 0
         tf.train.write_graph(graph_or_graph_def=sess.graph, logdir='',
                              name='{:s}/shadownet_model.pb'.format(model_save_dir))
 
@@ -493,12 +495,13 @@ def train_shadownet_multi_gpu(dataset_dir, weights_path, char_dict_path, ord_map
         else:
             logger.info('Restore model from last model checkpoint {:s}'.format(weights_path))
             saver.restore(sess=sess, save_path=weights_path)
+            epoch = sess.run(tf.train.get_global_step())
 
         train_cost_time_mean = []
         val_cost_time_mean = []
 
-        for epoch in range(train_epochs):
-
+        while epoch < train_epochs:
+            epoch += 1
             # training part
             t_start = time.time()
 
