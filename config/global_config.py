@@ -25,16 +25,16 @@ __C.ARCH.HIDDEN_UNITS = 256
 # Number of stacked LSTM cells
 __C.ARCH.HIDDEN_LAYERS = 2
 # Sequence length.  This has to be the width of the final feature map of the CNN, which is input size width / 4
-__C.ARCH.SEQ_LENGTH = 70  # cn dataset
-# __C.ARCH.SEQ_LENGTH = 25  # synth90k dataset
+# __C.ARCH.SEQ_LENGTH = 70  # cn dataset
+__C.ARCH.SEQ_LENGTH = 25  # synth90k dataset
 # Width x height into which training / testing images are resized before feeding into the network
-__C.ARCH.INPUT_SIZE = (280, 32)  # cn dataset
-# __C.ARCH.INPUT_SIZE = (100, 32)  # synth90k dataset
+# __C.ARCH.INPUT_SIZE = (280, 32)  # cn dataset
+__C.ARCH.INPUT_SIZE = (100, 32)  # synth90k dataset
 # Number of channels in images
 __C.ARCH.INPUT_CHANNELS = 3
-# Number of units in each LSTM cell
-__C.ARCH.NUM_CLASSES = 5825  # cn dataset
-# __C.ARCH.NUM_CLASSES = 37  # synth90k dataset
+# Number character classes
+# __C.ARCH.NUM_CLASSES = 5825  # cn dataset
+__C.ARCH.NUM_CLASSES = 37  # synth90k dataset
 
 # Train options
 __C.TRAIN = edict()
@@ -61,7 +61,7 @@ __C.TRAIN.GPU_MEMORY_FRACTION = 0.9
 # Set the GPU allow growth parameter during tensorflow training process
 __C.TRAIN.TF_ALLOW_GROWTH = True
 # Set the shadownet training batch size
-__C.TRAIN.BATCH_SIZE = 16
+__C.TRAIN.BATCH_SIZE = 32
 # Set the shadownet validation batch size
 __C.TRAIN.VAL_BATCH_SIZE = 32
 # Set the learning rate decay steps
