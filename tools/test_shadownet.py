@@ -70,7 +70,7 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
     :param is_vis:
     :return:
     """
-    image = cv2.imdecode(np.fromfile(image_path, dtype=np.uint8), cv2.IMREAD_COLOR)
+    image = cv2.imread(image_path, cv2.IMREAD_COLOR)
     image = cv2.resize(image, tuple(CFG.ARCH.INPUT_SIZE), interpolation=cv2.INTER_LINEAR)
     image_vis = image
     image = np.array(image, np.float32) / 127.5 - 1.0
