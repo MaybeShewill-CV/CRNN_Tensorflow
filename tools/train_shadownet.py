@@ -409,7 +409,6 @@ def train_shadownet_multi_gpu(dataset_dir, weights_path, char_dict_path, ord_map
                     is_network_initialized = True
 
                     # Only use the mean and var in the first gpu tower to update the parameter
-                    # TODO implement batch normalization for distributed device (luoyao@baidu.com)
                     if i == 0:
                         batchnorm_updates = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
                         train_summary_op_updates = tf.get_collection(tf.GraphKeys.SUMMARIES)
