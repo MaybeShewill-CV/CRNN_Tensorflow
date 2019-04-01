@@ -71,14 +71,17 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
     :return:
     """
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-    image = cv2.resize(image, tuple(CFG.ARCH.INPUT_SIZE), interpolation=cv2.INTER_LINEAR)
+    new_heigth = 32
+    scale_rate = new_heigth / image.shape[0]
+    new_width = int(scale_rate * image.shape[1])
+    new_width = new_width if new_width > 100 else 100
+    image = cv2.resize(image, (new_width, new_heigth), interpolation=cv2.INTER_LINEAR)
     image_vis = image
     image = np.array(image, np.float32) / 127.5 - 1.0
 
-    [image_width, image_height] = tuple(CFG.ARCH.INPUT_SIZE)
     inputdata = tf.placeholder(
         dtype=tf.float32,
-        shape=[1, image_height, image_width, CFG.ARCH.INPUT_CHANNELS],
+        shape=[1, new_heigth, new_width, CFG.ARCH.INPUT_CHANNELS],
         name='input'
     )
 
