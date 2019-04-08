@@ -74,7 +74,7 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
     new_heigth = 32
     scale_rate = new_heigth / image.shape[0]
     new_width = int(scale_rate * image.shape[1])
-    new_width = new_width if new_width > 100 else 100
+    new_width = new_width if new_width > CFG.ARCH.INPUT_SIZE[0] else CFG.ARCH.INPUT_SIZE[0]
     image = cv2.resize(image, (new_width, new_heigth), interpolation=cv2.INTER_LINEAR)
     image_vis = image
     image = np.array(image, np.float32) / 127.5 - 1.0
@@ -105,8 +105,9 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
 
     decodes, _ = tf.nn.ctc_beam_search_decoder(
         inputs=inference_ret,
-        sequence_length=CFG.ARCH.SEQ_LENGTH * np.ones(1),
-        merge_repeated=False
+        sequence_length=int(new_width / 4) * np.ones(1),
+        merge_repeated=False,
+        beam_width=10
     )
 
     # config tf saver
