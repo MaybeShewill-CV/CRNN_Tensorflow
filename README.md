@@ -241,6 +241,28 @@ The `val loss` dropped as follows
   
 ![Validation_loss](./data/images/avg_val_loss_cn.png)
 
+## 2019.4.10 Updates
+Add a small demo to recognize chinese pdf using the chinese crnn model weights. If you
+want to have a try you may follow the command:
+
+```
+cd CRNN_ROOT_REPO
+python tools/recongnize_chinese_pdf.py -c ./data/char_dict/char_dict_cn.json 
+-o ./data/char_dict/ord_map_cn.json --weights_path model/crnn_chinese/shadownet.ckpt 
+--image_path data/test_images/test_pdf.png --save_path pdf_recognize_result.txt
+```
+
+You should see the same result as follows:
+
+The left image is the recognize result displayed on console and the right 
+image is the origin pdf image.
+
+![recognize_result_console](./data/images/pdf_recognize_console.png)
+
+The left image is the recognize result written in local file and the right 
+image is the origin pdf image.
+![recognize_result_file](./data/images/pdf_recognize_file.png)
+
 ## TODO
 
 - [x] Add new model weights trained on the whole synth90k dataset
