@@ -59,7 +59,12 @@ def compute_accuracy(ground_truth, predictions, display=False, mode='per_char'):
         avg_accuracy = np.mean(np.array(accuracy).astype(np.float32), axis=0)
     elif mode == 'full_sequence':
         try:
-            avg_accuracy = len(set(ground_truth).intersection(predictions)) / len(ground_truth)
+            correct_count = 0
+            for index, label in enumerate(ground_truth):
+                prediction = predictions[index]
+                if prediction == label:
+                    correct_count += 1
+            avg_accuracy = correct_count / len(ground_truth)
         except ZeroDivisionError:
             if not predictions:
                 avg_accuracy = 1
