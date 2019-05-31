@@ -61,7 +61,7 @@ def args_str2bool(arg_value):
         raise argparse.ArgumentTypeError('Unsupported value encountered.')
 
 
-def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vis):
+def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vis, is_english=True):
     """
 
     :param image_path:
@@ -128,7 +128,8 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
         preds = sess.run(decodes, feed_dict={inputdata: [image]})
 
         preds = codec.sparse_tensor_to_str(preds[0])[0]
-        preds = ' '.join(wordninja.split(preds))
+        if is_english:
+            preds = ' '.join(wordninja.split(preds))
 
         logger.info('Predict image {:s} result: {:s}'.format(
             ops.split(image_path)[1], preds)
