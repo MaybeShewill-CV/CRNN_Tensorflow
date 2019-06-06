@@ -6,7 +6,7 @@
 # @File    : shadownet_data_feed_pipline.py
 # @IDE: PyCharm
 """
-nsfw数据feed pipline
+Synth90k dataset feed pipline
 """
 import os
 import os.path as ops
