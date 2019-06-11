@@ -92,7 +92,6 @@ class CrnnDataProducer(object):
             writer_process_nums=self._writer_process_nums,
             dataset_flag='train'
         )
-
         tfrecords_writer.run()
 
         log.info('Generate training sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
@@ -110,7 +109,6 @@ class CrnnDataProducer(object):
             writer_process_nums=self._writer_process_nums,
             dataset_flag='val'
         )
-
         tfrecords_writer.run()
 
         log.info('Generate validation sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
@@ -128,7 +126,6 @@ class CrnnDataProducer(object):
             writer_process_nums=self._writer_process_nums,
             dataset_flag='test'
         )
-
         tfrecords_writer.run()
 
         log.info('Generate testing sample tfrecords complete, cost time: {:.5f}'.format(time.time() - t_start))
