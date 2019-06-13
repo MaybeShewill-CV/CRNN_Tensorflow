@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+ #!/usr/bin/env bash
 
-python tools/export_saved_model.py -s model/crnn_syn90k_saved_model -i model/crnn_syn90k/shadownet.ckpt \
--c data/char_dict/char_dict_en.json -o data/char_dict/ord_map_en.json
+PYTHONPATH=$(pwd) python tools/export_saved_model.py --export_dir model/crnn_syn90k_saved_model --ckpt_path checkpoints/shadownet.ckpt \
+--char_dict_path data/char_dict/char_dict_en.json --ord_map_dict_path data/char_dict/ord_map_en.json

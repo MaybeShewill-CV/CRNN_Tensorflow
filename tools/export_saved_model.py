@@ -49,10 +49,10 @@ def build_saved_model(ckpt_path, export_dir):
     :return:
     """
 
-    if ops.exists(export_dir):
-        raise ValueError('Export dir must be a dir path that does not exist')
+    #if ops.exists(export_dir):
+    #    raise ValueError('Export dir must be a dir path that does not exist')
 
-    assert ops.exists(ops.split(ckpt_path)[0])
+    #assert ops.exists(ops.split(ckpt_path)[0])
 
     # build inference tensorflow graph
     image_size = tuple(CFG.ARCH.INPUT_SIZE)
@@ -83,6 +83,9 @@ def build_saved_model(ckpt_path, export_dir):
         merge_repeated=False
     )
 
+    indices_output_tensor_info = tf.saved_model.utils.build_tensor_info(decodes[0].indices)
+    values_output_tensor_info = tf.saved_model.utils.build_tensor_info(decodes[0].values)
+    dense_shape_output_tensor_info = tf.saved_model.utils.build_tensor_info(decodes[0].dense_shape)
     saver = tf.train.Saver()
 
     # Set sess configuration
@@ -107,15 +110,19 @@ def build_saved_model(ckpt_path, export_dir):
         # build SignatureDef protobuf
         signatur_def = sm.signature_def_utils.build_signature_def(
             inputs={'input_tensor': saved_input_tensor},
-            outputs={'prediction': saved_prediction_tensor},
-            method_name=sm.signature_constants.PREDICT_METHOD_NAME
+            outputs = {
+                'decodes_indices':indices_output_tensor_info,
+                'decodes_values':values_output_tensor_info,
+                'decodes_dense_shape':dense_shape_output_tensor_info,
+            },
+            method_name=sm.signature_constants.PREDICT_METHOD_NAME,
         )
 
         # add graph into MetaGraphDef protobuf
         saved_builder.add_meta_graph_and_variables(
             sess,
             tags=[sm.tag_constants.SERVING],
-            signature_def_map={sm.signature_constants.PREDICT_OUTPUTS: signatur_def}
+            signature_def_map={sm.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY: signatur_def},
         )
 
         # save model
@@ -193,4 +200,5 @@ if __name__ == '__main__':
     build_saved_model(args.ckpt_path, args.export_dir)
 
     # test build saved model
-    test_load_saved_model(args.export_dir, args.char_dict_path, args.ord_map_dict_path)
+    #test_load_saved_model(args.export_dir, args.char_dict_path, args.ord_map_dict_path)
+    # nah.
