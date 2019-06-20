@@ -102,12 +102,18 @@ def build_saved_model(ckpt_path, export_dir):
 
         # add tensor need to be saved
         saved_input_tensor = sm.utils.build_tensor_info(image_tensor)
-        saved_prediction_tensor = sm.utils.build_tensor_info(decodes[0])
+        saved_decoded_indices = tf.saved_model.utils.build_tensor_info(decodes[0].indices)
+        saved_decoded_values = tf.saved_model.utils.build_tensor_info(decodes[0].values)
+        saved_deocded_dense_shape = tf.saved_model.utils.build_tensor_info(decodes[0].dense_shape)
 
         # build SignatureDef protobuf
         signatur_def = sm.signature_def_utils.build_signature_def(
             inputs={'input_tensor': saved_input_tensor},
-            outputs={'prediction': saved_prediction_tensor},
+            outputs={
+                'decode_indices': saved_decoded_indices,
+                'decode_values': saved_decoded_values,
+                'decode_dense_shape': saved_deocded_dense_shape
+            },
             method_name=sm.signature_constants.PREDICT_METHOD_NAME
         )
 
@@ -161,19 +167,34 @@ def test_load_saved_model(saved_model_dir, char_dict_path, ord_map_dict_path):
         signature_def_d = signature_def_d['crnn_prediction_result']
 
         image_input_tensor = signature_def_d.inputs['input_tensor']
-        prediction_tensor = signature_def_d.outputs['prediction']
+        decode_indices_tensor = signature_def_d.outputs['decode_indices']
+        decode_values_tensor = signature_def_d.outputs['decode_values']
+        decode_dense_shape_tensor = signature_def_d.outputs['decode_dense_shape']
 
         input_tensor = sm.utils.get_tensor_from_tensor_info(image_input_tensor, sess.graph)
-        predictions = sm.utils.get_tensor_from_tensor_info(prediction_tensor, sess.graph)
+        decode_indices = sm.utils.get_tensor_from_tensor_info(decode_indices_tensor, sess.graph)
+        decode_values = sm.utils.get_tensor_from_tensor_info(decode_values_tensor, sess.graph)
+        decode_dense_shape = sm.utils.get_tensor_from_tensor_info(decode_dense_shape_tensor, sess.graph)
 
-        prediction_val = sess.run(predictions, feed_dict={input_tensor: image})
+        decode_indices_val, decode_values_val, decode_dense_shape_val = sess.run(
+            [decode_indices, decode_values, decode_dense_shape],
+            feed_dict={input_tensor: image}
+        )
 
         codec = tf_io_pipline_fast_tools.CrnnFeatureReader(
             char_dict_path=char_dict_path,
             ord_map_dict_path=ord_map_dict_path
         )
 
-        prediction_val = codec.sparse_tensor_to_str(prediction_val)[0]
+        print(decode_indices_val)
+        print(type(decode_indices_val))
+        print(decode_indices_val.shape)
+
+        prediction_val = codec.sparse_tensor_to_str_for_tf_serving(
+            decode_indices=decode_indices_val,
+            decode_values=decode_values_val,
+            decode_dense_shape=decode_dense_shape_val
+        )[0]
 
         log.info('Predict image result ----> {:s}'.format(prediction_val))
 
