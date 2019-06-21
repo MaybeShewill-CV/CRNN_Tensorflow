@@ -1,5 +1,0 @@
-numpy==1.14.5
-opencv_python==3.2.0.7
-matplotlib==2.2.2
-easydict==1.6
-jupyterlab>=0.32
