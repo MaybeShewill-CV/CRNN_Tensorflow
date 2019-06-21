@@ -15,7 +15,6 @@ import grpc
 import numpy as np
 import cv2
 from tensorflow.contrib.util import make_tensor_proto
-
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2_grpc
 

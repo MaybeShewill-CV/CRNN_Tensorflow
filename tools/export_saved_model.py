@@ -186,10 +186,6 @@ def test_load_saved_model(saved_model_dir, char_dict_path, ord_map_dict_path):
             ord_map_dict_path=ord_map_dict_path
         )
 
-        print(decode_indices_val)
-        print(type(decode_indices_val))
-        print(decode_indices_val.shape)
-
         prediction_val = codec.sparse_tensor_to_str_for_tf_serving(
             decode_indices=decode_indices_val,
             decode_values=decode_values_val,
