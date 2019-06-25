@@ -122,7 +122,7 @@ several folders filled up with pictures. Then you need to convert the whole
 dataset into tensorflow records as follows
 
 ```
-python tools/write_text_features 
+python tools/write_tfrecords 
 --dataset_dir PATH/TO/SYNTH90K_DATASET_ROOT_DIR
 --save_dir PATH/TO/TFRECORDS_DIR
 ```
