@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # @Time    : 19-3-14 下午3:18
-# @Author  : MaybeShewill-CV
+# @Author  : MaybeShewill-CV, eldon
 # @Site    : https://github.com/MaybeShewill-CV/CRNN_Tensorflow
 # @File    : export_saved_model.py
 # @IDE: PyCharm
@@ -14,7 +14,6 @@ import glog as log
 
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow import saved_model as sm
 
@@ -49,10 +48,10 @@ def build_saved_model(ckpt_path, export_dir):
     :return:
     """
 
-    if ops.exists(export_dir):
-        raise ValueError('Export dir must be a dir path that does not exist')
+    #if ops.exists(export_dir):
+    #    raise ValueError('Export dir must be a dir path that does not exist')
 
-    assert ops.exists(ops.split(ckpt_path)[0])
+    #assert ops.exists(ops.split(ckpt_path)[0])
 
     # build inference tensorflow graph
     image_size = tuple(CFG.ARCH.INPUT_SIZE)
@@ -83,6 +82,9 @@ def build_saved_model(ckpt_path, export_dir):
         merge_repeated=False
     )
 
+    indices_output_tensor_info = tf.saved_model.utils.build_tensor_info(decodes[0].indices)
+    values_output_tensor_info = tf.saved_model.utils.build_tensor_info(decodes[0].values)
+    dense_shape_output_tensor_info = tf.saved_model.utils.build_tensor_info(decodes[0].dense_shape)
     saver = tf.train.Saver()
 
     # Set sess configuration
@@ -107,7 +109,11 @@ def build_saved_model(ckpt_path, export_dir):
         # build SignatureDef protobuf
         signatur_def = sm.signature_def_utils.build_signature_def(
             inputs={'input_tensor': saved_input_tensor},
-            outputs={'prediction': saved_prediction_tensor},
+            outputs = {
+                'decodes_indices':indices_output_tensor_info,
+                'decodes_values':values_output_tensor_info,
+                'decodes_dense_shape':dense_shape_output_tensor_info,
+            },
             method_name=sm.signature_constants.PREDICT_METHOD_NAME,
         )
 
@@ -124,64 +130,6 @@ def build_saved_model(ckpt_path, export_dir):
     return
 
 
-def test_load_saved_model(saved_model_dir, char_dict_path, ord_map_dict_path):
-    """
-
-    :param saved_model_dir:
-    :param char_dict_path:
-    :param ord_map_dict_path:
-    :return:
-    """
-    image = cv2.imread('data/test_images/test_01.jpg', cv2.IMREAD_COLOR)
-    image_vis = image
-    image = cv2.resize(
-        src=image,
-        dsize=tuple(CFG.ARCH.INPUT_SIZE),
-        interpolation=cv2.INTER_LINEAR
-    )
-    image = np.array(image, np.float32) / 127.5 - 1.0
-    image = np.expand_dims(image, 0)
-
-    # Set sess configuration
-    sess_config = tf.ConfigProto(allow_soft_placement=True)
-    sess_config.gpu_options.per_process_gpu_memory_fraction = CFG.TRAIN.GPU_MEMORY_FRACTION
-    sess_config.gpu_options.allow_growth = CFG.TRAIN.TF_ALLOW_GROWTH
-    sess_config.gpu_options.allocator_type = 'BFC'
-
-    sess = tf.Session(config=sess_config)
-
-    with sess.as_default():
-
-        meta_graphdef = sm.loader.load(
-            sess,
-            tags=[sm.tag_constants.SERVING],
-            export_dir=saved_model_dir)
-
-        signature_def_d = meta_graphdef.signature_def
-        signature_def_d = signature_def_d[sm.signature_constants.PREDICT_OUTPUTS]
-
-        image_input_tensor = signature_def_d.inputs['input_tensor']
-        prediction_tensor = signature_def_d.outputs['prediction']
-
-        input_tensor = sm.utils.get_tensor_from_tensor_info(image_input_tensor, sess.graph)
-        predictions = sm.utils.get_tensor_from_tensor_info(prediction_tensor, sess.graph)
-
-        prediction_val = sess.run(predictions, feed_dict={input_tensor: image})
-
-        codec = tf_io_pipline_fast_tools.CrnnFeatureReader(
-            char_dict_path=char_dict_path,
-            ord_map_dict_path=ord_map_dict_path
-        )
-
-        prediction_val = codec.sparse_tensor_to_str(prediction_val)[0]
-
-        log.info('Predict image result ----> {:s}'.format(prediction_val))
-
-        plt.figure('CRNN Model Demo')
-        plt.imshow(image_vis[:, :, (2, 1, 0)])
-        plt.show()
-
-
 if __name__ == '__main__':
     """
     build saved model
@@ -191,6 +139,3 @@ if __name__ == '__main__':
 
     # build saved model
     build_saved_model(args.ckpt_path, args.export_dir)
-
-    # test build saved model
-    test_load_saved_model(args.export_dir, args.char_dict_path, args.ord_map_dict_path)

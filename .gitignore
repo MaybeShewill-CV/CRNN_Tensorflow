@@ -104,5 +104,4 @@ ENV/
 # Artifacts:
 tboard/
 .idea/
-
-checkpoints
+checkpoints/
