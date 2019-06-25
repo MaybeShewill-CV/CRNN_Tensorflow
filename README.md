@@ -16,11 +16,6 @@ incompatible with older versions.
 
 The following methods are provided to install dependencies:
 
-### Docker
-
-There are Dockerfiles inside the folder `docker`. Follow the instructions 
-inside `docker/README.md` to build the images.
-
 ### Conda
 
 You can create a conda environment with the required dependencies using: 
@@ -166,13 +161,38 @@ is the better the model performs. The training accuracy is computed by
 calculating the character-wise precision between
 the prediction and the ground truth so the higher the better the model performs.
 
-#### Export tensorflow saved model
+#### Tensorflow Serving
 
-You can convert the ckpt model into tensorflow saved model for tensorflow service
-by running following script
+Thanks for [Eldon's](https://github.com/eldon) contribution of tensorflow 
+service function:)
+
+Since tensorflow model server is a very powerful tools to serve the DL model in
+industry environment. Here's a script for you to convert the checkpoints model file
+into tensorflow saved model which can be used with tensorflow model server to serve
+the CRNN model. If you can not run the script normally you may need to check if the
+checkpoint file path is correct in the bash script.
 
 ```
-bash tools/export_crnn_saved_model.sh
+bash tfserve/export_crnn_saved_model.sh
+```
+
+To start the tensorflow model server you may check following script
+
+```
+bash tfserve/run_tfserve_crnn_gpu.sh
+```
+
+There are two different ways to test the python client of crnn model. First you may
+test the server via http/rest request by running
+
+```
+python tfserve/crnn_python_client_via_request.py ./data/test_images/test_01.jpg
+```
+
+Second you may test the server via grpc by running
+
+```
+python tfserve/crnn_python_client_via_grpc.py
 ```
 
 ## Experiment
@@ -269,4 +289,4 @@ image is the origin pdf image.
 - [x] Add multiple gpu training scripts
 - [x] Add new pretrained model on chinese dataset
 - [ ] Add an online toy demo
-- [ ] Add tensorflow service script
+- [x] Add tensorflow service script
