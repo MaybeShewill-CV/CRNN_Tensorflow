@@ -8,18 +8,15 @@
 """
 Convert ckpt model into tensorflow saved model
 """
-import os.path as ops
 import argparse
-import glog as log
+import os.path as ops
 
-import cv2
 import numpy as np
 import tensorflow as tf
 from tensorflow import saved_model as sm
 
 from config import global_config
 from crnn_model import crnn_net
-from data_provider import tf_io_pipline_fast_tools
 
 CFG = global_config.cfg
 
@@ -48,10 +45,10 @@ def build_saved_model(ckpt_path, export_dir):
     :return:
     """
 
-    #if ops.exists(export_dir):
-    #    raise ValueError('Export dir must be a dir path that does not exist')
+    if ops.exists(export_dir):
+        raise ValueError('Export dir must be a dir path that does not exist')
 
-    #assert ops.exists(ops.split(ckpt_path)[0])
+    assert ops.exists(ops.split(ckpt_path)[0])
 
     # build inference tensorflow graph
     image_size = tuple(CFG.ARCH.INPUT_SIZE)
@@ -82,9 +79,6 @@ def build_saved_model(ckpt_path, export_dir):
         merge_repeated=False
     )
 
-    indices_output_tensor_info = tf.saved_model.utils.build_tensor_info(decodes[0].indices)
-    values_output_tensor_info = tf.saved_model.utils.build_tensor_info(decodes[0].values)
-    dense_shape_output_tensor_info = tf.saved_model.utils.build_tensor_info(decodes[0].dense_shape)
     saver = tf.train.Saver()
 
     # Set sess configuration
@@ -96,7 +90,6 @@ def build_saved_model(ckpt_path, export_dir):
     sess = tf.Session(config=sess_config)
 
     with sess.as_default():
-
         saver.restore(sess=sess, save_path=ckpt_path)
 
         # set model save builder
@@ -104,15 +97,17 @@ def build_saved_model(ckpt_path, export_dir):
 
         # add tensor need to be saved
         saved_input_tensor = sm.utils.build_tensor_info(image_tensor)
-        saved_prediction_tensor = sm.utils.build_tensor_info(decodes[0])
+        indices_output_tensor_info = sm.utils.build_tensor_info(decodes[0].indices)
+        values_output_tensor_info = sm.utils.build_tensor_info(decodes[0].values)
+        dense_shape_output_tensor_info = sm.utils.build_tensor_info(decodes[0].dense_shape)
 
         # build SignatureDef protobuf
         signatur_def = sm.signature_def_utils.build_signature_def(
             inputs={'input_tensor': saved_input_tensor},
-            outputs = {
-                'decodes_indices':indices_output_tensor_info,
-                'decodes_values':values_output_tensor_info,
-                'decodes_dense_shape':dense_shape_output_tensor_info,
+            outputs={
+                'decodes_indices': indices_output_tensor_info,
+                'decodes_values': values_output_tensor_info,
+                'decodes_dense_shape': dense_shape_output_tensor_info,
             },
             method_name=sm.signature_constants.PREDICT_METHOD_NAME,
         )

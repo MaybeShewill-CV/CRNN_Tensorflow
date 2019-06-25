@@ -3,7 +3,7 @@
 # @Time    : 19-3-27 下午4:15
 # @Author  : MaybeShewill-CV
 # @Site    : https://github.com/MaybeShewill-CV
-# @File    : crnn_tfservice_client.py.py
+# @File    : crnn_python_client_via_grpc.py.py
 # @IDE: PyCharm
 """
 test python tensorflow client
@@ -14,6 +14,7 @@ from argparse import ArgumentParser
 import grpc
 import numpy as np
 import cv2
+from tensorflow import saved_model as sm
 from tensorflow.contrib.util import make_tensor_proto
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2_grpc
@@ -74,7 +75,7 @@ def make_request(image_path, server):
 
     request = predict_pb2.PredictRequest()
     request.model_spec.name = 'crnn'
-    request.model_spec.signature_name = 'crnn_prediction_result'
+    request.model_spec.signature_name = sm.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY
 
     request.inputs['input_tensor'].CopyFrom(make_tensor_proto(
         image_list, shape=[1, CFG.ARCH.INPUT_SIZE[1], CFG.ARCH.INPUT_SIZE[0], 3]))
@@ -109,15 +110,15 @@ def post_process(tf_serving_request_result):
     """
     decode_indices = convert_predict_response_into_nparray(
         tf_serving_request_result,
-        'decode_indices'
+        'decodes_indices'
     )
     decode_values = convert_predict_response_into_nparray(
         tf_serving_request_result,
-        'decode_values'
+        'decodes_values'
     )
     decode_dense_shape = convert_predict_response_into_nparray(
         tf_serving_request_result,
-        'decode_dense_shape'
+        'decodes_dense_shape'
     )
 
     prediction = CODEC.sparse_tensor_to_str_for_tf_serving(
