@@ -217,8 +217,6 @@ class ShadowNet(cnn_basenet.CNNBaseModel):
         :return:
         """
         with tf.variable_scope(name_or_scope=name, reuse=reuse):
-            # centerlized data
-            inputdata = tf.divide(inputdata, 255.0)
 
             # first apply the cnn feature extraction stage
             cnn_out = self._feature_sequence_extraction(
