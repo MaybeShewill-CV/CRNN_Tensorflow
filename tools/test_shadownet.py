@@ -61,7 +61,7 @@ def args_str2bool(arg_value):
         raise argparse.ArgumentTypeError('Unsupported value encountered.')
 
 
-def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vis, is_english=True):
+def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vis, is_english=False):
     """
 
     :param image_path:
@@ -69,20 +69,17 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
     :param char_dict_path:
     :param ord_map_dict_path:
     :param is_vis:
+    :param is_english:
     :return:
     """
     image = cv2.imread(image_path, cv2.IMREAD_COLOR)
-    new_heigth = 32
-    scale_rate = new_heigth / image.shape[0]
-    new_width = int(scale_rate * image.shape[1])
-    new_width = new_width if new_width > CFG.ARCH.INPUT_SIZE[0] else CFG.ARCH.INPUT_SIZE[0]
-    image = cv2.resize(image, (new_width, new_heigth), interpolation=cv2.INTER_LINEAR)
+    image = cv2.resize(image, dsize=tuple(CFG.ARCH.INPUT_SIZE), interpolation=cv2.INTER_LINEAR)
     image_vis = image
     image = np.array(image, np.float32) / 127.5 - 1.0
 
     inputdata = tf.placeholder(
         dtype=tf.float32,
-        shape=[1, new_heigth, new_width, CFG.ARCH.INPUT_CHANNELS],
+        shape=[1, CFG.ARCH.INPUT_SIZE[1], CFG.ARCH.INPUT_SIZE[0], CFG.ARCH.INPUT_CHANNELS],
         name='input'
     )
 
@@ -106,7 +103,7 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
 
     decodes, _ = tf.nn.ctc_beam_search_decoder(
         inputs=inference_ret,
-        sequence_length=int(new_width / 4) * np.ones(1),
+        sequence_length=int(CFG.ARCH.INPUT_SIZE[0] / 4) * np.ones(1),
         merge_repeated=False,
         beam_width=10
     )
