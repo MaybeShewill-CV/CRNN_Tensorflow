@@ -44,7 +44,7 @@ __C.TRAIN.PATIENCE_EPOCHS = 6
 __C.TRAIN.PATIENCE_DELTA = 1e-3
 
 # Set the shadownet training epochs
-__C.TRAIN.EPOCHS = 2000000
+__C.TRAIN.EPOCHS = 200000
 # Set the display step
 __C.TRAIN.DISPLAY_STEP = 1
 # Set the test display step during training process
