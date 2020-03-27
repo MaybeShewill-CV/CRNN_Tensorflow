@@ -97,7 +97,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
         test_sample_count = test_dataset.sample_counts()
         log.info('Test dataset sample counts: {:d}'.format(test_sample_count))
         log.info('Computing test dataset sample counts finished, cost time: {:.5f}'.format(time.time() - t_start))
-        num_iterations = int(math.ceil(test_sample_count / CFG.TEST.BATCH_SIZE))
+        num_iterations = int(math.ceil(test_sample_count / 128))
     else:
         num_iterations = 1
 
@@ -122,8 +122,8 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
     )
     test_decoded, test_log_prob = tf.nn.ctc_greedy_decoder(
         test_inference_ret,
-        CFG.ARCH.SEQ_LENGTH * np.ones(CFG.TEST.BATCH_SIZE),
-        merge_repeated=False
+        CFG.ARCH.SEQ_LENGTH * np.ones(128),
+        merge_repeated=True
     )
 
     # recover image from [-1.0, 1.0] ---> [0.0, 255.0]

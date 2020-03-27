@@ -103,8 +103,8 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
 
     decodes, _ = tf.nn.ctc_greedy_decoder(
         inference_ret,
-        CFG.ARCH.SEQ_LENGTH * np.ones(CFG.TEST.BATCH_SIZE),
-        merge_repeated=False
+        CFG.ARCH.SEQ_LENGTH * np.ones(1),
+        merge_repeated=True
     )
 
     # config tf saver
