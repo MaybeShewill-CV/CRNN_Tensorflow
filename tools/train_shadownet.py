@@ -176,57 +176,54 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
         ord_map_dict_path=ord_map_dict_path
     )
 
-    # set up training graph
-    with tf.device('/gpu:1'):
+    # compute loss and seq distance
+    train_inference_ret, train_ctc_loss = shadownet.compute_loss(
+        inputdata=train_images,
+        labels=train_labels,
+        name='shadow_net',
+        reuse=False
+    )
+    val_inference_ret, val_ctc_loss = shadownet_val.compute_loss(
+        inputdata=val_images,
+        labels=val_labels,
+        name='shadow_net',
+        reuse=True
+    )
 
-        # compute loss and seq distance
-        train_inference_ret, train_ctc_loss = shadownet.compute_loss(
-            inputdata=train_images,
-            labels=train_labels,
-            name='shadow_net',
-            reuse=False
-        )
-        val_inference_ret, val_ctc_loss = shadownet_val.compute_loss(
-            inputdata=val_images,
-            labels=val_labels,
-            name='shadow_net',
-            reuse=True
-        )
+    train_decoded, train_log_prob = tf.nn.ctc_greedy_decoder(
+        train_inference_ret,
+        CFG.ARCH.SEQ_LENGTH * np.ones(CFG.TRAIN.BATCH_SIZE),
+        merge_repeated=False
+    )
+    val_decoded, val_log_prob = tf.nn.ctc_greedy_decoder(
+        val_inference_ret,
+        CFG.ARCH.SEQ_LENGTH * np.ones(CFG.TRAIN.BATCH_SIZE),
+        merge_repeated=False
+    )
 
-        train_decoded, train_log_prob = tf.nn.ctc_beam_search_decoder(
-            train_inference_ret,
-            CFG.ARCH.SEQ_LENGTH * np.ones(CFG.TRAIN.BATCH_SIZE),
-            merge_repeated=False
-        )
-        val_decoded, val_log_prob = tf.nn.ctc_beam_search_decoder(
-            val_inference_ret,
-            CFG.ARCH.SEQ_LENGTH * np.ones(CFG.TRAIN.BATCH_SIZE),
-            merge_repeated=False
-        )
+    train_sequence_dist = tf.reduce_mean(
+        tf.edit_distance(tf.cast(train_decoded[0], tf.int32), train_labels),
+        name='train_edit_distance'
+    )
+    val_sequence_dist = tf.reduce_mean(
+        tf.edit_distance(tf.cast(val_decoded[0], tf.int32), val_labels),
+        name='val_edit_distance'
+    )
 
-        train_sequence_dist = tf.reduce_mean(
-            tf.edit_distance(tf.cast(train_decoded[0], tf.int32), train_labels),
-            name='train_edit_distance'
-        )
-        val_sequence_dist = tf.reduce_mean(
-            tf.edit_distance(tf.cast(val_decoded[0], tf.int32), val_labels),
-            name='val_edit_distance'
-        )
+    # set learning rate
+    global_step = tf.Variable(0, name='global_step', trainable=False)
+    learning_rate = tf.train.exponential_decay(
+        learning_rate=CFG.TRAIN.LEARNING_RATE,
+        global_step=global_step,
+        decay_steps=CFG.TRAIN.LR_DECAY_STEPS,
+        decay_rate=CFG.TRAIN.LR_DECAY_RATE,
+        staircase=CFG.TRAIN.LR_STAIRCASE)
 
-        # set learning rate
-        global_step = tf.Variable(0, name='global_step', trainable=False)
-        learning_rate = tf.train.exponential_decay(
-            learning_rate=CFG.TRAIN.LEARNING_RATE,
-            global_step=global_step,
-            decay_steps=CFG.TRAIN.LR_DECAY_STEPS,
-            decay_rate=CFG.TRAIN.LR_DECAY_RATE,
-            staircase=CFG.TRAIN.LR_STAIRCASE)
-
-        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-        with tf.control_dependencies(update_ops):
-            optimizer = tf.train.MomentumOptimizer(
-                learning_rate=learning_rate, momentum=0.9).minimize(
-                loss=train_ctc_loss, global_step=global_step)
+    update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+    with tf.control_dependencies(update_ops):
+        optimizer = tf.train.MomentumOptimizer(
+            learning_rate=learning_rate, momentum=0.9).minimize(
+            loss=train_ctc_loss, global_step=global_step)
 
     # Set tf summary
     tboard_save_dir = 'tboard/crnn_syn90k'
@@ -356,12 +353,12 @@ def train_shadownet_multi_gpu(dataset_dir, weights_path, char_dict_path, ord_map
         ord_map_dict_path=ord_map_dict_path,
         flags='val'
     )
-    train_images, train_labels, train_images_paths = train_dataset.inputs(
-        batch_size=CFG.TRAIN.BATCH_SIZE
-    )
-    val_images, val_labels, val_images_paths = val_dataset.inputs(
-        batch_size=CFG.TRAIN.BATCH_SIZE
-    )
+
+    train_samples = []
+    val_samples = []
+    for i in range(CFG.TRAIN.GPU_NUM):
+        train_samples.append(train_dataset.inputs(batch_size=CFG.TRAIN.BATCH_SIZE))
+        val_samples.append(val_dataset.inputs(batch_size=CFG.TRAIN.BATCH_SIZE))
 
     # set crnn net
     shadownet = crnn_net.ShadowNet(
@@ -402,6 +399,8 @@ def train_shadownet_multi_gpu(dataset_dir, weights_path, char_dict_path, ord_map
         for i in range(CFG.TRAIN.GPU_NUM):
             with tf.device('/gpu:{:d}'.format(i)):
                 with tf.name_scope('tower_{:d}'.format(i)) as _:
+                    train_images = train_samples[i][0]
+                    train_labels = train_samples[i][1]
                     train_loss, grads = compute_net_gradients(
                         train_images, train_labels, shadownet, optimizer,
                         is_net_first_initialized=is_network_initialized)
@@ -416,6 +415,8 @@ def train_shadownet_multi_gpu(dataset_dir, weights_path, char_dict_path, ord_map
                     tower_grads.append(grads)
                     train_tower_loss.append(train_loss)
                 with tf.name_scope('validation_{:d}'.format(i)) as _:
+                    val_images = val_samples[i][0]
+                    val_labels = val_samples[i][1]
                     val_loss, _ = compute_net_gradients(
                         val_images, val_labels, shadownet_val, optimizer,
                         is_net_first_initialized=is_network_initialized)
@@ -480,9 +481,6 @@ def train_shadownet_multi_gpu(dataset_dir, weights_path, char_dict_path, ord_map
 
     with sess.as_default():
         epoch = 0
-        tf.train.write_graph(graph_or_graph_def=sess.graph, logdir='',
-                             name='{:s}/shadownet_model.pb'.format(model_save_dir))
-
         if weights_path is None:
             logger.info('Training from scratch')
             init = tf.global_variables_initializer()
