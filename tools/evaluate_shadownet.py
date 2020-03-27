@@ -17,6 +17,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 import glog as log
+import tqdm
 from sklearn.metrics import confusion_matrix
 
 from crnn_model import crnn_net
@@ -44,7 +45,7 @@ def init_args():
                         help='Path to pre-trained weights')
     parser.add_argument('-v', '--visualize', type=args_str2bool, nargs='?', const=False,
                         help='Whether to display images')
-    parser.add_argument('-p', '--process_all', type=args_str2bool, nargs='?', const=True,
+    parser.add_argument('-p', '--process_all', type=args_str2bool, nargs='?', const=False,
                         help='Whether to process all test dataset')
 
     return parser.parse_args()
@@ -86,7 +87,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
         flags='test'
     )
     test_images, test_labels, test_images_paths = test_dataset.inputs(
-        batch_size=CFG.TEST.BATCH_SIZE
+        batch_size=128
     )
 
     # set up test sample count
@@ -94,6 +95,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
         log.info('Start computing test dataset sample counts')
         t_start = time.time()
         test_sample_count = test_dataset.sample_counts()
+        log.info('Test dataset sample counts: {:d}'.format(test_sample_count))
         log.info('Computing test dataset sample counts finished, cost time: {:.5f}'.format(time.time() - t_start))
         num_iterations = int(math.ceil(test_sample_count / CFG.TEST.BATCH_SIZE))
     else:
@@ -118,10 +120,9 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
         name='shadow_net',
         reuse=False
     )
-    test_decoded, test_log_prob = tf.nn.ctc_beam_search_decoder(
+    test_decoded, test_log_prob = tf.nn.ctc_greedy_decoder(
         test_inference_ret,
         CFG.ARCH.SEQ_LENGTH * np.ones(CFG.TEST.BATCH_SIZE),
-        beam_width=1,
         merge_repeated=False
     )
 
@@ -148,13 +149,13 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
 
         total_labels_char_list = []
         total_predictions_char_list = []
+        epoch_tqdm = tqdm.tqdm(range(num_iterations))
 
         while True:
             try:
-
-                for epoch in range(num_iterations):
-                    test_predictions_value, test_images_value, test_labels_value, \
-                     test_images_paths_value = sess.run(
+                for epoch in epoch_tqdm:
+                    t_start = time.time()
+                    test_predictions_value, test_images_value, test_labels_value, test_images_paths_value = sess.run(
                         [test_decoded, test_images, test_labels, test_images_paths])
                     test_images_paths_value = np.reshape(
                         test_images_paths_value,
@@ -199,10 +200,11 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
 
                         total_labels_char_list.extend(test_labels_char_list_value)
                         total_predictions_char_list.extend(test_predictions_char_list_value)
-
                         if is_visualize:
                             plt.imshow(np.array(test_image, np.uint8)[:, :, (2, 1, 0)])
-
+                    epoch_tqdm.set_description('Epoch {:d} cost time: {:.5f}s'.format(epoch, time.time() - t_start))
+                if num_iterations == 1:
+                    raise tf.errors.OutOfRangeError
             except tf.errors.OutOfRangeError:
                 log.error('End of tfrecords sequence')
                 break
@@ -210,6 +212,7 @@ def evaluate_shadownet(dataset_dir, weights_path, char_dict_path,
                 log.error(err)
                 break
 
+        epoch_tqdm.close()
         avg_per_char_accuracy = per_char_accuracy / num_iterations
         avg_full_sequence_accuracy = full_sequence_accuracy / num_iterations
         log.info('Mean test per char accuracy is {:5f}'.format(avg_per_char_accuracy))
