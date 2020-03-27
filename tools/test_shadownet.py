@@ -101,11 +101,10 @@ def recognize(image_path, weights_path, char_dict_path, ord_map_dict_path, is_vi
         reuse=False
     )
 
-    decodes, _ = tf.nn.ctc_beam_search_decoder(
-        inputs=inference_ret,
-        sequence_length=int(CFG.ARCH.INPUT_SIZE[0] / 4) * np.ones(1),
-        merge_repeated=False,
-        beam_width=10
+    decodes, _ = tf.nn.ctc_greedy_decoder(
+        inference_ret,
+        CFG.ARCH.SEQ_LENGTH * np.ones(CFG.TEST.BATCH_SIZE),
+        merge_repeated=False
     )
 
     # config tf saver
