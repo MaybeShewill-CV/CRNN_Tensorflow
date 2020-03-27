@@ -212,12 +212,13 @@ def train_shadownet(dataset_dir, weights_path, char_dict_path, ord_map_dict_path
 
     # set learning rate
     global_step = tf.Variable(0, name='global_step', trainable=False)
-    learning_rate = tf.train.exponential_decay(
+    learning_rate = tf.train.polynomial_decay(
         learning_rate=CFG.TRAIN.LEARNING_RATE,
         global_step=global_step,
-        decay_steps=CFG.TRAIN.LR_DECAY_STEPS,
-        decay_rate=CFG.TRAIN.LR_DECAY_RATE,
-        staircase=CFG.TRAIN.LR_STAIRCASE)
+        decay_steps=CFG.TRAIN.EPOCHS,
+        end_learning_rate=0.000001,
+        power=CFG.TRAIN.LR_DECAY_RATE
+    )
 
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
     with tf.control_dependencies(update_ops):
@@ -383,12 +384,13 @@ def train_shadownet_multi_gpu(dataset_dir, weights_path, char_dict_path, ord_map
 
     # set lr
     global_step = tf.Variable(0, name='global_step', trainable=False)
-    learning_rate = tf.train.exponential_decay(
+    learning_rate = tf.train.polynomial_decay(
         learning_rate=CFG.TRAIN.LEARNING_RATE,
         global_step=global_step,
-        decay_steps=CFG.TRAIN.LR_DECAY_STEPS,
-        decay_rate=CFG.TRAIN.LR_DECAY_RATE,
-        staircase=CFG.TRAIN.LR_STAIRCASE)
+        decay_steps=CFG.TRAIN.EPOCHS,
+        end_learning_rate=0.000001,
+        power=CFG.TRAIN.LR_DECAY_RATE
+    )
 
     # set up optimizer
     optimizer = tf.train.MomentumOptimizer(learning_rate=learning_rate, momentum=0.9)
