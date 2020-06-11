@@ -290,3 +290,15 @@ image is the origin pdf image.
 - [x] Add new pretrained model on chinese dataset
 - [ ] Add an online toy demo
 - [x] Add tensorflow service script
+
+
+## Acknowledgement
+Please cite my repo 
+[CRNN_Tensorflow](https://github.com/MaybeShewill-CV/CRNN_Tensorflow) 
+if you use it.
+
+
+## Contact
+
+Scan the following QR to disscuss :)
+![qr](./data/images/qr.jpg)
