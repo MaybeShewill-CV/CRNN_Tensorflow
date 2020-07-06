@@ -14,7 +14,8 @@ It takes only one click:
 
 <!--
 <a href="https://tracking.gitads.io/?repo=CRNN_Tensorflow">
- <imgsrc="https://images.gitads.io/CRNN_Tensorflow" alt="GitAds"/> </a>
+ <img src="https://images.gitads.io/CRNN_Tensorflow" alt="GitAds"/> 
+</a>
 -->
 
 <br><i>This advert was placed by <a href="https://tracking.gitads.io/?campaign=gitads&repo=mongodb-university-classes&redirect=gitads.io">GitAds</a> </i>
