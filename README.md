@@ -14,7 +14,7 @@ It takes only one click:
 
 <!--
 <a href="https://tracking.gitads.io/?repo=CRNN_Tensorflow">
- <img src="https://images.gitads.io/CRNN_Tensorflow" alt="GitAds"/> 
+ <imgsrc="https://images.gitads.io/CRNN_Tensorflow" alt="GitAds"/> 
 </a>
 -->
 
