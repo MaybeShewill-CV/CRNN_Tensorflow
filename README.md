@@ -20,7 +20,7 @@ It takes only one click:
 
 <br><i>This advert was placed by <a href="https://tracking.gitads.io/?campaign=gitads&repo=mongodb-university-classes&redirect=gitads.io">GitAds</a> </i>
 
-[CRNN_Tensorflow] is being sponsored by the following tool; please help to support us by taking a look and signing up to a free trial.
+[CRNN_Tensorflow](https://github.com/MaybeShewill-CV/CRNN_Tensorflow) is being sponsored by the following tool; please help to support us by taking a look and signing up to a free trial.
 
 ## Installation
 
