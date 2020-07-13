@@ -12,7 +12,7 @@ to an RNN stage (Bi-LSTM) and a CTC loss.
 [CRNN_Tensorflow](https://github.com/MaybeShewill-CV/CRNN_Tensorflow) is being 
 sponsored by the following tool; please help to support us by taking a look and signing up to a free trial
 
-<a href="https://tracking.gitads.io/?repo=attentive-gan-derainnet"><img src="https://images.gitads.io/attentive-gan-derainnet" alt="GitAds"/></a>
+<a href="https://tracking.gitads.io/?repo=CRNN_Tensorflow"><img src="https://images.gitads.io/CRNN_Tensorflow" alt="GitAds"/></a>
 
 ## Installation
 
