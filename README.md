@@ -9,18 +9,10 @@ The model consists of a CNN stage extracting features which are fed
 to an RNN stage (Bi-LSTM) and a CTC loss.
 
 ## Supporting the project
-You can support the project by checking out our sponsor page. 
-It takes only one click:
+[CRNN_Tensorflow](https://github.com/MaybeShewill-CV/CRNN_Tensorflow) is being 
+sponsored by the following tool; please help to support us by taking a look and signing up to a free trial
 
-<a href="https://tracking.gitads.io/?repo=CRNN_Tensorflow">
- <img src="https://images.gitads.io/CRNN_Tensorflow" alt="GitAds"/> 
-</a>
-
-<br><i>This advert was placed by <a href="https://tracking.gitads.io/?campaign=gitads&repo=mongodb-university-classes&redirect=gitads.io">GitAds</a> </i>
-
-[CRNN_Tensorflow](https://github.com/MaybeShewill-CV/CRNN_Tensorflow) is being sponsored by the following tool; please help to support us by taking a look and signing up to a free trial.
-
-
+<a href="https://tracking.gitads.io/?repo=attentive-gan-derainnet"><img src="https://images.gitads.io/attentive-gan-derainnet" alt="GitAds"/></a>
 
 ## Installation
 
