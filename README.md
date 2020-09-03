@@ -8,12 +8,6 @@ the author [Baoguang Shi](https://github.com/bgshih).
 The model consists of a CNN stage extracting features which are fed 
 to an RNN stage (Bi-LSTM) and a CTC loss.
 
-## Supporting the project
-[CRNN_Tensorflow](https://github.com/MaybeShewill-CV/CRNN_Tensorflow) is being 
-sponsored by the following tool; please help to support us by taking a look and signing up to a free trial
-
-<a href="https://tracking.gitads.io/?repo=CRNN_Tensorflow"><img src="https://images.gitads.io/CRNN_Tensorflow" alt="GitAds"/></a>
-
 ## Installation
 
 This software has been developed on Ubuntu 16.04(x64) using python 3.5 and 
