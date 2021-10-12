@@ -6,6 +6,6 @@ tqdm==4.28.1
 matplotlib==3.0.2
 typing==3.6.6
 wordninja==0.1.5
-opencv_contrib_python==3.4.1.15
+opencv_contrib_python==4.2.0.32
 pdf2image==1.5.1
 scikit_learn==0.21.2
