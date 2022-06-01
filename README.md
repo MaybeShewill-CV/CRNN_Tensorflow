@@ -11,7 +11,7 @@ to an RNN stage (Bi-LSTM) and a CTC loss.
 ## Installation
 
 This software has been developed on Ubuntu 16.04(x64) using python 3.5 and 
-TensorFlow 1.12. Since it uses some recent features of TensorFlow it is 
+TensorFlow 1.15. Since it uses some recent features of TensorFlow which is 
 incompatible with older versions.
 
 The following methods are provided to install dependencies:
@@ -35,8 +35,8 @@ pip3 install -r requirements.txt
 ## Testing the pre-trained model
 
 ### Evaluate the model on the synth90k dataset
-In this repo you will find a model pre-trained on the 
-[Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/)dataset. When the tfrecords
+In this repo you will find a model trained on the 
+[Synth 90k](http://www.robots.ox.ac.uk/~vgg/data/text/) dataset. When the tfrecords
 file of synth90k dataset has been successfully generated you may evaluated the
 model by the following script
 
