@@ -1,7 +1,7 @@
 AUG:
     RESIZE_METHOD: 'unpadding' # choice unpadding rangescaling and stepscaling
-    TRAIN_INPUT_SIZE: [280, 32]  # crop size for training
-    EVAL_INPUT_SIZE: [280, 32]  # crop size for evaluating
+    TRAIN_INPUT_SIZE: [100, 32]  # crop size for training
+    EVAL_INPUT_SIZE: [100, 32]  # crop size for evaluating
     MIRROR: True
     RICH_CROP:
         ENABLE: False
@@ -14,13 +14,12 @@ AUG:
         CONTRAST_JITTER_RATIO: 0.5
         SATURATION_JITTER_RATIO: 0.5
 DATASET:
-    DATA_DIR: '/PATH/IMAGE_SCENE_SEGMENTATION/CITYSPACES'
+    DATA_DIR: '/PATH/IMAGE_OCR/CITYSPACES'
     IMAGE_TYPE: 'rgb'  # choice rgb or rgba
-    NUM_CLASSES: 5825
-    TEST_FILE_LIST: '/PATH/IMAGE_SCENE_SEGMENTATION/CITYSPACES/image_file_index/test.txt'
-    TRAIN_FILE_LIST: '/PATH/IMAGE_SCENE_SEGMENTATION/CITYSPACES/image_file_index/train.txt'
-    VAL_FILE_LIST: '/PATH/IMAGE_SCENE_SEGMENTATION/CITYSPACES/image_file_index/val.txt'
-    IGNORE_INDEX: 255
+    NUM_CLASSES: 37
+    TEST_FILE_LIST: '/PATH/IMAGE_OCR/SYNTH_CHINESE/labels/test.txt'
+    TRAIN_FILE_LIST: '/PATH/IMAGE_OCR/SYNTH_CHINESE/labels/train.txt'
+    VAL_FILE_LIST: '/PATH/IMAGE_OCR/SYNTH_CHINESE/labels/val.txt'
     PADDING_VALUE: [127.5, 127.5, 127.5]
     MEAN_VALUE: [0.5, 0.5, 0.5]
     STD_VALUE: [0.5, 0.5, 0.5]
@@ -33,12 +32,12 @@ MODEL:
     CRNN:
         HIDDEN_UNITS: 256
         HIDDEN_LAYERS: 2
-        SEQ_LENGTH: 70
+        SEQ_LENGTH: 25
 TEST:
-    TEST_MODEL: 'weights/crnn_synth_chinese/final'
+    TEST_MODEL: 'weights/crnn_synth_90k/final'
 TRAIN:
-    MODEL_SAVE_DIR: 'weights/crnn_synth_chinese/'
-    TBOARD_SAVE_DIR: 'tboard/crnn_synth_chinese/'
+    MODEL_SAVE_DIR: 'weights/crnn_synth_90k/'
+    TBOARD_SAVE_DIR: 'tboard/crnn_synth_90k/'
     MODEL_PARAMS_CONFIG_FILE_NAME: "model_train_config.json"
     RESTORE_FROM_SNAPSHOT:
         ENABLE: False
