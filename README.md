@@ -291,6 +291,10 @@ image is the origin pdf image.
 - [ ] Add an online toy demo
 - [x] Add tensorflow service script
 
+## Visitor Count
+
+![Visitor Count](https://profile-counter.glitch.me/15725187_crnn_tensorflow/count.svg)
+
 
 ## Acknowledgement
 Please cite my repo 
